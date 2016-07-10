@@ -1,0 +1,140 @@
+[
+    {
+        "entity": "party",
+        "components": [
+            {
+                "type": "name",
+                "name": "Party"
+            },
+            {
+                "type": "position",
+                "x": 21,
+                "y": 12
+            },
+            {
+                "type": "sprite",
+                "res": "sprites/tileset.png!0,26:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "controller",
+                "state": "MOVE"
+            }, 
+            {
+                "type": "camera",
+                "state": "MOVE"
+            }
+        ]
+    }, {
+        "entity": "player1",
+        "components": [
+            {
+                "type": "name",
+                "name": "Arthur"
+            },
+            {
+                "type": "party",
+                "pos": 1
+            },
+            {
+                "type": "hp",
+                "hp": 7777,
+                "maxHP": 9999
+            },
+            {
+                "type": "mp",
+                "mp": 0,
+                "maxMP": 0
+            }
+        ]
+    }, {
+        "entity": "player2",
+        "components": [
+            {
+                "type": "name",
+                "name": "Zeni"
+            },
+            {
+                "type": "party",
+                "pos": 2
+            },
+            {
+                "type": "hp",
+                "hp": 1,
+                "maxHP": 9999
+            },
+            {
+                "type": "mp",
+                "mp": 777,
+                "maxMP": 999
+            }
+        ]
+    }, {
+        "entity": "player3",
+        "components": [
+            {
+                "type": "name",
+                "name": "Bill"
+            },
+            {
+                "type": "party",
+                "pos": 3
+            },
+            {
+                "type": "hp",
+                "hp": 9999,
+                "maxHP": 9999
+            },
+            {
+                "type": "mp",
+                "mp": 77,
+                "maxMP": 99
+            }
+        ]
+    },   
+    {
+        "entity": "cursor",
+        "components": [
+            {
+                "type": "position",
+                "x": 21,
+                "y": 12
+            },
+            {
+                "type": "sprite",
+                "color": "YELLOW",
+                "fill": false
+            },
+            {
+                "type": "hidden"
+            },
+            {
+                "type": "controller",
+                "state": "SELECT"
+            }
+        ]
+    },
+    {
+        "entity": "mob1",
+        "components": [
+            {
+                "type": "position",
+                "x": 5,
+                "y": 4
+            },
+            {
+                "type": "sprite",
+                "res": "sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
+    }
+]
