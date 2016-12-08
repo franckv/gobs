@@ -20,7 +20,7 @@ import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.ui.GUI;
-import com.gobs.ui.GUI.FontSize;
+import com.gobs.ui.GUILayout;
 
 public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -38,6 +38,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private ImmutableArray<Entity> controllablesEntities;
     private ImmutableArray<Entity> charactersEntities;
 
+    private int margin, spacing;
+
     public UIRenderingSystem(Batch batch) {
         this(batch, 0);
     }
@@ -51,8 +53,13 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         this.batch = batch;
 
         gui = new GUI(batch);
-        gui.setSpacing(5);
 
+        gui.addFont("small", GameState.getFontManager().getFont(16));
+        gui.addFont("medium", GameState.getFontManager().getFont(24));
+        gui.addFont("large", GameState.getFontManager().getFont(30));
+
+        margin = 5;
+        spacing = 30;
     }
 
     @Override
@@ -78,10 +85,20 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         batch.begin();
 
+        gui.init();
+
+        gui.createSection("Screen", GUILayout.FlowDirection.NONE);
+
+        gui.setMargin(margin);
+        gui.setSpacing(spacing);
+
         drawStatusBar();
+
         if (GameState.getState() == RunningState.CRAWL) {
             drawCharactersStats();
         }
+
+        gui.endSection();
 
         batch.end();
 
@@ -89,14 +106,17 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     }
 
     private void drawStatusBar() {
-        gui.setMargin(5);
-        gui.setSpacing(5);
-        gui.setFontSize(FontSize.SMALL);
+        gui.setFont("small");
         gui.setColor(Color.GREEN);
-        gui.setFlow(GUI.FlowDirection.RIGHT);
+
+        gui.createSection("PushToBottom", GUILayout.FlowDirection.VERTICAL);
 
         String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + GameState.getEngine().getEntities().size();
-        gui.setAlign(GUI.AlignH.LEFT, GUI.AlignV.BOTTOM);
+
+        gui.pushToEnd(gui.getLabelHeight(msg));
+
+        gui.createSection("StatusBar", GUILayout.FlowDirection.HORIZONTAL);
+
         gui.Label(msg);
 
         // display player position
@@ -109,78 +129,87 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                 int y = pos.getY();
 
                 msg = "Position: " + x + "," + y;
-                gui.setAlign(GUI.AlignH.RIGHT, GUI.AlignV.BOTTOM);
+
+                gui.pushToEnd(gui.getLabelWidth(msg));
+
                 gui.Label(msg);
+
                 break;
             }
         }
+
+        gui.endSection();
+
+        gui.endSection();
     }
 
     private void drawCharactersStats() {
         int nPlayers = charactersEntities.size();
-
-        /*
-               Draw character boxes     
-         */
         int boxW = 250;
         int boxH = 150;
 
-        // offset to center a group of n widgets is -(n-1)/2 * (size + spacing)
-        gui.setAlign(GUI.AlignH.CENTER, GUI.AlignV.TOP, -(nPlayers - 1) * (boxW + 5) / 2, 0);
+        float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
+        float space = (GameState.getOverlayViewport().getWorldWidth() - size) / 2;
 
-        for (int i = 0; i < nPlayers; i++) {
-            gui.pushState();
-            gui.Box(boxW, boxH);
-        }
+        gui.createSection("Portraits", GUILayout.FlowDirection.HORIZONTAL);
 
-        /*
-               Draw character states
-         */
-        int textMarginX = 30;
-        int textMarginY = 20;
-        int textSpacing = 7;
-
-        gui.setColor(Color.WHITE);
-        gui.setFontSize(FontSize.LARGE);
+        gui.Spacer(space);
 
         for (int i = 0; i < nPlayers; i++) {
             for (Entity e : charactersEntities) {
-                if (am.get(e).getPos() == nPlayers - i) {
-                    gui.popState();
-                    gui.setFlow(GUI.FlowDirection.DOWN);
-                    gui.setMargin(textMarginX, textMarginY);
-                    gui.setSpacing(3 * textSpacing);
-                    gui.setFontSize(FontSize.LARGE);
-                    gui.Label(nm.get(e).getName());
-                    gui.setFontSize(FontSize.MEDIUM);
-                    gui.setSpacing(textSpacing);
-                    gui.setAlignH(GUI.AlignH.NONE, -boxW / 2 + textMarginX);
-                    int hp = hm.get(e).getHP();
-                    int maxHP = hm.get(e).getMaxHP();
-                    if (hp == maxHP) {
+                if (am.get(e).getPos() == i + 1) {
+                    gui.createSection("Portrait", GUILayout.FlowDirection.NONE);
+                    gui.Box(boxW, boxH);
+
+                    gui.createSection("Details", GUILayout.FlowDirection.VERTICAL);
+                    {
+                        gui.setMargin(20, 15);
+                        gui.setSpacing(10);
+
                         gui.setColor(Color.WHITE);
-                    } else if (hp < maxHP / 4) {
-                        gui.setColor(Color.RED);
-                    } else {
-                        gui.setColor(Color.GOLD);
-                    }
-                    gui.Label(String.format("HP: %d / %d", hp, maxHP));
-                    gui.setColor(Color.WHITE);
-                    int mp = mm.get(e).getMP();
-                    int maxMP = mm.get(e).getMaxMP();
-                    if (mp == maxMP) {
+                        gui.setFont("large");
+                        gui.Label(nm.get(e).getName());
+
+                        gui.Spacer(5);
+
+                        // HP
+                        gui.setFont("medium");
+                        int hp = hm.get(e).getHP();
+                        int maxHP = hm.get(e).getMaxHP();
+                        if (hp == maxHP) {
+                            gui.setColor(Color.WHITE);
+                        } else if (hp < maxHP / 4) {
+                            gui.setColor(Color.RED);
+                        } else {
+                            gui.setColor(Color.GOLD);
+                        }
+                        gui.Label(String.format("HP: %d / %d", hp, maxHP));
+
+                        // MP
                         gui.setColor(Color.WHITE);
-                    } else if (mp < maxMP / 4) {
-                        gui.setColor(Color.RED);
-                    } else {
-                        gui.setColor(Color.GOLD);
+                        int mp = mm.get(e).getMP();
+                        int maxMP = mm.get(e).getMaxMP();
+                        if (mp == maxMP) {
+                            gui.setColor(Color.WHITE);
+                        } else if (mp < maxMP / 4) {
+                            gui.setColor(Color.RED);
+                        } else {
+                            gui.setColor(Color.GOLD);
+                        }
+                        gui.Label(String.format("MP: %d / %d", mp, maxMP));
+
+                        // LVL
+                        gui.setColor(Color.WHITE);
+                        gui.Label("LV: 99");
                     }
-                    gui.Label(String.format("MP: %d / %d", mp, maxMP));
-                    gui.setColor(Color.WHITE);
-                    gui.Label("LV: 99");
+                    gui.endSection();
+
+                    gui.endSection();
                 }
             }
         }
+
+        gui.endSection();
     }
 
     @Override
