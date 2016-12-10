@@ -18,6 +18,7 @@ import com.gobs.components.Position;
 import com.gobs.input.Input;
 import com.gobs.input.InputHandler;
 import com.gobs.input.InputMap;
+import com.gobs.ui.GUI;
 
 public class InputSystem extends EntityProcessingSystem {
     private InputHandler inputHandler;
@@ -42,6 +43,9 @@ public class InputSystem extends EntityProcessingSystem {
 
     @Override
     public void update(float deltaTime) {
+        InputMap inputMap = inputHandler.getInputMap();
+        GUI.AcceptInput(inputMap);
+
         if (inputHandler.hasInput()) {
             if (inputHandler.hasChanged()) {
                 repeat = 0;
@@ -57,8 +61,6 @@ public class InputSystem extends EntityProcessingSystem {
             }
 
             if (repeat == 0) {
-                InputMap inputMap = inputHandler.getInputMap();
-
                 dispatchInput(inputMap);
             }
 

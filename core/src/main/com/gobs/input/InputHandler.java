@@ -1,5 +1,6 @@
 package com.gobs.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class InputHandler extends InputAdapter {
         codes.put(Keys.DEL, Input.DEL);
         codes.put(Keys.ESCAPE, Input.ESCAPE);
         codes.put(Keys.TAB, Input.TAB);
-        
+
         codes.put(Keys.A, Input.A);
         codes.put(Keys.D, Input.D);
         codes.put(Keys.E, Input.E);
@@ -66,6 +67,34 @@ public class InputHandler extends InputAdapter {
         return result;
     }
 
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        inputMap.setMouseDown(false);
+
+        return true;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        inputMap.setMouseDown(true);
+
+        return true;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
+
+        return true;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
+
+        return true;
+    }
+
     public InputMap getInputMap() {
         return inputMap;
     }
@@ -76,10 +105,5 @@ public class InputHandler extends InputAdapter {
 
     public boolean hasInput() {
         return inputMap.hasInput();
-    }
-
-    public void reset() {
-        last = new InputMap(inputMap);
-        inputMap.reset();
     }
 }

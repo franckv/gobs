@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GameState;
 import com.gobs.input.InputMap;
@@ -23,6 +24,10 @@ public class GUI implements Disposable {
         SMALL, MEDIUM, LARGE
     }
 
+    private static InputMap inputs;
+
+    String hot, active;
+
     private GUILayout layout;
     private Deque<GUILayout> layouts;
 
@@ -31,26 +36,68 @@ public class GUI implements Disposable {
     private BitmapFont font;
     private Color color;
     private TextureRegion frame;
+    private TextureRegion frameSelected;
     private ShapeRenderer render;
 
     public GUI(Batch batch) {
         this.batch = batch;
+
+        hot = null;
+        active = null;
 
         fonts = new HashMap<>();
 
         color = Color.GREEN;
 
         frame = GameState.getTileManager().getFrame();
+        frameSelected = GameState.getTileManager().getFrameSelected();
 
         render = new ShapeRenderer();
 
-        init();
+        begin();
     }
 
-    public void init() {
+    public void begin() {
         layout = new GUILayout("root", null, GUILayout.FlowDirection.VERTICAL);
         layouts = new ArrayDeque<>();
         layouts.addFirst(layout);
+
+        hot = null;
+    }
+
+    public void end() {
+        if (!isActivated()) {
+            active = null;
+        } else {
+            if (active == null) {
+                active = "Invalid";
+            }
+        }
+    }
+
+    private boolean isActivated() {
+        return (inputs != null && inputs.isMouseDown());
+    }
+    
+    private boolean isSelected(String id, Rectangle rec) {
+        if (inputs != null && rec.contains(inputs.getMouseX(), inputs.getMouseY())) {
+            hot = id;
+            if (active == null && isActivated()) {
+                active = id;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isClicked(String id) {
+        if (inputs != null && !isActivated() && id.equals(hot) && id.equals(active)) {
+            System.out.println(id + " is clicked");
+            return true;
+        }
+
+        return false;
     }
 
     public void addFont(String name, BitmapFont font) {
@@ -64,7 +111,9 @@ public class GUI implements Disposable {
         }
     }
 
-    public boolean AcceptInput(InputMap inputMap) {
+    public static boolean AcceptInput(InputMap inputMap) {
+        GUI.inputs = inputMap;
+
         return false;
     }
 
@@ -94,25 +143,37 @@ public class GUI implements Disposable {
 
         font.draw(batch, glayout, layout.getX(w), h + layout.getY(h));
 
-        layout.updateLayout(w, h);
+        layout.update(w, h);
     }
 
     public void Spacer(float size) {
         layout.space(size);
     }
 
-    public void Box(float w, float h) {
+    public void Frame(float w, float h) {
         batch.draw(frame, layout.getX(w), layout.getY(h), w, h);
 
-        layout.updateLayout(w, h);
+        layout.update(w, h);
+    }
+
+    public boolean Box(String id, float w, float h) {
+        Rectangle rec = new Rectangle(layout.getX(w), layout.getY(h), w, h);
+
+        TextureRegion r = frame;
+
+        if (isSelected(id, rec)) {
+            r = frameSelected;
+        }
+
+        batch.draw(r, rec.x, rec.y, w, h);
+
+        layout.update(w, h);
+
+        return isClicked(id);
     }
 
     public void setColor(Color color) {
         this.color = color;
-    }
-
-    public GUILayout getLayout() {
-        return layout;
     }
 
     public void createSection(String name, GUILayout.FlowDirection flow) {
@@ -122,6 +183,10 @@ public class GUI implements Disposable {
     public void endSection() {
         layout.end();
         popLayout();
+    }
+
+    public void SetPosition(float x, float y) {
+        layout.setPosition(x, y);
     }
 
     public void pushToEnd(float size) {
