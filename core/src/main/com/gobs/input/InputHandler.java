@@ -1,5 +1,7 @@
 package com.gobs.input;
 
+import com.gobs.ui.InputMap;
+import com.gobs.ui.Input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;

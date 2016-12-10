@@ -1,22 +1,23 @@
-package com.gobs.input;
+package com.gobs.ui;
 
-import com.badlogic.gdx.utils.Bits;
+import com.gobs.ui.Input;
+import java.util.BitSet;
 
 /**
  * Represent a set of inputs for an entity
  */
 public class InputMap {
-    Bits inputs;
+    BitSet inputs;
     int mouseX, mouseY;
     boolean mouseDown;
 
     public InputMap() {
-        inputs = new Bits(Input.values().length);
+        inputs = new BitSet(Input.values().length);
         mouseDown = false;
     }
 
     public InputMap(InputMap clone) {
-        inputs = new Bits(clone.inputs.length());
+        inputs = new BitSet(clone.inputs.length());
         inputs.or(clone.inputs);
         mouseDown = false;
     }
@@ -66,12 +67,12 @@ public class InputMap {
         return mouseDown;
     }
 
-    void mouseMoved(int screenX, int screenY) {
+    public void mouseMoved(int screenX, int screenY) {
         this.mouseX = screenX;
         this.mouseY = screenY;
     }
 
-    void setMouseDown(boolean down) {
+    public void setMouseDown(boolean down) {
         mouseDown = down;
     }
 }

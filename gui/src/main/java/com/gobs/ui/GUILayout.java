@@ -1,7 +1,5 @@
 package com.gobs.ui;
 
-import com.gobs.GameState;
-
 /**
  *
  */
@@ -26,16 +24,16 @@ public class GUILayout {
     private int marginX, marginY;
     private int spacing;
 
-    GUILayout(String name, GUILayout parent, GUILayout.FlowDirection flow) {
+    GUILayout(String name, GUILayout parent, GUILayout.FlowDirection flow, float maxWidth, float maxHeight) {
         this.name = name;
         
         this.parent = parent;
 
         this.flow = flow;
 
-        this.maxWidth = GameState.getOverlayViewport().getWorldWidth();
-        this.maxHeight = GameState.getOverlayViewport().getWorldHeight();
-
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
+        
         if (parent != null) {
             this.marginX = parent.marginX;
             this.marginY = parent.marginY;
@@ -79,7 +77,24 @@ public class GUILayout {
         return posY - height;
     }
 
-    void updateLayout(float width, float height) {
+    void setPosition(float x, float y) {
+        if (flow != FlowDirection.NONE) {
+            return;
+        }
+        
+        if (x < 0 || x > maxWidth || y < 0 || y > maxHeight) {
+            return;
+        }
+        
+        posX = x;
+        posY = y;
+        top = y;
+        bottom = y;
+        left = x;
+        right = x;
+    }
+    
+    void update(float width, float height) {
         switch (flow) {
             case VERTICAL:
                 if (width > right - left) {
@@ -132,10 +147,10 @@ public class GUILayout {
 
         switch (flow) {
             case VERTICAL:
-                updateLayout(0, size);
+                update(0, size);
                 break;
             case HORIZONTAL:
-                updateLayout(size, 0);
+                update(size, 0);
                 break;
         }
     }

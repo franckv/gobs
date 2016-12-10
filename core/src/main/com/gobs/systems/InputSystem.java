@@ -15,9 +15,9 @@ import com.gobs.components.Controller;
 import com.gobs.components.Goal;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
-import com.gobs.input.Input;
+import com.gobs.ui.Input;
 import com.gobs.input.InputHandler;
-import com.gobs.input.InputMap;
+import com.gobs.ui.InputMap;
 import com.gobs.ui.GUI;
 
 public class InputSystem extends EntityProcessingSystem {

@@ -19,8 +19,8 @@ import com.gobs.components.MP;
 import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
-import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
+import com.gobs.ui.GdxGUI;
 
 public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -31,7 +31,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<MP> mm = ComponentMapper.getFor(MP.class);
 
     private Batch batch;
-    private GUI gui;
+    private GdxGUI gui;
 
     private Family controllables;
     private Family characters;
@@ -52,7 +52,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         this.batch = batch;
 
-        gui = new GUI(batch);
+        gui = new GdxGUI(batch);
 
         gui.addFont("small", GameState.getFontManager().getFont(16));
         gui.addFont("medium", GameState.getFontManager().getFont(24));
@@ -85,7 +85,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         batch.begin();
 
-        gui.init();
+        gui.begin();
 
         gui.createSection("Screen", GUILayout.FlowDirection.NONE);
 
@@ -99,6 +99,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         }
 
         gui.endSection();
+
+        gui.end();
 
         batch.end();
 
@@ -159,7 +161,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
             for (Entity e : charactersEntities) {
                 if (am.get(e).getPos() == i + 1) {
                     gui.createSection("Portrait", GUILayout.FlowDirection.NONE);
-                    gui.Box(boxW, boxH);
+                    gui.Box("Stats" + i, boxW, boxH);
 
                     gui.createSection("Details", GUILayout.FlowDirection.VERTICAL);
                     {
