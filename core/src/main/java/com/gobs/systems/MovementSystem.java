@@ -3,7 +3,6 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.gobs.GameState;
 import com.gobs.components.Camera;
 import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
@@ -30,7 +29,7 @@ public class MovementSystem extends EntityProcessingSystem {
             Transform trans = new Transform();
 
             if (command.getCommand() == CommandType.LEFT) {
-                if (cam != null && cam.getState() == GameState.getState()) {
+                if (cam != null) {
                     switch (cam.getOrientation()) {
                         case UP:
                             cam.setOrientation(Camera.Orientation.LEFT);
@@ -51,7 +50,7 @@ public class MovementSystem extends EntityProcessingSystem {
             }
 
             if (command.getCommand() == CommandType.RIGHT) {
-                if (cam != null && cam.getState() == GameState.getState()) {
+                if (cam != null) {
                     switch (cam.getOrientation()) {
                         case UP:
                             cam.setOrientation(Camera.Orientation.RIGHT);
@@ -71,7 +70,7 @@ public class MovementSystem extends EntityProcessingSystem {
                 }
             }
             if (command.getCommand() == CommandType.UP) {
-                if (cam != null && cam.getState() == GameState.getState()) {
+                if (cam != null) {
                     switch (cam.getOrientation()) {
                         case UP:
                             trans.addY(1);
@@ -91,7 +90,7 @@ public class MovementSystem extends EntityProcessingSystem {
                 }
             }
             if (command.getCommand() == CommandType.DOWN) {
-                if (cam != null && cam.getState() == GameState.getState()) {
+                if (cam != null) {
                     switch (cam.getOrientation()) {
                         case UP:
                             trans.addY(-1);

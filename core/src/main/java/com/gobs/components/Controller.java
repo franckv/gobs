@@ -8,12 +8,13 @@ import com.gobs.RunningState;
  */
 public class Controller implements Component {
     RunningState state;
-
+    
     public Controller(RunningState state) {
         this.state = state;
     }
-
+    
     public RunningState getState() {
         return state;
     }
+            
 }

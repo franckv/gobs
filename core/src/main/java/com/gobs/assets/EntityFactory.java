@@ -3,7 +3,6 @@ package com.gobs.assets;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
@@ -119,23 +118,11 @@ public class EntityFactory {
                 c = new Name(name);
                 break;
             case "controller":
-                RunningState state;
-                String stateValue = component.getString("state");
-                if (stateValue.equals("MOVE")) {
-                    state = RunningState.CRAWL;
-                } else {
-                    state = RunningState.SELECT;
-                }
+                RunningState state = RunningState.valueOf(component.getString("state"));
                 c = new Controller(state);
                 break;
             case "camera":
-                stateValue = component.getString("state");
-                if (stateValue.equals("MOVE")) {
-                    state = RunningState.CRAWL;
-                } else {
-                    state = RunningState.SELECT;
-                }
-                c = new Camera(state, Camera.Orientation.UP);
+                c = new Camera(Camera.Orientation.UP);
                 break;
             case "ai":
                 AIBehavior behavior = new MobBehavior(e);
@@ -147,8 +134,6 @@ public class EntityFactory {
     }
 
     private static TextureRegion getTexture(String res) {
-        AssetManager manager = GameState.getAssetManager();
-
         String textureName = res;
 
         Matcher matcher = resourcePattern.matcher(res);

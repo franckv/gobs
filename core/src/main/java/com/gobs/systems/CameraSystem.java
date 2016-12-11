@@ -3,7 +3,6 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.gobs.GameState;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 
@@ -26,12 +25,7 @@ public class CameraSystem extends EntityProcessingSystem {
     public void update(float deltaTime) {
         for (Entity entity : getEntities()) {
             Camera cam = cm.get(entity);
-
-            if (cam.getState() == GameState.getState()) {
-                Position pos = pm.get(entity);
-
-                
-            }
+            Position pos = pm.get(entity);
         }
     }
 

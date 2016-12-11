@@ -101,30 +101,28 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
             Camera cam = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (cam.getState() == GameState.getState()) {
-                GameState.getFPVCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
+            GameState.getFPVCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
 
-                int dx = 0, dy = 0;
+            int dx = 0, dy = 0;
 
-                switch (cam.getOrientation()) {
-                    case UP:
-                        dy = 1;
-                        break;
-                    case DOWN:
-                        dy = -1;
-                        break;
-                    case LEFT:
-                        dx = -1;
-                        break;
-                    case RIGHT:
-                        dx = 1;
-                        break;
+            switch (cam.getOrientation()) {
+                case UP:
+                    dy = 1;
+                    break;
+                case DOWN:
+                    dy = -1;
+                    break;
+                case LEFT:
+                    dx = -1;
+                    break;
+                case RIGHT:
+                    dx = 1;
+                    break;
 
-                }
-
-                Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
-                GameState.getFPVCamera().lookAt(vec);
             }
+
+            Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
+            GameState.getFPVCamera().lookAt(vec);
         }
 
         GameState.getFPVCamera().update();
