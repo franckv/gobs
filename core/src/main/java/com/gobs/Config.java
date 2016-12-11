@@ -11,6 +11,8 @@ public class Config {
     private int tileSize;
     private int worldWidth, worldHeight;
     private int repeat;
+    private String frameSprite;
+    private String frameSelectedSprite;
     
     public Config(String res) {
         props = new Properties();
@@ -26,6 +28,8 @@ public class Config {
         worldWidth = getInt("worldWidth", 100);
         worldHeight = getInt("worldHeight", 100);
         repeat = getInt("repeat", 20);
+        frameSprite = getString("frameSprite", "");
+        frameSelectedSprite = getString("frameSelectedSprite", "");
     }
 
     final int getInt(String prop, int val) {
@@ -33,6 +37,14 @@ public class Config {
             return Integer.parseInt(props.getProperty(prop));
         }
 
+        return val;
+    }
+    
+    final String getString(String prop, String val) {
+        if (props.containsKey(prop)) {
+            return props.getProperty(prop);
+        }
+        
         return val;
     }
 
@@ -54,5 +66,13 @@ public class Config {
 
     public int getRepeat() {
         return repeat;
+    }
+    
+    public String getFrameSprite() {
+        return frameSprite;
+    }
+    
+    public String getFrameSelectedSprite() {
+        return frameSelectedSprite;
     }
 }

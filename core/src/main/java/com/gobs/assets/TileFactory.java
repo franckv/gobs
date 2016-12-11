@@ -82,11 +82,11 @@ public class TileFactory implements Disposable {
     }
     
     public TextureRegion getFrame() {
-        return getTile("sprites/frame.png");
+        return getTile(GameState.getConfig().getFrameSprite());
     }
         
     public TextureRegion getFrameSelected() {
-        return getTile("sprites/frame_selected.png");
+        return getTile(GameState.getConfig().getFrameSelectedSprite());
     }
 
     public TextureRegion getTile(String res, int x, int y, int w, int h) {
