@@ -10,8 +10,6 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -22,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gobs.assets.FontFactory;
 import com.gobs.assets.TileFactory;
+import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
 import com.gobs.managers.CollisionManager;
 import com.gobs.screens.MainScreen;
@@ -35,22 +34,25 @@ import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameState implements Disposable {
+    public enum SCREEN {
+        WORLD, INVENTORY, MAP
+    }
+
     private Game game;
 
     private static GameState currentState = null;
-
-    private StateMachine<GameState, RunningState> stateMachine;
 
     private Config config;
     private Engine engine;
     private InputHandler inputHandler;
 
-    private static Screen mainScreen;
-    private static Screen mapScreen;
-    private Screen screen;
+    private Map<SCREEN, Screen> screens;
+    private SCREEN screen;
 
     // camera to display map items
     private OrthographicCamera mapCamera;
@@ -65,6 +67,7 @@ public class GameState implements Disposable {
 
     private TileFactory tileManager;
     private FontFactory fontManager;
+    private ContextManager contextManager;
     private CollisionManager collisionManager;
     private TiledMapView mapView;
     private Layer mapLayer;
@@ -88,8 +91,6 @@ public class GameState implements Disposable {
         config = new Config("config.properties");
         engine = new Engine();
 
-        stateMachine = new DefaultStateMachine<>(this, RunningState.CRAWL);
-
         // screen resolution
         // TODO: update when resizing
         screenWidth = Gdx.graphics.getWidth();
@@ -109,15 +110,16 @@ public class GameState implements Disposable {
         inputHandler = new InputHandler();
         tileManager = new TileFactory(tileSize);
         fontManager = new FontFactory();
+        contextManager = new ContextManager();
         collisionManager = new CollisionManager(worldWidth, worldHeight);
         mapView = new TiledMapView(worldWidth, worldHeight, tileSize);
         batch = new SpriteBatch();
 
         assetManager = new AssetManager();
 
-        mainScreen = new MainScreen();
-        mapScreen = new MapScreen();
-        screen = mainScreen;
+        screens = new HashMap<>();
+        screens.put(SCREEN.WORLD, new MainScreen());
+        screens.put(SCREEN.MAP, new MapScreen());
 
         initCamera();
         initSystems();
@@ -220,25 +222,17 @@ public class GameState implements Disposable {
         return getGameState().inputHandler;
     }
 
-    public Screen getScreen() {
+    public SCREEN getScreen() {
         return screen;
     }
 
     public void setGame(Game game) {
         this.game = game;
     }
-    
-    public void setScreen(Screen screen) {
-        this.screen = screen;
-        game.setScreen(screen);
-    }
-    
-    public static void setMainScreen() {
-        getGameState().setScreen(mainScreen);
-    }
 
-    public static void setMapScreen() {
-        getGameState().setScreen(mapScreen);
+    public void setScreen(SCREEN screenType) {
+        screen = screenType;
+        game.setScreen(screens.get(screenType));
     }
 
     public static Viewport getMapViewport() {
@@ -285,34 +279,19 @@ public class GameState implements Disposable {
         return getGameState().collisionManager;
     }
 
+    public static ContextManager getContextManager() {
+        return getGameState().contextManager;
+    }
+    
     public static AssetManager getAssetManager() {
         return getGameState().assetManager;
     }
 
-    public static RunningState getState() {
-        return getGameState().stateMachine.getCurrentState();
-    }
-
-    public static void toggleSelect() {
-        if (getGameState().stateMachine.getCurrentState() == RunningState.MAP) {
-            getGameState().stateMachine.changeState(RunningState.SELECT);
-        } else if (getGameState().stateMachine.getCurrentState() == RunningState.SELECT) {
-            getGameState().stateMachine.changeState(RunningState.MAP);
-        }
-    }
-
-    public static void toggleView() {
-        getMapLayer().setDirty(true);
-        if (getState() == RunningState.CRAWL) {
-            getGameState().stateMachine.changeState(RunningState.MAP);
-        } else {
-            getGameState().stateMachine.changeState(RunningState.CRAWL);
-        }
-    }
-
     @Override
     public void dispose() {
-        screen.dispose();
+        for (Screen s : screens.values()) {
+            s.dispose();
+        }
         mapView.dispose();
         tileManager.dispose();
         batch.dispose();

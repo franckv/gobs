@@ -8,7 +8,8 @@ public class GobsGame extends Game {
     @Override
     public void create() {
         GameState.getGameState().setGame(this);
-        setScreen(GameState.getGameState().getScreen());
+        GameState.getGameState().setScreen(GameState.SCREEN.WORLD);
+        
         Gdx.input.setInputProcessor(GameState.getInputHandler());
 
         Gdx.app.setLogLevel(Application.LOG_INFO);
