@@ -15,18 +15,10 @@ import com.gobs.map.Layer.LayerType;
  */
 public class TiledMapView implements Disposable {
     private TiledMap map;
-    private int tileSize;
-    private int width;
-    private int height;
 
     public TiledMapView(int width, int height, int tileSize) {
-        this.width = width;
-        this.height = height;
-        this.tileSize = tileSize;
-
         map = new TiledMap();
 
-        map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
         map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
     }
 
@@ -46,6 +38,7 @@ public class TiledMapView implements Disposable {
                 switch (c.getType()) {
                     case STAIRS:
                         color = Color.BLUE;
+                        isFilled = true;
                         break;
                     case FLOOR:
                         color = Color.LIGHT_GRAY;

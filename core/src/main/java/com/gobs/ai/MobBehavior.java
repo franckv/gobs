@@ -14,7 +14,6 @@ import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
 import com.gobs.components.Goal;
 import com.gobs.components.Position;
-import com.gobs.components.Sprite;
 import com.gobs.pathfinding.Graph;
 import com.gobs.pathfinding.ManhattanHeuristic;
 import java.util.Random;
@@ -27,7 +26,6 @@ public class MobBehavior implements AIBehavior {
 
     private static Random rnd = new Random();
     private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private static ComponentMapper<Sprite> sm = ComponentMapper.getFor(Sprite.class);
     private static ComponentMapper<Goal> gm = ComponentMapper.getFor(Goal.class);
 
     StateMachine<MobBehavior, MobState> stateMachine;

@@ -2,6 +2,7 @@ package com.gobs.map;
 
 import com.gobs.map.LayerCell.LayerCellType;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Store a level
@@ -70,6 +71,10 @@ public class Layer implements Iterable<LayerCell> {
 
             @Override
             public Object next() {
+                int size = w*h;
+                if (idx >= size) {
+                    throw new NoSuchElementException();
+                }
                 while (idx < w * h) {
                     int x = idx % w;
                     int y = idx / w;
