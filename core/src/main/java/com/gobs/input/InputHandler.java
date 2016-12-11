@@ -31,13 +31,30 @@ public class InputHandler extends InputAdapter {
         codes.put(Keys.TAB, Input.TAB);
 
         codes.put(Keys.A, Input.A);
+        codes.put(Keys.B, Input.B);
+        codes.put(Keys.C, Input.C);
         codes.put(Keys.D, Input.D);
         codes.put(Keys.E, Input.E);
+        codes.put(Keys.F, Input.F);
+        codes.put(Keys.G, Input.G);
+        codes.put(Keys.H, Input.H);
+        codes.put(Keys.I, Input.I);
+        codes.put(Keys.J, Input.J);
+        codes.put(Keys.K, Input.K);
+        codes.put(Keys.L, Input.L);
         codes.put(Keys.M, Input.M);
+        codes.put(Keys.N, Input.N);
+        codes.put(Keys.O, Input.O);
+        codes.put(Keys.P, Input.P);
         codes.put(Keys.Q, Input.Q);
+        codes.put(Keys.R, Input.R);
         codes.put(Keys.S, Input.S);
         codes.put(Keys.T, Input.T);
+        codes.put(Keys.U, Input.U);
+        codes.put(Keys.V, Input.V);
         codes.put(Keys.W, Input.W);
+        codes.put(Keys.X, Input.X);
+        codes.put(Keys.Y, Input.Y);
         codes.put(Keys.Z, Input.Z);
     }
 

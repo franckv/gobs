@@ -10,6 +10,8 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
+import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -24,7 +26,6 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
 import com.gobs.managers.CollisionManager;
 import com.gobs.screens.MainScreen;
-import com.gobs.screens.MapScreen;
 import com.gobs.systems.AISystem;
 import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.FPVRenderingSystem;
@@ -40,12 +41,14 @@ import java.util.Map;
 
 public class GameState implements Disposable {
     public enum SCREEN {
-        WORLD, INVENTORY, MAP
+        WORLD
     }
 
     private Game game;
 
     private static GameState currentState = null;
+
+    private StateMachine<GameState, RunningState> stateMachine;
 
     private Config config;
     private Engine engine;
@@ -107,6 +110,8 @@ public class GameState implements Disposable {
         mapWidth = (int) screenWidth / tileSize;
         mapHeight = (int) screenHeight / tileSize;
 
+        stateMachine = new DefaultStateMachine<>(GameState.getGameState(), RunningState.CRAWL);
+
         inputHandler = new InputHandler();
         tileManager = new TileFactory(tileSize);
         fontManager = new FontFactory();
@@ -119,7 +124,6 @@ public class GameState implements Disposable {
 
         screens = new HashMap<>();
         screens.put(SCREEN.WORLD, new MainScreen());
-        screens.put(SCREEN.MAP, new MapScreen());
 
         initCamera();
         initSystems();
@@ -160,7 +164,9 @@ public class GameState implements Disposable {
 
     public void initSystems() {
         engine.addSystem(new FPVRenderingSystem());
-        engine.addSystem(new MapRenderingSystem(batch));
+        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(batch);
+        mapRenderingSystem.setProcessing(false);
+        engine.addSystem(mapRenderingSystem);
         engine.addSystem(new UIRenderingSystem(batch));
         engine.addSystem(new InputSystem());
         engine.addSystem(new AISystem(0.5f));
@@ -192,6 +198,14 @@ public class GameState implements Disposable {
 
     public static Engine getEngine() {
         return getGameState().engine;
+    }
+
+    public static RunningState getState() {
+        return getGameState().stateMachine.getCurrentState();
+    }
+
+    public static void setState(RunningState state) {
+        getGameState().stateMachine.changeState(state);
     }
 
     public static int getMapHeight() {
@@ -282,7 +296,7 @@ public class GameState implements Disposable {
     public static ContextManager getContextManager() {
         return getGameState().contextManager;
     }
-    
+
     public static AssetManager getAssetManager() {
         return getGameState().assetManager;
     }

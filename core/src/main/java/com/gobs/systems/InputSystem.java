@@ -5,8 +5,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.gobs.GameState;
 import com.gobs.RunningState;
 import com.gobs.map.LayerCell.LayerCellType;
@@ -26,7 +24,6 @@ import com.gobs.ui.GUI;
 
 public class InputSystem extends EntityProcessingSystem {
     private InputHandler inputHandler;
-    private StateMachine<GameState, RunningState> stateMachine;
     private ContextManager contextManager;
 
     int repeat = 0;
@@ -46,7 +43,6 @@ public class InputSystem extends EntityProcessingSystem {
         super(Family.one(Controller.class, AI.class).get(), priority);
 
         inputHandler = GameState.getInputHandler();
-        stateMachine = new DefaultStateMachine<>(GameState.getGameState(), RunningState.CRAWL);
 
         repeatWait = GameState.getConfig().getRepeat();
 
@@ -62,8 +58,9 @@ public class InputSystem extends EntityProcessingSystem {
     @Override
     public void update(float deltaTime) {
         InputMap inputMap = inputHandler.getInputMap();
+        
         GUI.acceptInput(inputMap);
-
+        
         if (inputHandler.hasInput()) {
             if (inputHandler.hasChanged()) {
                 repeat = 0;
@@ -147,16 +144,15 @@ public class InputSystem extends EntityProcessingSystem {
         });
 
         contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateMachine.changeState(RunningState.MAP);
-            GameState.getMapLayer().setDirty(true);
+            GameState.setState(RunningState.MAP);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateMachine.changeState(RunningState.CRAWL);
+            GameState.setState(RunningState.CRAWL);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.TOGGLE_EDIT, (action) -> {
-            stateMachine.changeState(RunningState.EDITMAP);
+            GameState.setState(RunningState.EDITMAP);
             editMap(true);
         });
 
@@ -183,7 +179,7 @@ public class InputSystem extends EntityProcessingSystem {
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_OUT, (action) -> {
             GameState.getMapCamera().zoom += 0.1f;
         });
-        
+
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_UP, (action) -> {
             setCommand(CommandType.UP);
         });
@@ -213,12 +209,12 @@ public class InputSystem extends EntityProcessingSystem {
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateMachine.changeState(RunningState.CRAWL);
+            GameState.setState(RunningState.CRAWL);
             editMap(false);
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TOGGLE_EDIT, (action) -> {
-            stateMachine.changeState(RunningState.MAP);
+            GameState.setState(RunningState.MAP);
             editMap(false);
         });
     }
@@ -228,7 +224,7 @@ public class InputSystem extends EntityProcessingSystem {
         for (Entity entity : getEntities()) {
             Controller controller = cm.get(entity);
 
-            if (controller != null && controller.getState() == stateMachine.getCurrentState()) {
+            if (controller != null && controller.getState() == GameState.getState()) {
                 entity.add(command);
                 return true;
             }
@@ -255,7 +251,7 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (controller != null && pos != null) {
+            if (controller != null && controller.getState() == GameState.getState() && pos != null) {
                 x = pos.getX();
                 y = pos.getY();
                 break;
@@ -264,7 +260,7 @@ public class InputSystem extends EntityProcessingSystem {
 
         System.out.println("Dig at " + x + "," + y);
         GameState.getMapLayer().setCell(x, y, LayerCellType.FLOOR, false);
-
+        GameState.getMapLayer().setDirty(true);
     }
 
     private void fillMap() {
@@ -274,7 +270,7 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (controller != null && pos != null) {
+            if (controller != null && controller.getState() == GameState.getState() && pos != null) {
                 x = pos.getX();
                 y = pos.getY();
                 break;
@@ -283,7 +279,7 @@ public class InputSystem extends EntityProcessingSystem {
 
         System.out.println("Fill " + x + "," + y);
         GameState.getMapLayer().setCell(x, y, LayerCellType.WALL, true);
-
+        GameState.getMapLayer().setDirty(true);
     }
 
     private void editMap(boolean edit) {
