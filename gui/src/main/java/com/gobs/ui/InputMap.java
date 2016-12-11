@@ -1,7 +1,8 @@
 package com.gobs.ui;
 
-import com.gobs.ui.Input;
 import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represent a set of inputs for an entity
@@ -28,6 +29,16 @@ public class InputMap {
 
     public void clear(Input input) {
         inputs.clear(input.ordinal());
+    }
+
+    public Set<Input> get() {
+        Set<Input> set = new HashSet<>();
+        
+        for (int i = inputs.nextSetBit(0); i >= 0; i = inputs.nextSetBit(i + 1)) {
+            set.add(Input.values()[i]);
+        }
+        
+        return set;
     }
 
     @Override
