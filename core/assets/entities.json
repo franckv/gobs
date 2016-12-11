@@ -20,11 +20,10 @@
             },
             {
                 "type": "controller",
-                "state": "MOVE"
+                "state": "CRAWL"
             }, 
             {
-                "type": "camera",
-                "state": "MOVE"
+                "type": "camera"
             }
         ]
     }, {
@@ -76,7 +75,7 @@
         "components": [
             {
                 "type": "name",
-                "name": "Bill"
+                "name": "Moka"
             },
             {
                 "type": "party",
@@ -108,11 +107,11 @@
                 "fill": false
             },
             {
-                "type": "hidden"
-            },
-            {
                 "type": "controller",
-                "state": "SELECT"
+                "state": "EDITMAP"
+            }, 
+            {
+                "type": "hidden"
             }
         ]
     },
