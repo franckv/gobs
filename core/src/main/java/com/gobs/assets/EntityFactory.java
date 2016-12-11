@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gobs.GameState;
-import com.gobs.RunningState;
 import com.gobs.ai.AIBehavior;
 import com.gobs.ai.MobBehavior;
 import com.gobs.components.AI;
@@ -39,13 +38,20 @@ public class EntityFactory {
 
         for (JsonValue entity = json.child; entity != null; entity = entity.next) {
             Entity e = parseEntity(entity);
-            entities.add(e);
+            if (e != null) {
+                entities.add(e);
+            }
         }
 
         return entities;
     }
 
     private static Entity parseEntity(JsonValue entity) {
+        JsonValue disabled = entity.get("disabled");
+        if (disabled != null && disabled.asBoolean()) {
+            return null;
+        }
+
         Entity e = new Entity();
 
         JsonValue components = entity.get("components");
@@ -118,8 +124,8 @@ public class EntityFactory {
                 c = new Name(name);
                 break;
             case "controller":
-                RunningState state = RunningState.valueOf(component.getString("state"));
-                c = new Controller(state);
+                boolean active = component.getBoolean("active");
+                c = new Controller(active);
                 break;
             case "camera":
                 c = new Camera(Camera.Orientation.UP);

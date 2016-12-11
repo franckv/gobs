@@ -58,9 +58,9 @@ public class InputSystem extends EntityProcessingSystem {
     @Override
     public void update(float deltaTime) {
         InputMap inputMap = inputHandler.getInputMap();
-        
+
         GUI.acceptInput(inputMap);
-        
+
         if (inputHandler.hasInput()) {
             if (inputHandler.hasChanged()) {
                 repeat = 0;
@@ -224,7 +224,7 @@ public class InputSystem extends EntityProcessingSystem {
         for (Entity entity : getEntities()) {
             Controller controller = cm.get(entity);
 
-            if (controller != null && controller.getState() == GameState.getState()) {
+            if (controller != null && controller.isActive()) {
                 entity.add(command);
                 return true;
             }
@@ -251,7 +251,7 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (controller != null && controller.getState() == GameState.getState() && pos != null) {
+            if (controller != null && controller.isActive() && pos != null) {
                 x = pos.getX();
                 y = pos.getY();
                 break;
@@ -270,7 +270,7 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (controller != null && controller.getState() == GameState.getState() && pos != null) {
+            if (controller != null && controller.isActive() && pos != null) {
                 x = pos.getX();
                 y = pos.getY();
                 break;
@@ -287,13 +287,28 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Hidden hidden = hm.get(entity);
 
-            // show cursor only in select mode
-            if (edit && controller != null && controller.getState() == RunningState.EDITMAP && hidden != null) {
-                System.out.println("Show cursor");
-                entity.remove(Hidden.class);
-            } else if (!edit && controller != null && controller.getState() == RunningState.EDITMAP && hidden == null) {
-                System.out.println("Hide cursor");
-                entity.add(new Hidden());
+            if (controller == null) {
+                continue;
+            }
+
+            if (edit) {
+                if (controller.isActive()) {
+                    controller.setActive(false);
+                } else {
+                    System.out.println("Show cursor");
+                    controller.setActive(true);
+                    if (hidden != null) {
+                        entity.remove(Hidden.class);
+                    }
+                }
+            } else {
+                if (controller.isActive()) {
+                    System.out.println("Hide cursor");
+                    controller.setActive(false);
+                    entity.add(new Hidden());
+                } else {
+                    controller.setActive(true);
+                }
             }
         }
     }
@@ -305,7 +320,7 @@ public class InputSystem extends EntityProcessingSystem {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
-            if (controller != null && controller.getState() == RunningState.EDITMAP && pos != null) {
+            if (controller != null && controller.isActive() && pos != null) {
                 x = pos.getX();
                 y = pos.getY();
                 System.out.println("Target");

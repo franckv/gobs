@@ -20,7 +20,7 @@
             },
             {
                 "type": "controller",
-                "state": "CRAWL"
+                "active": true
             }, 
             {
                 "type": "camera"
@@ -95,6 +95,7 @@
     },   
     {
         "entity": "cursor",
+        "disabled": false,
         "components": [
             {
                 "type": "position",
@@ -108,7 +109,7 @@
             },
             {
                 "type": "controller",
-                "state": "EDITMAP"
+                "active": false
             }, 
             {
                 "type": "hidden"

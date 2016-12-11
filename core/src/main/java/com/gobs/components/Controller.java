@@ -7,14 +7,17 @@ import com.gobs.RunningState;
  * Make an entity controllable by the player
  */
 public class Controller implements Component {
-    RunningState state;
+    boolean active;
     
-    public Controller(RunningState state) {
-        this.state = state;
+    public Controller(boolean active) {
+        this.active = active;
     }
     
-    public RunningState getState() {
-        return state;
+    public boolean isActive() {
+        return active;
     }
-            
+    
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }
