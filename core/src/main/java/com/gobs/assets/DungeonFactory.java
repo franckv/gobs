@@ -7,6 +7,7 @@ import com.gobs.map.LayerCell.LayerCellType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +23,7 @@ public class DungeonFactory {
         Layer mapLayer = new Layer(width, height, Layer.LayerType.MAP_LAYER);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Gdx.files.internal(res).read()))) {
+                Gdx.files.internal(res).read(), Charset.forName("UTF-8")))) {
             String line;
 
             List<String> lines = new ArrayList<>();

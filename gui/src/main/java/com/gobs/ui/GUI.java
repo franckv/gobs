@@ -21,8 +21,6 @@ public abstract class GUI {
     public GUI() {
         hot = null;
         active = null;
-
-        begin();
     }
 
     public void begin() {
@@ -72,7 +70,7 @@ public abstract class GUI {
         return false;
     }
 
-    public static boolean AcceptInput(InputMap inputMap) {
+    public static boolean acceptInput(InputMap inputMap) {
         GUI.inputs = inputMap;
 
         return false;
@@ -122,7 +120,7 @@ public abstract class GUI {
         popLayout();
     }
 
-    public void SetPosition(float x, float y) {
+    public void setPosition(float x, float y) {
         layout.setPosition(x, y);
     }
 

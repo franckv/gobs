@@ -52,10 +52,12 @@ public class GdxGUI extends GUI implements Disposable {
         this.color = color;
     }
 
+    @Override
     public float getMaxWidth() {
         return GameState.getOverlayViewport().getWorldWidth();
     }
 
+    @Override
     public float getMaxHeight() {
         return GameState.getOverlayViewport().getWorldHeight();
     }
@@ -113,7 +115,7 @@ public class GdxGUI extends GUI implements Disposable {
         render.setProjectionMatrix(GameState.getOverlayCamera().combined);
         render.begin(ShapeRenderer.ShapeType.Line);
         render.setColor(Color.RED);
-        render.line(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+        render.line(Gdx.graphics.getWidth() / 2.0f, 0, Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight());
         render.line(0, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 2);
 
         render.end();
