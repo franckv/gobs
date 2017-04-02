@@ -23,6 +23,12 @@ public class InputMapTest {
         map.set(Input.LEFT);
         Assert.assertTrue(map.isPressed(Input.LEFT));
         Assert.assertEquals(1, map.inputs.cardinality());
+        
+        Assert.assertFalse(map.isPressed(Input.E));
+        map.set(Input.E);
+        Assert.assertTrue(map.isPressed(Input.E));
+        Assert.assertFalse(map.isPressed(Input.F));
+        Assert.assertEquals(2, map.inputs.cardinality());
     }
 
     @Test
