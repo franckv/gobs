@@ -6,16 +6,18 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.gobs.GameState;
 import com.gobs.map.Layer;
 import com.gobs.map.LayerCell;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
-import com.gobs.managers.CollisionManager;
+import com.gobs.util.CollisionManager;
+import com.gobs.ui.DisplayManager;
 
 public class CollisionSystem extends EntityProcessingSystem {
-    private CollisionManager collisionManager;
+    private CollisionManager<Entity> collisionManager;
+    private DisplayManager displayManager;
+    private Layer mapLayer;
 
     private ImmutableArray<Entity> colliders;
 
@@ -23,14 +25,16 @@ public class CollisionSystem extends EntityProcessingSystem {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Collider> cm = ComponentMapper.getFor(Collider.class);
 
-    public CollisionSystem() {
-        this(0);
+    public CollisionSystem(CollisionManager<Entity> collisionManager, DisplayManager displayManager, Layer mapLayer) {
+        this(collisionManager, displayManager, mapLayer, 0);
     }
 
-    public CollisionSystem(int priority) {
+    public CollisionSystem(CollisionManager<Entity> collisionManager, DisplayManager displayManager, Layer mapLayer, int priority) {
         super(Family.all(Position.class, Transform.class).get(), priority);
 
-        this.collisionManager = GameState.getCollisionManager();
+        this.collisionManager = collisionManager;
+        this.displayManager = displayManager;
+        this.mapLayer = mapLayer;
     }
 
     @Override
@@ -48,8 +52,8 @@ public class CollisionSystem extends EntityProcessingSystem {
 
     @Override
     public void update(float deltaTime) {
-        int width = GameState.getWorldWidth();
-        int height = GameState.getWorldHeight();
+        int width = displayManager.getWorldWidth();
+        int height = displayManager.getWorldHeight();
 
         for (Entity entity : getEntities()) {
             Position pos = pm.get(entity);
@@ -74,7 +78,6 @@ public class CollisionSystem extends EntityProcessingSystem {
             buildTree();
         }
 
-        Layer mapLayer = GameState.getMapLayer();
         for (LayerCell cell : mapLayer) {
             if (cell != null && cell.isBlockable()) {
                 collisionManager.addBlockable(cell.getX(), cell.getY());

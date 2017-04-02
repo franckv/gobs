@@ -9,32 +9,40 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.gobs.GameState;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.components.Sprite;
+import com.gobs.map.Layer;
+import com.gobs.map.TiledMapView;
+import com.gobs.ui.DisplayManager;
 
 public class MapRenderingSystem extends EntityProcessingSystem {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Sprite> sm = ComponentMapper.getFor(Sprite.class);
 
-    OrthogonalTiledMapRenderer renderer;
-    Batch batch;
+    private DisplayManager displayManager;
+    private OrthogonalTiledMapRenderer renderer;
+    private Batch batch;
+    private TiledMapView mapView;
+    private Layer mapLayer;
 
-    public MapRenderingSystem(Batch batch) {
-        this(batch, 0);
+    public MapRenderingSystem(DisplayManager displayManager, TiledMapView mapView, Layer mapLayer, Batch batch) {
+        this(displayManager, mapView, mapLayer, batch, 0);
     }
 
-    public MapRenderingSystem(Batch batch, int priority) {
+    public MapRenderingSystem(DisplayManager displayManager, TiledMapView mapView, Layer mapLayer, Batch batch, int priority) {
         super(Family.all(Position.class, Sprite.class).exclude(Hidden.class).get(), priority);
 
+        this.displayManager = displayManager;
+        this.mapView = mapView;
+        this.mapLayer = mapLayer;
         this.batch = batch;
 
-        TiledMap map = GameState.getMapView().getMap();
+        TiledMap map = mapView.getMap();
 
         // Scale world coordinates to pixel coordinates
-        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / GameState.getTileSize(), batch);
-        renderer.setView(GameState.getMapCamera());
+        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / displayManager.getTileSize(), batch);
+        renderer.setView(displayManager.getMapCamera());
     }
 
     @Override
@@ -43,9 +51,9 @@ public class MapRenderingSystem extends EntityProcessingSystem {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
 
         // draw the tile map
-        GameState.getMapView().drawLayer(GameState.getMapLayer());
-        GameState.getMapCamera().update();
-        renderer.setView(GameState.getMapCamera());
+        mapView.drawLayer(mapLayer);
+        displayManager.getMapCamera().update();
+        renderer.setView(displayManager.getMapCamera());
         renderer.render();
 
         // draw entities

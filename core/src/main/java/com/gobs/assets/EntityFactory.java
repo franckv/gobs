@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.gobs.GameState;
 import com.gobs.ai.AIBehavior;
 import com.gobs.ai.MobBehavior;
 import com.gobs.components.AI;
@@ -21,6 +20,7 @@ import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.components.Sprite;
+import com.gobs.util.CollisionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,8 +28,15 @@ import java.util.regex.Pattern;
 
 public class EntityFactory {
     private static Pattern resourcePattern = Pattern.compile("(^.*)!(\\d+),(\\d+):(\\d+),(\\d+)$");
+    private CollisionManager<Entity> collisionManager;
+    private TileFactory tileManager;
 
-    public static List<Entity> loadEntities(String filename) {
+    public EntityFactory(CollisionManager<Entity> collisionManager, TileFactory tileManager) {
+        this.collisionManager = collisionManager;
+        this.tileManager = tileManager;
+    }
+    
+    public List<Entity> loadEntities(String filename) {
         List<Entity> entities = new ArrayList<>();
 
         JsonReader reader = new JsonReader();
@@ -46,7 +53,7 @@ public class EntityFactory {
         return entities;
     }
 
-    private static Entity parseEntity(JsonValue entity) {
+    private Entity parseEntity(JsonValue entity) {
         JsonValue disabled = entity.get("disabled");
         if (disabled != null && disabled.asBoolean()) {
             return null;
@@ -66,7 +73,7 @@ public class EntityFactory {
         return e;
     }
 
-    private static Component parseComponent(Entity e, JsonValue component) {
+    private Component parseComponent(Entity e, JsonValue component) {
         Component c = null;
 
         String type = component.getString("type");
@@ -93,9 +100,9 @@ public class EntityFactory {
                     }
 
                     if (!component.has("fill") || component.getBoolean("fill")) {
-                        c = new Sprite(GameState.getTileManager().getFullTile(color));
+                        c = new Sprite(tileManager.getFullTile(color));
                     } else {
-                        c = new Sprite(GameState.getTileManager().getRectTile(color));
+                        c = new Sprite(tileManager.getRectTile(color));
                     }
                 }
                 break;
@@ -131,7 +138,7 @@ public class EntityFactory {
                 c = new Camera(Camera.Orientation.UP);
                 break;
             case "ai":
-                AIBehavior behavior = new MobBehavior(e);
+                AIBehavior behavior = new MobBehavior(collisionManager, e);
                 c = new AI(behavior);
                 break;
         }
@@ -139,7 +146,7 @@ public class EntityFactory {
         return c;
     }
 
-    private static TextureRegion getTexture(String res) {
+    private TextureRegion getTexture(String res) {
         String textureName = res;
 
         Matcher matcher = resourcePattern.matcher(res);
@@ -153,9 +160,9 @@ public class EntityFactory {
             int w = Integer.parseInt(matcher.group(4));
             int h = Integer.parseInt(matcher.group(5));
 
-            return GameState.getTileManager().getTile(textureName, x, y, w, h);
+            return tileManager.getTile(textureName, x, y, w, h);
         } else {
-            return GameState.getTileManager().getTile(textureName);
+            return tileManager.getTile(textureName);
         }
     }
 }

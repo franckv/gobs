@@ -2,7 +2,6 @@ package com.gobs.assets;
 
 import com.gobs.map.Layer;
 import com.badlogic.gdx.Gdx;
-import com.gobs.GameState;
 import com.gobs.map.LayerCell.LayerCellType;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,11 +15,8 @@ import java.util.List;
  *
  */
 public class DungeonFactory {
-    public static Layer loadMap(String res) throws IOException {
-        int width = GameState.getConfig().getWordWidth();
-        int height = GameState.getConfig().getWorldHeight();
-
-        Layer mapLayer = new Layer(width, height, Layer.LayerType.MAP_LAYER);
+    public static Layer loadMap(int worldWidth, int worldHeight, String res) throws IOException {
+        Layer mapLayer = new Layer(worldWidth, worldHeight, Layer.LayerType.MAP_LAYER);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 Gdx.files.internal(res).read(), Charset.forName("UTF-8")))) {

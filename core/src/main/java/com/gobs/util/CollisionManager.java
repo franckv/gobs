@@ -1,6 +1,5 @@
-package com.gobs.managers;
+package com.gobs.util;
 
-import com.badlogic.ashley.core.Entity;
 import com.gobs.pathfinding.Graph;
 import com.gobs.util.PointQuadTree;
 import com.gobs.util.QuadTree;
@@ -9,21 +8,21 @@ import java.util.List;
 /**
  *
  */
-public class CollisionManager {
-    private Graph graph;
-    private QuadTree<Entity> tree;
+public class CollisionManager<T> {
+    private Graph<T> graph;
+    private QuadTree<T> tree;
     
     public CollisionManager(int width, int height) {
         tree = new PointQuadTree<>(height - 1, 0, 0, width - 1);
 
-        graph = new Graph(this, width, height);
+        graph = new Graph<>(this, width, height, false);
     }
 
     public Graph getGraph() {
         return graph;
     }
 
-    public QuadTree<Entity> getTree() {
+    public QuadTree<T> getTree() {
         return tree;
     }
 
@@ -31,7 +30,7 @@ public class CollisionManager {
         tree.reset();
     }
 
-    public void addEntity(Entity e, int x, int y) {
+    public void addEntity(T e, int x, int y) {
         tree.insert(e, x, y);
     }
 
@@ -39,14 +38,14 @@ public class CollisionManager {
         tree.insert(null, x, y);
     }
     
-    public boolean isColliding(Entity e, int x, int y) {
-        List<Entity> result = tree.find(x, y);
+    public boolean isColliding(T e, int x, int y) {
+        List<T> result = tree.find(x, y);
 
         return result != null && (result.size() > 1 || result.get(0) != e);
     }
 
     public boolean isBlocked(int x, int y) {
-        List<Entity> result = tree.find(x, y);
+        List<T> result = tree.find(x, y);
         
         return result != null && !result.isEmpty();
     }

@@ -9,11 +9,11 @@ import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.GridPoint2;
-import com.gobs.GameState;
 import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
 import com.gobs.components.Goal;
 import com.gobs.components.Position;
+import com.gobs.util.CollisionManager;
 import com.gobs.pathfinding.Graph;
 import com.gobs.pathfinding.ManhattanHeuristic;
 import java.util.Random;
@@ -23,6 +23,7 @@ import java.util.Random;
  */
 public class MobBehavior implements AIBehavior {
     private Entity entity;
+    private CollisionManager<Entity> collisionManager;
 
     private static Random rnd = new Random();
     private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -30,8 +31,9 @@ public class MobBehavior implements AIBehavior {
 
     StateMachine<MobBehavior, MobState> stateMachine;
 
-    public MobBehavior(Entity entity) {
+    public MobBehavior(CollisionManager<Entity> collisionManager, Entity entity) {
         this.stateMachine = new DefaultStateMachine<>(this, MobState.WAITING);
+        this.collisionManager = collisionManager;
         this.entity = entity;
     }
 
@@ -79,7 +81,7 @@ public class MobBehavior implements AIBehavior {
 
             if (pos.getX() == goal.getX() && pos.getY() == goal.getY()) {
                 System.out.println("Target reached");
-            } else if (!GameState.getCollisionManager().isBlocked(goal.getX(), goal.getY())) {
+            } else if (!collisionManager.isBlocked(goal.getX(), goal.getY())) {
                 GridPoint2 nextPos = getMove(pos.getX(), pos.getY(), goal.getX(), goal.getY());
 
                 if (nextPos != null) {
@@ -143,7 +145,7 @@ public class MobBehavior implements AIBehavior {
     }
 
     private GridPoint2 getMove(int x, int y, int a, int b) {
-        Graph graph = GameState.getCollisionManager().getGraph();
+        Graph graph = collisionManager.getGraph();
 
         IndexedAStarPathFinder<GridPoint2> pf = new IndexedAStarPathFinder<>(graph, true);
 

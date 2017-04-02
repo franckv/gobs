@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import com.gobs.GameState;
+import com.gobs.assets.TileFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +23,20 @@ public class GdxGUI extends GUI implements Disposable {
     private TextureRegion frame;
     private TextureRegion frameSelected;
     private ShapeRenderer render;
+    private TileFactory tileManager;
+    private DisplayManager displayManager;
 
-    public GdxGUI(Batch batch) {
+    public GdxGUI(DisplayManager displayManager, TileFactory tileManager, Batch batch) {
+        this.displayManager = displayManager;
+        this.tileManager = tileManager;
         this.batch = batch;
 
         fonts = new HashMap<>();
 
         color = Color.GREEN;
 
-        frame = GameState.getTileManager().getFrame();
-        frameSelected = GameState.getTileManager().getFrameSelected();
+        frame = tileManager.getFrame();
+        frameSelected = tileManager.getFrameSelected();
 
         render = new ShapeRenderer();
     }
@@ -54,12 +58,12 @@ public class GdxGUI extends GUI implements Disposable {
 
     @Override
     public float getMaxWidth() {
-        return GameState.getOverlayViewport().getWorldWidth();
+        return displayManager.getOverlayViewport().getWorldWidth();
     }
 
     @Override
     public float getMaxHeight() {
-        return GameState.getOverlayViewport().getWorldHeight();
+        return displayManager.getOverlayViewport().getWorldHeight();
     }
 
     @Override
@@ -98,7 +102,7 @@ public class GdxGUI extends GUI implements Disposable {
 
     public void drawSquare(float x1, float y1, float x2, float y2) {
         Gdx.gl20.glLineWidth(5);
-        render.setProjectionMatrix(GameState.getOverlayCamera().combined);
+        render.setProjectionMatrix(displayManager.getOverlayCamera().combined);
         render.begin(ShapeRenderer.ShapeType.Line);
         render.setColor(Color.GREEN);
 
@@ -112,7 +116,7 @@ public class GdxGUI extends GUI implements Disposable {
 
     public void showCenters() {
         Gdx.gl20.glLineWidth(1);
-        render.setProjectionMatrix(GameState.getOverlayCamera().combined);
+        render.setProjectionMatrix(displayManager.getOverlayCamera().combined);
         render.begin(ShapeRenderer.ShapeType.Line);
         render.setColor(Color.RED);
         render.line(Gdx.graphics.getWidth() / 2.0f, 0, Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight());

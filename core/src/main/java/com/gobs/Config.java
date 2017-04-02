@@ -56,7 +56,7 @@ public class Config {
         return tileSize;
     }
     
-    public int getWordWidth() {
+    public int getWorldWidth() {
         return worldWidth;
     }
     

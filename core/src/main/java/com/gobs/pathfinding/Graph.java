@@ -5,24 +5,24 @@ import com.badlogic.gdx.ai.pfa.DefaultConnection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
-import com.gobs.managers.CollisionManager;
+import com.gobs.util.CollisionManager;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Graph implements IndexedGraph<GridPoint2> {
+public class Graph<T> implements IndexedGraph<GridPoint2> {
     private int width;
     private int height;
     private boolean diags;
-    private CollisionManager collisionManager;
+    private CollisionManager<T> collisionManager;
     Map<String, GridPoint2> nodes;
 
-    public Graph(CollisionManager collisionManager, int width, int height) {
+    public Graph(CollisionManager<T> collisionManager, int width, int height, boolean diags) {
         this.collisionManager = collisionManager;
         this.width = width;
         this.height = height;
 
         // entity can move only in 4 cardinal directions
-        this.diags = false;
+        this.diags = diags;
 
         this.nodes = new HashMap<>();
     }

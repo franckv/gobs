@@ -5,8 +5,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
-import com.gobs.GameState;
-import com.gobs.RunningState;
 import com.gobs.map.LayerCell.LayerCellType;
 import com.gobs.components.AI;
 import com.gobs.components.Command;
@@ -19,13 +17,19 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.ui.Input;
 import com.gobs.input.InputHandler;
+import com.gobs.StateManager;
+import com.gobs.map.Layer;
+import com.gobs.ui.DisplayManager;
 import com.gobs.ui.InputMap;
 import com.gobs.ui.GUI;
 
 public class InputSystem extends EntityProcessingSystem {
+    private DisplayManager displayManager;
     private InputHandler inputHandler;
     private ContextManager contextManager;
-
+    private StateManager stateManager;
+    private Layer mapLayer;
+    
     int repeat = 0;
     int repeatWait = 20;
     int rate = 1;
@@ -35,18 +39,20 @@ public class InputSystem extends EntityProcessingSystem {
     private ComponentMapper<Hidden> hm = ComponentMapper.getFor(Hidden.class);
     private ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
 
-    public InputSystem() {
-        this(0);
+    public InputSystem(DisplayManager displayManager, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat) {
+        this(displayManager, inputHandler, contextManager, stateManager, mapLayer, repeat, 0);
     }
 
-    public InputSystem(int priority) {
+    public InputSystem(DisplayManager displayManager, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat, int priority) {
         super(Family.one(Controller.class, AI.class).get(), priority);
 
-        inputHandler = GameState.getInputHandler();
-
-        repeatWait = GameState.getConfig().getRepeat();
-
-        contextManager = GameState.getContextManager();
+        this.displayManager = displayManager;
+        this.inputHandler = inputHandler;
+        this.stateManager = stateManager;
+        this.contextManager = contextManager;
+        this.mapLayer = mapLayer;
+        
+        repeatWait = repeat;
 
         mapInputs();
         registerActions();
@@ -144,40 +150,40 @@ public class InputSystem extends EntityProcessingSystem {
         });
 
         contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            GameState.setState(RunningState.MAP);
+            stateManager.setState(StateManager.State.MAP);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            GameState.setState(RunningState.CRAWL);
+            stateManager.setState(StateManager.State.CRAWL);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.TOGGLE_EDIT, (action) -> {
-            GameState.setState(RunningState.EDITMAP);
+            stateManager.setState(StateManager.State.EDITMAP);
             editMap(true);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_UP, (action) -> {
-            GameState.getMapCamera().translate(0, 1);
+            displayManager.getMapCamera().translate(0, 1);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_DOWN, (action) -> {
-            GameState.getMapCamera().translate(0, -1);
+            displayManager.getMapCamera().translate(0, -1);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_LEFT, (action) -> {
-            GameState.getMapCamera().translate(-1, 0);
+            displayManager.getMapCamera().translate(-1, 0);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_RIGHT, (action) -> {
-            GameState.getMapCamera().translate(1, 0);
+            displayManager.getMapCamera().translate(1, 0);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_IN, (action) -> {
-            GameState.getMapCamera().zoom -= 0.1f;
+            displayManager.getMapCamera().zoom -= 0.1f;
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_OUT, (action) -> {
-            GameState.getMapCamera().zoom += 0.1f;
+            displayManager.getMapCamera().zoom += 0.1f;
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_UP, (action) -> {
@@ -209,12 +215,12 @@ public class InputSystem extends EntityProcessingSystem {
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            GameState.setState(RunningState.CRAWL);
+            stateManager.setState(StateManager.State.CRAWL);
             editMap(false);
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TOGGLE_EDIT, (action) -> {
-            GameState.setState(RunningState.MAP);
+            stateManager.setState(StateManager.State.MAP);
             editMap(false);
         });
     }
@@ -259,8 +265,8 @@ public class InputSystem extends EntityProcessingSystem {
         }
 
         System.out.println("Dig at " + x + "," + y);
-        GameState.getMapLayer().setCell(x, y, LayerCellType.FLOOR, false);
-        GameState.getMapLayer().setDirty(true);
+        mapLayer.setCell(x, y, LayerCellType.FLOOR, false);
+        mapLayer.setDirty(true);
     }
 
     private void fillMap() {
@@ -278,8 +284,8 @@ public class InputSystem extends EntityProcessingSystem {
         }
 
         System.out.println("Fill " + x + "," + y);
-        GameState.getMapLayer().setCell(x, y, LayerCellType.WALL, true);
-        GameState.getMapLayer().setDirty(true);
+        mapLayer.setCell(x, y, LayerCellType.WALL, true);
+        mapLayer.setDirty(true);
     }
 
     private void editMap(boolean edit) {

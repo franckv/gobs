@@ -1,14 +1,19 @@
 package com.gobs.screens;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Screen;
-import com.gobs.GameState;
+import com.gobs.ui.DisplayManager;
 
 /**
  *
  */
 public class BaseScreen implements Screen {
-    public BaseScreen() {
-
+    private DisplayManager displayManager;
+    private Engine engine;
+    
+    public BaseScreen(DisplayManager displayManager, Engine engine) {
+        this.displayManager = displayManager;
+        this.engine = engine;
     }
     
     @Override
@@ -17,14 +22,14 @@ public class BaseScreen implements Screen {
     
     @Override
     public void render(float delta) {
-        GameState.getEngine().update(delta);
+        engine.update(delta);
     }
     
     @Override
     public void resize(int width, int height) {
-        GameState.getMapViewport().update(width / GameState.getTileSize(), height / GameState.getTileSize());
-        GameState.getOverlayViewport().update(width, height);
-        GameState.getFPVViewport().update(width, height);
+        displayManager.getMapViewport().update(width / displayManager.getTileSize(), height / displayManager.getTileSize());
+        displayManager.getOverlayViewport().update(width, height);
+        displayManager.getFPVViewport().update(width, height);
     }
     
     @Override

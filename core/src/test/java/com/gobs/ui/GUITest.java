@@ -1,6 +1,8 @@
 package com.gobs.ui;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.gobs.Config;
+import com.gobs.assets.TileFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +14,8 @@ public class GUITest {
 
     @Before
     public void setUp() {
-        gui = new GdxGUI(new SpriteBatch());
+        Config config = new Config(null);
+        gui = new GdxGUI(new DisplayManager(1024, 768, 32), new TileFactory(config, 32), new SpriteBatch());
     }
 
     @Test

@@ -7,7 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.utils.Disposable;
-import com.gobs.GameState;
+import com.gobs.assets.TileFactory;
 import com.gobs.map.Layer.LayerType;
 
 /**
@@ -15,8 +15,10 @@ import com.gobs.map.Layer.LayerType;
  */
 public class TiledMapView implements Disposable {
     private TiledMap map;
+    private TileFactory tileManager;
 
-    public TiledMapView(int width, int height, int tileSize) {
+    public TiledMapView(TileFactory tileManager, int width, int height, int tileSize) {
+        this.tileManager = tileManager;
         map = new TiledMap();
 
         map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
@@ -72,9 +74,9 @@ public class TiledMapView implements Disposable {
         TextureRegion tile;
 
         if (fill) {
-            tile = GameState.getTileManager().getFullTile(color);
+            tile = tileManager.getFullTile(color);
         } else {
-            tile = GameState.getTileManager().getRectTile(color);
+            tile = tileManager.getRectTile(color);
         }
 
         if (cell.getTile() == null) {

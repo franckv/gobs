@@ -18,10 +18,11 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.gobs.GameState;
 import com.gobs.map.LayerCell;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
+import com.gobs.map.Layer;
+import com.gobs.ui.DisplayManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
 
+    private Layer mapLayer;
+    private DisplayManager displayManager;
     private Environment environment;
     private ModelBatch modelBatch;
     private Model wall, floor;
@@ -41,12 +44,15 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
     private DirectionalLight light;
     private Texture texture;
 
-    public FPVRenderingSystem() {
-        this(0);
+    public FPVRenderingSystem(DisplayManager displayManager, Layer mapLayer) {
+        this(displayManager, mapLayer, 0);
     }
 
-    public FPVRenderingSystem(int priority) {
+    public FPVRenderingSystem(DisplayManager displayManager, Layer mapLayer, int priority) {
         super(Family.all(Camera.class).get(), priority);
+
+        this.mapLayer = mapLayer;
+        this.displayManager = displayManager;
 
         texture = new Texture("textures/wall.png");
 
@@ -63,7 +69,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         ModelBuilder modelBuilder = new ModelBuilder();
         wall = modelBuilder.createBox(step, step, step, mat, attr);
 
-        floor = modelBuilder.createBox(GameState.getWorldWidth() * step, GameState.getWorldHeight() * step, h,
+        floor = modelBuilder.createBox(displayManager.getWorldWidth() * step, displayManager.getWorldHeight() * step, h,
                 new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
     }
@@ -74,10 +80,10 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         instances.clear();
 
         instance = new ModelInstance(floor);
-        instance.transform.translate(GameState.getWorldWidth() * step / 2 - step / 2, GameState.getWorldHeight() * step / 2 - step / 2, -(step + h) / 2);
+        instance.transform.translate(displayManager.getWorldWidth() * step / 2 - step / 2, displayManager.getWorldHeight() * step / 2 - step / 2, -(step + h) / 2);
         instances.add(instance);
 
-        for (LayerCell c : GameState.getMapLayer()) {
+        for (LayerCell c : mapLayer) {
             if (c != null) {
                 switch (c.getType()) {
                     case WALL:
@@ -101,7 +107,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
             Camera cam = cm.get(entity);
             Position pos = pm.get(entity);
 
-            GameState.getFPVCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
+            displayManager.getFPVCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
 
             int dx = 0, dy = 0;
 
@@ -122,17 +128,17 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
             }
 
             Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
-            GameState.getFPVCamera().lookAt(vec);
+            displayManager.getFPVCamera().lookAt(vec);
         }
 
-        GameState.getFPVCamera().update();
+        displayManager.getFPVCamera().update();
 
-        if (GameState.getMapLayer().isDirty()) {
+        if (mapLayer.isDirty()) {
             buildScene();
-            GameState.getMapLayer().setDirty(false);
+            mapLayer.setDirty(false);
         }
 
-        modelBatch.begin(GameState.getFPVCamera());
+        modelBatch.begin(displayManager.getFPVCamera());
 
         modelBatch.render(instances, environment);
 

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import com.gobs.GameState;
+import com.gobs.Config;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +16,18 @@ import java.util.Map;
  * Factory for color tiles
  */
 public class TileFactory implements Disposable {
+    private AssetManager assetManager;
     private int tileSize; // size in pixels
     private Pixmap pixmap;
     private Texture texture;
+    private String frameSprite;
+    private String frameSelectedSprite;
 
     private Map<Color, TextureRegion> fullTiles;
     private Map<Color, TextureRegion> rectTiles;
 
-    public TileFactory(int tileSize) {
+    public TileFactory(Config config, int tileSize) {
+        this.assetManager = new AssetManager();
         this.tileSize = tileSize;
 
         fullTiles = new HashMap<>();
@@ -43,6 +47,9 @@ public class TileFactory implements Disposable {
         colors.add(Color.GOLD);
 
         initTiles(colors);
+        
+        frameSprite = config.getFrameSprite();
+        frameSelectedSprite = config.getFrameSelectedSprite();
     }
 
     private void initTiles(List<Color> colors) {
@@ -80,42 +87,41 @@ public class TileFactory implements Disposable {
             return rectTiles.get(Color.DARK_GRAY);
         }
     }
-    
+
     public TextureRegion getFrame() {
-        return getTile(GameState.getConfig().getFrameSprite());
+        return getTile(frameSprite);
     }
-        
+
     public TextureRegion getFrameSelected() {
-        return getTile(GameState.getConfig().getFrameSelectedSprite());
+        return getTile(frameSelectedSprite);
     }
 
     public TextureRegion getTile(String res, int x, int y, int w, int h) {
         Texture tex = getTexture(res);
-        
+
         return new TextureRegion(tex, x * w, y * h, w, h);
     }
-    
+
     public TextureRegion getTile(String res) {
         Texture tex = getTexture(res);
-        
+
         return new TextureRegion(tex);
     }
-    
-    private Texture getTexture(String res) {
-        AssetManager manager = GameState.getAssetManager();
 
-        if (!manager.isLoaded(res, Texture.class)) {
-            manager.load(res, Texture.class);
-            manager.finishLoadingAsset(res);
+    private Texture getTexture(String res) {
+        if (!assetManager.isLoaded(res, Texture.class)) {
+            assetManager.load(res, Texture.class);
+            assetManager.finishLoadingAsset(res);
         }
 
-        Texture tex = manager.get(res, Texture.class);
+        Texture tex = assetManager.get(res, Texture.class);
 
         return tex;
     }
 
     @Override
     public void dispose() {
+        assetManager.dispose();
         pixmap.dispose();
         texture.dispose();
     }
