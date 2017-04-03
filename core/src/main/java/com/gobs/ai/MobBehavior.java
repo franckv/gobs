@@ -13,9 +13,9 @@ import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
 import com.gobs.components.Goal;
 import com.gobs.components.Position;
-import com.gobs.util.CollisionManager;
 import com.gobs.pathfinding.Graph;
 import com.gobs.pathfinding.ManhattanHeuristic;
+import com.gobs.util.CollisionManager;
 import java.util.Random;
 
 /**

@@ -1,25 +1,13 @@
 package com.gobs.display;
 
-import com.badlogic.gdx.Gdx;
-
 public class DisplayManager {
-    private int screenWidth;
-    private int screenHeight;
-    private float screenRatio;
-
     private int tileSize;
 
     MapDisplay mapDisplay;
     OrthographicDisplay overlayDisplay;
     PerspectiveDisplay fpvDisplay;
 
-    public DisplayManager(int worldWidth, int worldHeight, int tileSize) {
-        // screen resolution
-        // TODO: update when resizing
-        screenWidth = Gdx.graphics.getWidth();
-        screenHeight = Gdx.graphics.getHeight();
-        screenRatio = (float) screenWidth / screenHeight;
-
+    public DisplayManager(int screenWidth, int screenHeight, int worldWidth, int worldHeight, int tileSize) {
         this.tileSize = tileSize;
 
         mapDisplay = new MapDisplay(screenWidth, screenHeight, tileSize);

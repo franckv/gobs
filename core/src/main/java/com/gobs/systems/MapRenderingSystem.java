@@ -12,9 +12,9 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.components.Sprite;
+import com.gobs.display.MapDisplay;
 import com.gobs.map.Layer;
 import com.gobs.map.TiledMapView;
-import com.gobs.display.MapDisplay;
 
 public class MapRenderingSystem extends EntityProcessingSystem {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);

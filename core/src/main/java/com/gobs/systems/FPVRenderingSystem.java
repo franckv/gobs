@@ -18,11 +18,11 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.gobs.map.LayerCell;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
-import com.gobs.map.Layer;
 import com.gobs.display.PerspectiveDisplay;
+import com.gobs.map.Layer;
+import com.gobs.map.LayerCell;
 import java.util.ArrayList;
 import java.util.List;
 

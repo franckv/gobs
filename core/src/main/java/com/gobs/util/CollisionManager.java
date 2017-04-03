@@ -1,8 +1,6 @@
 package com.gobs.util;
 
 import com.gobs.pathfinding.Graph;
-import com.gobs.util.PointQuadTree;
-import com.gobs.util.QuadTree;
 import java.util.List;
 
 /**

@@ -6,11 +6,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.gobs.map.Layer;
-import com.gobs.map.LayerCell;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
+import com.gobs.map.Layer;
+import com.gobs.map.LayerCell;
 import com.gobs.util.CollisionManager;
 
 public class CollisionSystem extends EntityProcessingSystem {

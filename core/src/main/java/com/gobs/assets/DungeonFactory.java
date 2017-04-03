@@ -1,7 +1,7 @@
 package com.gobs.assets;
 
-import com.gobs.map.Layer;
 import com.badlogic.gdx.Gdx;
+import com.gobs.map.Layer;
 import com.gobs.map.LayerCell.LayerCellType;
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
-import com.gobs.map.LayerCell.LayerCellType;
+import com.gobs.StateManager;
 import com.gobs.components.AI;
 import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
@@ -13,15 +13,15 @@ import com.gobs.components.Controller;
 import com.gobs.components.Goal;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
+import com.gobs.display.MapDisplay;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
-import com.gobs.ui.Input;
 import com.gobs.input.InputHandler;
-import com.gobs.StateManager;
 import com.gobs.map.Layer;
-import com.gobs.display.MapDisplay;
-import com.gobs.ui.InputMap;
+import com.gobs.map.LayerCell.LayerCellType;
 import com.gobs.ui.GUI;
+import com.gobs.ui.Input;
+import com.gobs.ui.InputMap;
 
 public class InputSystem extends EntityProcessingSystem {
     private MapDisplay display;
