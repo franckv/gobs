@@ -50,9 +50,9 @@ public class ContextManagerTest {
         Assert.assertEquals(1, handlers.size());
 
         triggered = false;
-        
+
         handlers.get(0).triggerAction(Action.MOVE_UP);
-        
+
         Assert.assertTrue(triggered);
     }
 
@@ -78,5 +78,69 @@ public class ContextManagerTest {
         accepted = manager.acceptInput(map);
 
         Assert.assertTrue(triggered && accepted);
+    }
+
+    @Test
+    public void testRegisterConsumer() {
+        manager.registerConsumer("test", Action.DUMP);
+
+        Assert.assertEquals(1, manager.consummerMappings.keySet().size());
+        Assert.assertEquals(1, manager.consummerMappings.get(Action.DUMP).size());
+
+        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
+
+        manager.registerConsumer("test2", Action.DUMP);
+
+        Assert.assertEquals(1, manager.consummerMappings.keySet().size());
+        Assert.assertEquals(2, manager.consummerMappings.get(Action.DUMP).size());
+
+        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
+        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DUMP).get(1));
+
+        manager.registerConsumer("test2", Action.DIG);
+
+        Assert.assertEquals(2, manager.consummerMappings.keySet().size());
+        Assert.assertEquals(2, manager.consummerMappings.get(Action.DUMP).size());
+        Assert.assertEquals(1, manager.consummerMappings.get(Action.DIG).size());
+
+        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
+        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DUMP).get(1));
+        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DIG).get(0));
+    }
+
+    @Test
+    public void testDispatchInput() {
+        manager.activateContext(ContextManager.ContextType.CRAWLING);
+        manager.mapInput(ContextType.CRAWLING, Input.D, Action.DUMP);
+        manager.mapInput(ContextType.CRAWLING, Input.ESCAPE, Action.EXIT);
+        manager.registerConsumer("test", Action.DUMP);
+        manager.registerConsumer("test", Action.EXIT);
+        manager.registerConsumer("test2", Action.EXIT);
+
+        InputMap map = new InputMap();
+        map.set(Input.UP);
+        manager.dispatchInput(map);
+
+        Assert.assertEquals(0, manager.dispatcher.get("test").size());
+
+        map.set(Input.D);
+        manager.dispatchInput(map);
+
+        Assert.assertEquals(1, manager.dispatcher.get("test").size());
+
+        map.clear(Input.UP);
+        map.set(Input.ESCAPE);
+        manager.dispatchInput(map);
+
+        Assert.assertEquals(2, manager.dispatcher.get("test").size());
+        Assert.assertEquals(1, manager.dispatcher.get("test2").size());
+
+        map.clear(Input.D);
+        manager.dispatchInput(map);
+
+        Assert.assertEquals(1, manager.dispatcher.get("test").size());
+        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test").get(0));
+        Assert.assertEquals(1, manager.dispatcher.get("test2").size());
+        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test2").get(0));
     }
 }

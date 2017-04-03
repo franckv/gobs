@@ -26,13 +26,21 @@ public class ContextManager {
     }
 
     BitSet activeContexts;
+    // map input to actions in a specific context
     Map<ContextType, Map<Input, Action>> inputMappings;
+    // callback registration for actions
     Map<ContextType, Map<Action, List<ContextHandler>>> handlerMappings;
+    // poll based consummer registration for actions
+    Map<Action, List<String>> consummerMappings;
+    // list of actions available for a specific consummer
+    Map<String, List<Action>> dispatcher;
 
     public ContextManager() {
         activeContexts = new BitSet(ContextType.values().length);
         inputMappings = new HashMap<>();
         handlerMappings = new HashMap<>();
+        consummerMappings = new HashMap<>();
+        dispatcher = new HashMap<>();
     }
 
     public void activateContext(ContextType context) {
@@ -53,6 +61,41 @@ public class ContextManager {
         }
 
         inputMapping.put(input, action);
+    }
+
+    public void registerConsumer(String consummer, Action action) {
+        if (!consummerMappings.containsKey(action)) {
+            consummerMappings.put(action, new ArrayList<>());
+        }
+        consummerMappings.get(action).add(consummer);
+        if (!dispatcher.containsKey(consummer)) {
+            dispatcher.put(consummer, new ArrayList<>());
+        }
+    }
+
+    public void dispatchInput(InputMap inputmap) {
+        for (Input input : inputmap.get()) {
+            for (ContextType context : inputMappings.keySet()) {
+                if (activeContexts.get(context.ordinal())) {
+                    if (inputMappings.get(context).containsKey(input)) {
+                        Action action = inputMappings.get(context).get(input);
+
+                        if (consummerMappings.containsKey(action)) {
+                            for (String consummer : consummerMappings.get(action)) {
+                                dispatcher.get(consummer).add(action);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Action> pollActions(String consummer) {
+        List<Action> result = new ArrayList<>(dispatcher.get(consummer));
+        dispatcher.get(consummer).clear();;
+        
+        return result;
     }
 
     public void registerAction(ContextType context, Action action, ContextHandler handler) {
@@ -87,11 +130,11 @@ public class ContextManager {
 
     public boolean acceptInput(Input input) {
         for (ContextType context : inputMappings.keySet()) {
-            if (activeContexts.get(context.ordinal()) && handlerMappings.containsKey(context)) {
+            if (activeContexts.get(context.ordinal())) {
                 if (inputMappings.get(context).containsKey(input)) {
                     Action action = inputMappings.get(context).get(input);
 
-                    if (handlerMappings.get(context).containsKey(action)) {
+                    if (handlerMappings.containsKey(context) && handlerMappings.get(context).containsKey(action)) {
                         for (ContextHandler handler : handlerMappings.get(context).get(action)) {
                             handler.triggerAction(action);
                             return true;
