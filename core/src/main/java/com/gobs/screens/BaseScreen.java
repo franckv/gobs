@@ -10,6 +10,8 @@ import com.gobs.display.DisplayManager;
 public class BaseScreen implements Screen {
     private DisplayManager displayManager;
     private Engine engine;
+    private double accu = 0.0;
+    private float step = 1.0f/60f;
     
     public BaseScreen(DisplayManager displayManager, Engine engine) {
         this.displayManager = displayManager;
@@ -22,7 +24,12 @@ public class BaseScreen implements Screen {
     
     @Override
     public void render(float delta) {
-        engine.update(delta);
+        accu += delta;
+        
+        while (accu >= step) {
+            accu -= step;
+            engine.update(step);
+        }
     }
     
     @Override
