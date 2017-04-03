@@ -134,13 +134,16 @@ public class GUILayout {
             switch (parent.flow) {
                 case HORIZONTAL:
                     parent.right = Math.min(parent.right + spacing, maxWidth);
+                    parent.posX = parent.right;
+                    parent.posY = parent.top;
                     break;
                 case VERTICAL:
                     parent.bottom = Math.max(0, parent.bottom - spacing);
+                    parent.posX = parent.left;
+                    parent.posY = parent.bottom;
                     break;
             }
         }
-        //System.out.println(name + " T: " + top + ", B: " + bottom + ", L:" + left + ", R:" + right);
     }
 
     void space(float size) {
