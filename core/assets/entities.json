@@ -1,5 +1,18 @@
 [
     {
+        "entity": "sword",
+        "components": [
+            {
+                "type": "item",
+                "name": "Short sword"
+            },
+            {
+                "type": "sprite",
+                "res": "sprites/tileset.png!0,5:34,34"
+            }
+        ]
+    },
+    {
         "entity": "party",
         "components": [
             {
@@ -9,7 +22,7 @@
             {
                 "type": "position",
                 "x": 21,
-                "y": 12
+                "y": 10
             },
             {
                 "type": "sprite",
@@ -24,6 +37,11 @@
             }, 
             {
                 "type": "camera"
+            },
+            {
+                "type": "inventory",
+                "size": 10,
+                "items": []
             }
         ]
     }, {
