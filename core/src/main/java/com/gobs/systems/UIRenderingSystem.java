@@ -100,10 +100,13 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         gui.setSpacing(spacing);
 
         drawStatusBar();
+
+        gui.createSection("ui", GUILayout.FlowDirection.VERTICAL);
         if (stateManager.getState() == State.CRAWL) {
             drawCharactersStats();
             //drawInventory();
         }
+        gui.endSection();
 
         gui.endSection();
 
@@ -227,40 +230,43 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     }
 
     private void drawInventory() {
-        gui.setPosition(212, 584);
-
-        gui.Frame(400, 400);
-
-        gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
-        gui.setMargin(50);
-
-        gui.createSection("", GUILayout.FlowDirection.VERTICAL);
+        gui.createSection("inventory", GUILayout.FlowDirection.NONE);
         {
+            gui.Frame(400, 400);
 
-            for (int i = 0; i < 4; i++) {
-                gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
-                gui.Box("Item" + (2 * i), 50, 50);
-                gui.Box("Item" + (2 * i + 1), 50, 50);
+            gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
+            {
+                gui.setMargin(50);
+
+                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
+                {
+
+                    for (int i = 0; i < 4; i++) {
+                        gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
+                        gui.Box("Item" + (2 * i), 50, 50);
+                        gui.Box("Item" + (2 * i + 1), 50, 50);
+                        gui.endSection();
+                    }
+                }
+                gui.endSection();
+
+                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
+                {
+                    gui.Spacer(150);
+                }
+                gui.endSection();
+
+                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
+                {
+                    gui.Box("Equip1", 50, 50);
+                    gui.Box("Equip2", 50, 50);
+                    gui.Box("Equip3", 50, 50);
+                    gui.Box("Equip4", 50, 50);
+                }
                 gui.endSection();
             }
+            gui.endSection();
         }
-        gui.endSection();
-
-        gui.createSection("", GUILayout.FlowDirection.VERTICAL);
-        {
-            gui.Spacer(150);
-        }
-        gui.endSection();
-
-        gui.createSection("", GUILayout.FlowDirection.VERTICAL);
-        {
-            gui.Box("Equip1", 50, 50);
-            gui.Box("Equip2", 50, 50);
-            gui.Box("Equip3", 50, 50);
-            gui.Box("Equip4", 50, 50);
-        }
-        gui.endSection();
-
         gui.endSection();
     }
 
