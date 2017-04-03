@@ -31,7 +31,7 @@ public class Layer implements Iterable<LayerCell> {
         if (x >= 0 && x < w && y >= 0 && y < h) {
             cells[x][y] = new LayerCell(x, y, cellType, block);
         }
-        
+
         this.dirty = true;
     }
 
@@ -55,11 +55,11 @@ public class Layer implements Iterable<LayerCell> {
     public LayerType getType() {
         return type;
     }
-    
+
     public boolean isDirty() {
         return dirty;
     }
-    
+
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
@@ -71,26 +71,34 @@ public class Layer implements Iterable<LayerCell> {
 
             @Override
             public Object next() {
-                int size = w*h;
+                int size = w * h;
                 if (idx >= size) {
                     throw new NoSuchElementException();
                 }
-                while (idx < w * h) {
-                    int x = idx % w;
-                    int y = idx / w;
-                    idx += 1;
-                    LayerCell cell = cells[x][y];
-                    if (cell != null) {
-                        return cell;
-                    }
-                }
-                
-                return null;
+                int x = idx % w;
+                int y = idx / w;
+                idx += 1;
+                return cells[x][y];
             }
 
             @Override
             public boolean hasNext() {
-                return idx < w * h;
+                int size = w * h;
+                if (idx >= size) {
+                    return false;
+                }
+                while (idx < size) {
+                    int x = idx % w;
+                    int y = idx / w;
+                    
+                    LayerCell cell = cells[x][y];
+                    if (cell != null) {
+                        return true;
+                    }
+                    idx += 1;
+                }
+
+                return false;
             }
         };
 
