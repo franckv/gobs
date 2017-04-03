@@ -12,11 +12,11 @@ import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
 import com.gobs.util.CollisionManager;
-import com.gobs.ui.DisplayManager;
 
 public class CollisionSystem extends EntityProcessingSystem {
     private CollisionManager<Entity> collisionManager;
-    private DisplayManager displayManager;
+    private int worldWidth;
+    private int worldHeight;
     private Layer mapLayer;
 
     private ImmutableArray<Entity> colliders;
@@ -25,15 +25,16 @@ public class CollisionSystem extends EntityProcessingSystem {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Collider> cm = ComponentMapper.getFor(Collider.class);
 
-    public CollisionSystem(CollisionManager<Entity> collisionManager, DisplayManager displayManager, Layer mapLayer) {
-        this(collisionManager, displayManager, mapLayer, 0);
+    public CollisionSystem(CollisionManager<Entity> collisionManager, int worldWidth, int worldHeight, Layer mapLayer) {
+        this(collisionManager, worldWidth, worldHeight, mapLayer, 0);
     }
 
-    public CollisionSystem(CollisionManager<Entity> collisionManager, DisplayManager displayManager, Layer mapLayer, int priority) {
+    public CollisionSystem(CollisionManager<Entity> collisionManager, int worldWidth, int worldHeight, Layer mapLayer, int priority) {
         super(Family.all(Position.class, Transform.class).get(), priority);
 
         this.collisionManager = collisionManager;
-        this.displayManager = displayManager;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
         this.mapLayer = mapLayer;
     }
 
@@ -52,9 +53,6 @@ public class CollisionSystem extends EntityProcessingSystem {
 
     @Override
     public void update(float deltaTime) {
-        int width = displayManager.getWorldWidth();
-        int height = displayManager.getWorldHeight();
-
         for (Entity entity : getEntities()) {
             Position pos = pm.get(entity);
             Transform trans = tm.get(entity);
@@ -67,7 +65,7 @@ public class CollisionSystem extends EntityProcessingSystem {
             Gdx.app.debug("CollisionSystem", x + dx + ":" + y + dy);
 
             // TODO: trigger scrolling if moving out of screen
-            if (checkBounds(x + dx, y + dy, width, height)) {
+            if (checkBounds(x + dx, y + dy, worldWidth, worldHeight)) {
                 trans.setDX(0);
                 trans.setDY(0);
             }

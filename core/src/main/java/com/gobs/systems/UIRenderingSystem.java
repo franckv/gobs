@@ -21,7 +21,8 @@ import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.StateManager;
 import com.gobs.StateManager.State;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.Display;
+import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.GdxGUI;
 
@@ -32,12 +33,13 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Party> am = ComponentMapper.getFor(Party.class);
     private final ComponentMapper<HP> hm = ComponentMapper.getFor(HP.class);
     private final ComponentMapper<MP> mm = ComponentMapper.getFor(MP.class);
+    private final ComponentMapper<Hidden> dm = ComponentMapper.getFor(Hidden.class);
 
-    private DisplayManager displayManager;
+    private OrthographicDisplay display;
     private StateManager stateManager;
     private Batch batch;
     private GdxGUI gui;
-    
+
     private Family controllables;
     private Family characters;
     private ImmutableArray<Entity> controllablesEntities;
@@ -45,21 +47,21 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
     private int margin, spacing;
 
-    public UIRenderingSystem(DisplayManager displayManager, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch) {
-        this(displayManager, tileManager, fontManager, stateManager, batch, 0);
+    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch) {
+        this(display, tileManager, fontManager, stateManager, batch, 0);
     }
 
-    public UIRenderingSystem(DisplayManager displayManager, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch, int priority) {
+    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch, int priority) {
         super(priority);
 
-        controllables = Family.all(Position.class, Controller.class).exclude(Hidden.class).get();
+        controllables = Family.all(Position.class, Controller.class).get();
         characters = Family.all(Party.class, Name.class, HP.class, MP.class).get();
 
-        this.displayManager = displayManager;
+        this.display = display;
         this.stateManager = stateManager;
         this.batch = batch;
 
-        gui = new GdxGUI(displayManager, tileManager, batch);
+        gui = new GdxGUI(display, tileManager, batch);
 
         gui.addFont("small", fontManager.getFont(16));
         gui.addFont("medium", fontManager.getFont(24));
@@ -86,8 +88,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     @Override
     public void update(float deltaTime) {
         // overlay text is displayed using absolute screen coordinates to avoid scaling font
-        displayManager.getOverlayCamera().update();
-        batch.setProjectionMatrix(displayManager.getOverlayCamera().combined);
+        display.getCamera().update();
+        batch.setProjectionMatrix(display.getCamera().combined);
 
         batch.begin();
 
@@ -129,21 +131,26 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         // display player position
         for (Entity entity : controllablesEntities) {
+            if (dm.get(entity) != null) {
+                continue;
+            }
             Controller controller = cm.get(entity);
+            if (controller == null || !controller.isActive()) {
+                continue;
+            }
+
             Position pos = pm.get(entity);
 
-            if (controller != null) {
-                int x = pos.getX();
-                int y = pos.getY();
+            int x = pos.getX();
+            int y = pos.getY();
 
-                msg = "Position: " + x + "," + y;
+            msg = "Position: " + x + "," + y;
 
-                gui.pushToEnd(gui.getLabelWidth(msg));
+            gui.pushToEnd(gui.getLabelWidth(msg));
 
-                gui.Label(msg);
+            gui.Label(msg);
 
-                break;
-            }
+            break;
         }
 
         gui.endSection();
@@ -157,7 +164,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         int boxH = 150;
 
         float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
-        float space = (displayManager.getOverlayViewport().getWorldWidth() - size) / 2;
+        float space = (display.getViewPort().getWorldWidth() - size) / 2;
 
         gui.createSection("Portraits", GUILayout.FlowDirection.HORIZONTAL);
 

@@ -2,7 +2,7 @@ package com.gobs.screens;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Screen;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.DisplayManager;
 
 /**
  *
@@ -27,9 +27,7 @@ public class BaseScreen implements Screen {
     
     @Override
     public void resize(int width, int height) {
-        displayManager.getMapViewport().update(width / displayManager.getTileSize(), height / displayManager.getTileSize());
-        displayManager.getOverlayViewport().update(width, height);
-        displayManager.getFPVViewport().update(width, height);
+        displayManager.resize(width, height);
     }
     
     @Override

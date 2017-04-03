@@ -28,7 +28,7 @@ import com.gobs.systems.MapRenderingSystem;
 import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.DisplayManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -108,15 +108,15 @@ public class GobsGame extends Game {
     }
 
     public void initSystems() {
-        engine.addSystem(new FPVRenderingSystem(displayManager, mapLayer));
-        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(displayManager, mapView, mapLayer, batch);
+        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), config.getWorldWidth(), config.getWorldHeight(), mapLayer));
+        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(displayManager.getMapDisplay(), mapView, mapLayer, batch);
         mapRenderingSystem.setProcessing(false);
         engine.addSystem(mapRenderingSystem);
-        engine.addSystem(new UIRenderingSystem(displayManager, tileManager, fontManager, stateManager, batch));
-        engine.addSystem(new InputSystem(displayManager, inputHandler, contextManager, stateManager, mapLayer, config.getRepeat()));
+        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, fontManager, stateManager, batch));
+        engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager, stateManager, mapLayer, config.getRepeat()));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem());
-        engine.addSystem(new CollisionSystem(collisionManager, displayManager, mapLayer));
+        engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));
         engine.addSystem(new TransformationSystem());
     }
 

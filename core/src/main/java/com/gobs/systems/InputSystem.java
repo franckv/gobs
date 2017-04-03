@@ -19,12 +19,12 @@ import com.gobs.ui.Input;
 import com.gobs.input.InputHandler;
 import com.gobs.StateManager;
 import com.gobs.map.Layer;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.MapDisplay;
 import com.gobs.ui.InputMap;
 import com.gobs.ui.GUI;
 
 public class InputSystem extends EntityProcessingSystem {
-    private DisplayManager displayManager;
+    private MapDisplay display;
     private InputHandler inputHandler;
     private ContextManager contextManager;
     private StateManager stateManager;
@@ -39,14 +39,14 @@ public class InputSystem extends EntityProcessingSystem {
     private ComponentMapper<Hidden> hm = ComponentMapper.getFor(Hidden.class);
     private ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
 
-    public InputSystem(DisplayManager displayManager, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat) {
-        this(displayManager, inputHandler, contextManager, stateManager, mapLayer, repeat, 0);
+    public InputSystem(MapDisplay display, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat) {
+        this(display, inputHandler, contextManager, stateManager, mapLayer, repeat, 0);
     }
 
-    public InputSystem(DisplayManager displayManager, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat, int priority) {
+    public InputSystem(MapDisplay display, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat, int priority) {
         super(Family.one(Controller.class, AI.class).get(), priority);
 
-        this.displayManager = displayManager;
+        this.display = display;
         this.inputHandler = inputHandler;
         this.stateManager = stateManager;
         this.contextManager = contextManager;
@@ -163,27 +163,27 @@ public class InputSystem extends EntityProcessingSystem {
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_UP, (action) -> {
-            displayManager.getMapCamera().translate(0, 1);
+            display.getCamera().translate(0, 1);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_DOWN, (action) -> {
-            displayManager.getMapCamera().translate(0, -1);
+            display.getCamera().translate(0, -1);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_LEFT, (action) -> {
-            displayManager.getMapCamera().translate(-1, 0);
+            display.getCamera().translate(-1, 0);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_RIGHT, (action) -> {
-            displayManager.getMapCamera().translate(1, 0);
+            display.getCamera().translate(1, 0);
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_IN, (action) -> {
-            displayManager.getMapCamera().zoom -= 0.1f;
+            display.getCamera().zoom -= 0.1f;
         });
 
         contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_OUT, (action) -> {
-            displayManager.getMapCamera().zoom += 0.1f;
+            display.getCamera().zoom += 0.1f;
         });
 
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_UP, (action) -> {

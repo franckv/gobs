@@ -13,7 +13,11 @@ public class Config {
     private int repeat;
     private String frameSprite;
     private String frameSelectedSprite;
-    
+
+    public Config() {
+        props = new Properties();
+    }
+
     public Config(String res) {
         props = new Properties();
 
@@ -39,12 +43,12 @@ public class Config {
 
         return val;
     }
-    
+
     final String getString(String prop, String val) {
         if (props.containsKey(prop)) {
             return props.getProperty(prop);
         }
-        
+
         return val;
     }
 
@@ -55,11 +59,11 @@ public class Config {
     public int getTileSize() {
         return tileSize;
     }
-    
+
     public int getWorldWidth() {
         return worldWidth;
     }
-    
+
     public int getWorldHeight() {
         return worldHeight;
     }
@@ -67,11 +71,11 @@ public class Config {
     public int getRepeat() {
         return repeat;
     }
-    
+
     public String getFrameSprite() {
         return frameSprite;
     }
-    
+
     public String getFrameSelectedSprite() {
         return frameSelectedSprite;
     }

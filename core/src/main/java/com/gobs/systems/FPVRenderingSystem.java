@@ -22,7 +22,7 @@ import com.gobs.map.LayerCell;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.map.Layer;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.PerspectiveDisplay;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,9 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
 
     private Layer mapLayer;
-    private DisplayManager displayManager;
+    private PerspectiveDisplay display;
+    private int worldWidth;
+    private int worldHeight;
     private Environment environment;
     private ModelBatch modelBatch;
     private Model wall, floor;
@@ -44,15 +46,17 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
     private DirectionalLight light;
     private Texture texture;
 
-    public FPVRenderingSystem(DisplayManager displayManager, Layer mapLayer) {
-        this(displayManager, mapLayer, 0);
+    public FPVRenderingSystem(PerspectiveDisplay displayManager, int worldWidth, int worldHeight, Layer mapLayer) {
+        this(displayManager, worldWidth, worldHeight, mapLayer, 0);
     }
 
-    public FPVRenderingSystem(DisplayManager displayManager, Layer mapLayer, int priority) {
+    public FPVRenderingSystem(PerspectiveDisplay displayManager, int worldWidth, int worldHeight, Layer mapLayer, int priority) {
         super(Family.all(Camera.class).get(), priority);
 
         this.mapLayer = mapLayer;
-        this.displayManager = displayManager;
+        this.display = displayManager;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
 
         texture = new Texture("textures/wall.png");
 
@@ -69,7 +73,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         ModelBuilder modelBuilder = new ModelBuilder();
         wall = modelBuilder.createBox(step, step, step, mat, attr);
 
-        floor = modelBuilder.createBox(displayManager.getWorldWidth() * step, displayManager.getWorldHeight() * step, h,
+        floor = modelBuilder.createBox(worldWidth * step, worldHeight * step, h,
                 new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
     }
@@ -80,7 +84,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         instances.clear();
 
         instance = new ModelInstance(floor);
-        instance.transform.translate(displayManager.getWorldWidth() * step / 2 - step / 2, displayManager.getWorldHeight() * step / 2 - step / 2, -(step + h) / 2);
+        instance.transform.translate(worldWidth * step / 2 - step / 2, worldHeight * step / 2 - step / 2, -(step + h) / 2);
         instances.add(instance);
 
         for (LayerCell c : mapLayer) {
@@ -107,7 +111,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
             Camera cam = cm.get(entity);
             Position pos = pm.get(entity);
 
-            displayManager.getFPVCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
+            display.getCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
 
             int dx = 0, dy = 0;
 
@@ -128,17 +132,17 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
             }
 
             Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
-            displayManager.getFPVCamera().lookAt(vec);
+            display.getCamera().lookAt(vec);
         }
 
-        displayManager.getFPVCamera().update();
+        display.getCamera().update();
 
         if (mapLayer.isDirty()) {
             buildScene();
             mapLayer.setDirty(false);
         }
 
-        modelBatch.begin(displayManager.getFPVCamera());
+        modelBatch.begin(display.getCamera());
 
         modelBatch.render(instances, environment);
 

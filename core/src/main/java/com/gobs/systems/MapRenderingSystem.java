@@ -14,26 +14,26 @@ import com.gobs.components.Position;
 import com.gobs.components.Sprite;
 import com.gobs.map.Layer;
 import com.gobs.map.TiledMapView;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.MapDisplay;
 
 public class MapRenderingSystem extends EntityProcessingSystem {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Sprite> sm = ComponentMapper.getFor(Sprite.class);
 
-    private DisplayManager displayManager;
+    private MapDisplay display;
     private OrthogonalTiledMapRenderer renderer;
     private Batch batch;
     private TiledMapView mapView;
     private Layer mapLayer;
 
-    public MapRenderingSystem(DisplayManager displayManager, TiledMapView mapView, Layer mapLayer, Batch batch) {
-        this(displayManager, mapView, mapLayer, batch, 0);
+    public MapRenderingSystem(MapDisplay display, TiledMapView mapView, Layer mapLayer, Batch batch) {
+        this(display, mapView, mapLayer, batch, 0);
     }
 
-    public MapRenderingSystem(DisplayManager displayManager, TiledMapView mapView, Layer mapLayer, Batch batch, int priority) {
+    public MapRenderingSystem(MapDisplay display, TiledMapView mapView, Layer mapLayer, Batch batch, int priority) {
         super(Family.all(Position.class, Sprite.class).exclude(Hidden.class).get(), priority);
 
-        this.displayManager = displayManager;
+        this.display = display;
         this.mapView = mapView;
         this.mapLayer = mapLayer;
         this.batch = batch;
@@ -41,8 +41,8 @@ public class MapRenderingSystem extends EntityProcessingSystem {
         TiledMap map = mapView.getMap();
 
         // Scale world coordinates to pixel coordinates
-        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / displayManager.getTileSize(), batch);
-        renderer.setView(displayManager.getMapCamera());
+        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / display.getTileSize(), batch);
+        renderer.setView(display.getCamera());
     }
 
     @Override
@@ -52,8 +52,8 @@ public class MapRenderingSystem extends EntityProcessingSystem {
 
         // draw the tile map
         mapView.drawLayer(mapLayer);
-        displayManager.getMapCamera().update();
-        renderer.setView(displayManager.getMapCamera());
+        display.getCamera().update();
+        renderer.setView(display.getCamera());
         renderer.render();
 
         // draw entities

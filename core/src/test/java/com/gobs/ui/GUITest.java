@@ -1,10 +1,14 @@
 package com.gobs.ui;
 
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.backends.headless.HeadlessApplication;
+import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.gobs.Config;
 import com.gobs.assets.TileFactory;
+import com.gobs.display.DisplayManager;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  *
@@ -14,12 +18,33 @@ public class GUITest {
 
     @Before
     public void setUp() {
-        Config config = new Config(null);
-        gui = new GdxGUI(new DisplayManager(1024, 768, 32), new TileFactory(config, 32), new SpriteBatch());
+        final HeadlessApplicationConfiguration appConfig = new HeadlessApplicationConfiguration();
+        new HeadlessApplication(new ApplicationListener() {
+            @Override
+            public void create() {}
+            @Override
+            public void resize(int width, int height) {}
+            @Override
+            public void render() {}
+            @Override
+            public void pause() {}
+            @Override
+            public void resume() {}
+            @Override
+            public void dispose() {}
+        }, appConfig);
+        
+        DisplayManager displayManager = Mockito.mock(DisplayManager.class);
+        
+        TileFactory tileFactory = Mockito.mock(TileFactory.class);
+        SpriteBatch spriteBatch = Mockito.mock(SpriteBatch.class);
+        
+       gui = new GdxGUI(displayManager.getOverlayDisplay(), tileFactory, spriteBatch);
     }
 
     @Test
     public void testLayout() {
+        gui.begin();
         gui.setMargin(2, 3);
         gui.setSpacing(10);
 
@@ -75,5 +100,6 @@ public class GUITest {
             gui.endSection();
         }
         gui.endSection(); // Line1
+        gui.end();
     }
 }

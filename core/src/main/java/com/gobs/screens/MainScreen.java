@@ -1,7 +1,7 @@
 package com.gobs.screens;
 
 import com.badlogic.ashley.core.Engine;
-import com.gobs.ui.DisplayManager;
+import com.gobs.display.DisplayManager;
 
 public class MainScreen extends BaseScreen {
     public MainScreen(DisplayManager displayManager, Engine engine) {
