@@ -15,13 +15,14 @@ import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.display.MapDisplay;
 import com.gobs.input.ContextManager;
+import com.gobs.input.ContextManager.Action;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.InputHandler;
 import com.gobs.map.Layer;
 import com.gobs.map.LayerCell.LayerCellType;
 import com.gobs.ui.GUI;
-import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
+import java.util.List;
 
 public class InputSystem extends EntityProcessingSystem {
     private MapDisplay display;
@@ -29,10 +30,12 @@ public class InputSystem extends EntityProcessingSystem {
     private ContextManager contextManager;
     private StateManager stateManager;
     private Layer mapLayer;
-    
+
     int repeat = 0;
     int repeatWait = 20;
     int rate = 1;
+
+    private String consummerID = "runtime";
 
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
@@ -51,14 +54,10 @@ public class InputSystem extends EntityProcessingSystem {
         this.stateManager = stateManager;
         this.contextManager = contextManager;
         this.mapLayer = mapLayer;
-        
+
         repeatWait = repeat;
 
-        mapInputs();
         registerActions();
-
-        contextManager.activateContext(ContextType.CRAWLING);
-        contextManager.activateContext(ContextType.GLOBAL);
     }
 
     @Override
@@ -83,6 +82,8 @@ public class InputSystem extends EntityProcessingSystem {
 
             if (repeat == 0) {
                 contextManager.acceptInput(inputMap);
+                contextManager.dispatchInput(inputMap);
+                processInputs();
             }
 
             repeat += rate;
@@ -92,60 +93,23 @@ public class InputSystem extends EntityProcessingSystem {
         }
     }
 
-    private void mapInputs() {
-        contextManager.mapInput(ContextType.GLOBAL, Input.ESCAPE, ContextManager.Action.EXIT);
-        contextManager.mapInput(ContextType.GLOBAL, Input.E, ContextManager.Action.DUMP);
+    private void processInputs() {
+        List<Action> actions = contextManager.pollActions(consummerID);
 
-        contextManager.mapInput(ContextType.CRAWLING, Input.LEFT, ContextManager.Action.MOVE_LEFT);
-        contextManager.mapInput(ContextType.CRAWLING, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
-        contextManager.mapInput(ContextType.CRAWLING, Input.UP, ContextManager.Action.MOVE_UP);
-        contextManager.mapInput(ContextType.CRAWLING, Input.DOWN, ContextManager.Action.MOVE_DOWN);
-        contextManager.mapInput(ContextType.CRAWLING, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
-
-        contextManager.mapInput(ContextType.MAP, Input.Q, ContextManager.Action.SCROLL_LEFT);
-        contextManager.mapInput(ContextType.MAP, Input.D, ContextManager.Action.SCROLL_RIGHT);
-        contextManager.mapInput(ContextType.MAP, Input.Z, ContextManager.Action.SCROLL_UP);
-        contextManager.mapInput(ContextType.MAP, Input.S, ContextManager.Action.SCROLL_DOWN);
-        contextManager.mapInput(ContextType.MAP, Input.A, ContextManager.Action.ZOOM_IN);
-        contextManager.mapInput(ContextType.MAP, Input.W, ContextManager.Action.ZOOM_OUT);
-        contextManager.mapInput(ContextType.MAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
-        contextManager.mapInput(ContextType.MAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
-
-        contextManager.mapInput(ContextType.EDITMAP, Input.D, ContextManager.Action.DIG);
-        contextManager.mapInput(ContextType.EDITMAP, Input.F, ContextManager.Action.FILL);
-        contextManager.mapInput(ContextType.EDITMAP, Input.ENTER, ContextManager.Action.TARGET);
-        contextManager.mapInput(ContextType.EDITMAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
-        contextManager.mapInput(ContextType.EDITMAP, Input.LEFT, ContextManager.Action.MOVE_LEFT);
-        contextManager.mapInput(ContextType.EDITMAP, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
-        contextManager.mapInput(ContextType.EDITMAP, Input.UP, ContextManager.Action.MOVE_UP);
-        contextManager.mapInput(ContextType.EDITMAP, Input.DOWN, ContextManager.Action.MOVE_DOWN);
-        contextManager.mapInput(ContextType.EDITMAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+        for (Action action : actions) {
+            switch (action) {
+                case EXIT:
+                    Gdx.app.exit();
+                    break;
+                case DUMP:
+                    dumpEntities();
+            }
+        }
     }
 
     private void registerActions() {
-        contextManager.registerAction(ContextType.GLOBAL, ContextManager.Action.EXIT, (action) -> {
-            Gdx.app.exit();
-        });
-
-        contextManager.registerAction(ContextType.GLOBAL, ContextManager.Action.DUMP, (action) -> {
-            dumpEntities();
-        });
-
-        contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.MOVE_UP, (action) -> {
-            setCommand(CommandType.UP);
-        });
-
-        contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.MOVE_DOWN, (action) -> {
-            setCommand(CommandType.DOWN);
-        });
-
-        contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.MOVE_LEFT, (action) -> {
-            setCommand(CommandType.LEFT);
-        });
-
-        contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.MOVE_RIGHT, (action) -> {
-            setCommand(CommandType.RIGHT);
-        });
+        contextManager.registerConsumer(consummerID, ContextManager.Action.EXIT);
+        contextManager.registerConsumer(consummerID, ContextManager.Action.DUMP);
 
         contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW, (action) -> {
             stateManager.setState(StateManager.State.MAP);
@@ -184,22 +148,6 @@ public class InputSystem extends EntityProcessingSystem {
             display.getCamera().zoom += 0.1f;
         });
 
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_UP, (action) -> {
-            setCommand(CommandType.UP);
-        });
-
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_DOWN, (action) -> {
-            setCommand(CommandType.DOWN);
-        });
-
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_LEFT, (action) -> {
-            setCommand(CommandType.LEFT);
-        });
-
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.MOVE_RIGHT, (action) -> {
-            setCommand(CommandType.RIGHT);
-        });
-
         contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.DIG, (action) -> {
             digMap();
         });
@@ -221,20 +169,6 @@ public class InputSystem extends EntityProcessingSystem {
             stateManager.setState(StateManager.State.MAP);
             editMap(false);
         });
-    }
-
-    private boolean setCommand(CommandType type) {
-        Command command = new Command(type);
-        for (Entity entity : getEntities()) {
-            Controller controller = cm.get(entity);
-
-            if (controller != null && controller.isActive()) {
-                entity.add(command);
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void dumpEntities() {

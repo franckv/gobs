@@ -22,12 +22,14 @@ import com.gobs.map.TiledMapView;
 import com.gobs.screens.MainScreen;
 import com.gobs.systems.AISystem;
 import com.gobs.systems.CollisionSystem;
+import com.gobs.systems.ControllerSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
 import com.gobs.systems.MapRenderingSystem;
 import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
+import com.gobs.ui.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
 import java.util.HashMap;
@@ -81,6 +83,7 @@ public class GobsGame extends Game {
 
         loadMap();
         loadEntities(collisionManager, tileManager);
+        setKeyBindings();
 
         stateManager = new StateManager(engine, contextManager, mapLayer, StateManager.State.CRAWL);
 
@@ -114,6 +117,7 @@ public class GobsGame extends Game {
         engine.addSystem(mapRenderingSystem);
         engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, fontManager, stateManager, batch));
         engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager, stateManager, mapLayer, config.getRepeat()));
+        engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));
@@ -135,5 +139,38 @@ public class GobsGame extends Game {
         for (Entity entity : entities) {
             engine.addEntity(entity);
         }
+    }
+
+    private void setKeyBindings() {
+        contextManager.mapInput(ContextManager.ContextType.GLOBAL, Input.ESCAPE, ContextManager.Action.EXIT);
+        contextManager.mapInput(ContextManager.ContextType.GLOBAL, Input.E, ContextManager.Action.DUMP);
+
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.LEFT, ContextManager.Action.MOVE_LEFT);
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.UP, ContextManager.Action.MOVE_UP);
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.DOWN, ContextManager.Action.MOVE_DOWN);
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.Q, ContextManager.Action.SCROLL_LEFT);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.D, ContextManager.Action.SCROLL_RIGHT);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.Z, ContextManager.Action.SCROLL_UP);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.S, ContextManager.Action.SCROLL_DOWN);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.A, ContextManager.Action.ZOOM_IN);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.W, ContextManager.Action.ZOOM_OUT);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+        contextManager.mapInput(ContextManager.ContextType.MAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
+
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.D, ContextManager.Action.DIG);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.F, ContextManager.Action.FILL);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.ENTER, ContextManager.Action.TARGET);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.LEFT, ContextManager.Action.MOVE_LEFT);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.UP, ContextManager.Action.MOVE_UP);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.DOWN, ContextManager.Action.MOVE_DOWN);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+
+        contextManager.activateContext(ContextManager.ContextType.CRAWLING);
+        contextManager.activateContext(ContextManager.ContextType.GLOBAL);
     }
 }
