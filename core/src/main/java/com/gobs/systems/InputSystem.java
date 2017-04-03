@@ -101,7 +101,6 @@ public class InputSystem extends EntityProcessingSystem {
         contextManager.mapInput(ContextType.CRAWLING, Input.UP, ContextManager.Action.MOVE_UP);
         contextManager.mapInput(ContextType.CRAWLING, Input.DOWN, ContextManager.Action.MOVE_DOWN);
         contextManager.mapInput(ContextType.CRAWLING, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
-        contextManager.mapInput(ContextType.CRAWLING, Input.E, ContextManager.Action.DUMP);
 
         contextManager.mapInput(ContextType.MAP, Input.Q, ContextManager.Action.SCROLL_LEFT);
         contextManager.mapInput(ContextType.MAP, Input.D, ContextManager.Action.SCROLL_RIGHT);
@@ -109,7 +108,6 @@ public class InputSystem extends EntityProcessingSystem {
         contextManager.mapInput(ContextType.MAP, Input.S, ContextManager.Action.SCROLL_DOWN);
         contextManager.mapInput(ContextType.MAP, Input.A, ContextManager.Action.ZOOM_IN);
         contextManager.mapInput(ContextType.MAP, Input.W, ContextManager.Action.ZOOM_OUT);
-        contextManager.mapInput(ContextType.MAP, Input.ESCAPE, ContextManager.Action.EXIT);
         contextManager.mapInput(ContextType.MAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
         contextManager.mapInput(ContextType.MAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
 
