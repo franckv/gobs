@@ -3,12 +3,15 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.Disposable;
+import com.gobs.GobsEngine;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.components.Sprite;
@@ -16,7 +19,7 @@ import com.gobs.display.MapDisplay;
 import com.gobs.map.Layer;
 import com.gobs.map.TiledMapView;
 
-public class MapRenderingSystem extends EntityProcessingSystem {
+public class MapRenderingSystem extends IteratingSystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Sprite> sm = ComponentMapper.getFor(Sprite.class);
 
@@ -59,18 +62,22 @@ public class MapRenderingSystem extends EntityProcessingSystem {
         // draw entities
         batch.begin();
 
-        for (Entity entity : getEntities()) {
-            renderEntity(entity);
-        }
+        super.update(deltaTime);
 
         batch.end();
     }
 
-    private void renderEntity(Entity entity) {
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
         TextureRegion img = sm.get(entity).getTexture();
         Position pos = pm.get(entity);
 
         batch.draw(img, pos.getX(), pos.getY(), 1, 1);
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override

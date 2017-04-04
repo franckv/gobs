@@ -4,8 +4,10 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.gobs.GobsEngine;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
@@ -13,7 +15,7 @@ import com.gobs.map.Layer;
 import com.gobs.map.LayerCell;
 import com.gobs.util.CollisionManager;
 
-public class CollisionSystem extends EntityProcessingSystem {
+public class CollisionSystem extends IteratingSystem {
     private CollisionManager<Entity> collisionManager;
     private int worldWidth;
     private int worldHeight;
@@ -53,28 +55,10 @@ public class CollisionSystem extends EntityProcessingSystem {
 
     @Override
     public void update(float deltaTime) {
-        for (Entity entity : getEntities()) {
-            Position pos = pm.get(entity);
-            Transform trans = tm.get(entity);
 
-            int x = pos.getX();
-            int dx = trans.getDX();
-            int y = pos.getY();
-            int dy = trans.getDY();
+        collisionManager.reset();
 
-            Gdx.app.debug("CollisionSystem", x + dx + ":" + y + dy);
-
-            // TODO: trigger scrolling if moving out of screen
-            if (checkBounds(x + dx, y + dy, worldWidth, worldHeight)) {
-                trans.setDX(0);
-                trans.setDY(0);
-            }
-        }
-
-        if (getEntities().size() > 0) {
-            collisionManager.reset();
-            buildTree();
-        }
+        buildTree();
 
         for (LayerCell cell : mapLayer) {
             if (cell != null && cell.isBlockable()) {
@@ -82,20 +66,31 @@ public class CollisionSystem extends EntityProcessingSystem {
             }
         }
 
-        for (Entity entity : getEntities()) {
-            Position pos = pm.get(entity);
-            Transform trans = tm.get(entity);
+        super.update(deltaTime);
+    }
 
-            int x = pos.getX();
-            int dx = trans.getDX();
-            int y = pos.getY();
-            int dy = trans.getDY();
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+        Position pos = pm.get(entity);
+        Transform trans = tm.get(entity);
 
-            if (checkColliders(entity, x + dx, y + dy)) {
-                trans.setDX(0);
-                trans.setDY(0);
-            }
+        int x = pos.getX();
+        int dx = trans.getDX();
+        int y = pos.getY();
+        int dy = trans.getDY();
+
+        Gdx.app.debug("CollisionSystem", x + dx + ":" + y + dy);
+
+        // TODO: trigger scrolling if moving out of screen
+        if (checkBounds(x + dx, y + dy, worldWidth, worldHeight) || checkColliders(entity, x + dx, y + dy)) {
+            trans.setDX(0);
+            trans.setDY(0);
         }
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void buildTree() {
@@ -120,9 +115,5 @@ public class CollisionSystem extends EntityProcessingSystem {
             return collisionManager.isColliding(entity, x, y);
         }
         return false;
-    }
-
-    @Override
-    public void dispose() {
     }
 }

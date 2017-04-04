@@ -3,6 +3,7 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
@@ -18,6 +19,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
+import com.gobs.GobsEngine;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.display.PerspectiveDisplay;
@@ -26,10 +29,7 @@ import com.gobs.map.LayerCell;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
-public class FPVRenderingSystem extends EntityProcessingSystem {
+public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
 
@@ -107,33 +107,7 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
 
-        for (Entity entity : getEntities()) {
-            Camera cam = cm.get(entity);
-            Position pos = pm.get(entity);
-
-            display.getCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
-
-            int dx = 0, dy = 0;
-
-            switch (cam.getOrientation()) {
-                case UP:
-                    dy = 1;
-                    break;
-                case DOWN:
-                    dy = -1;
-                    break;
-                case LEFT:
-                    dx = -1;
-                    break;
-                case RIGHT:
-                    dx = 1;
-                    break;
-
-            }
-
-            Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
-            display.getCamera().lookAt(vec);
-        }
+        super.update(deltaTime);
 
         display.getCamera().update();
 
@@ -147,6 +121,40 @@ public class FPVRenderingSystem extends EntityProcessingSystem {
         modelBatch.render(instances, environment);
 
         modelBatch.end();
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+        Camera cam = cm.get(entity);
+        Position pos = pm.get(entity);
+
+        display.getCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
+
+        int dx = 0, dy = 0;
+
+        switch (cam.getOrientation()) {
+            case UP:
+                dy = 1;
+                break;
+            case DOWN:
+                dy = -1;
+                break;
+            case LEFT:
+                dx = -1;
+                break;
+            case RIGHT:
+                dx = 1;
+                break;
+
+        }
+
+        Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
+        display.getCamera().lookAt(vec);
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override

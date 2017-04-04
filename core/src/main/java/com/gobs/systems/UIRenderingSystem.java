@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
+import com.gobs.GobsEngine;
 import com.gobs.StateManager;
 import com.gobs.StateManager.State;
 import com.gobs.assets.FontFactory;
@@ -115,6 +116,11 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         batch.end();
 
         //gui.showCenters();
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void drawStatusBar() {

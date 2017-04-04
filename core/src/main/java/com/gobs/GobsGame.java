@@ -1,6 +1,5 @@
 package com.gobs;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Application;
@@ -45,7 +44,7 @@ public class GobsGame extends Game {
     private SCREEN currentScreen;
 
     private Config config;
-    private Engine engine;
+    private GobsEngine engine;
 
     private InputHandler inputHandler;
     private TileFactory tileManager;
@@ -64,7 +63,7 @@ public class GobsGame extends Game {
         Gdx.input.setInputProcessor(inputHandler);
 
         config = new Config("config.properties");
-        engine = new Engine();
+        engine = new GobsEngine();
 
         int tileSize = config.getTileSize();
 
@@ -111,17 +110,18 @@ public class GobsGame extends Game {
     }
 
     public void initSystems() {
-        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), config.getWorldWidth(), config.getWorldHeight(), mapLayer));
-        MapRenderingSystem mapRenderingSystem = new MapRenderingSystem(displayManager.getMapDisplay(), mapView, mapLayer, batch);
-        mapRenderingSystem.setProcessing(false);
-        engine.addSystem(mapRenderingSystem);
-        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, fontManager, stateManager, batch));
+        // logic systems
         engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager, stateManager, mapLayer, config.getRepeat()));
         engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));
         engine.addSystem(new TransformationSystem());
+
+        // rendering systems
+        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), config.getWorldWidth(), config.getWorldHeight(), mapLayer));
+        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), mapView, mapLayer, batch), false);
+        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, fontManager, stateManager, batch));
     }
 
     public void loadMap() {

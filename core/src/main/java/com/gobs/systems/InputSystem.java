@@ -2,13 +2,16 @@ package com.gobs.systems;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Disposable;
+import com.gobs.GobsEngine;
 import com.gobs.StateManager;
 import com.gobs.components.AI;
-import com.gobs.components.Command;
-import com.gobs.components.Command.CommandType;
 import com.gobs.components.Controller;
 import com.gobs.components.Goal;
 import com.gobs.components.Hidden;
@@ -24,12 +27,14 @@ import com.gobs.ui.GUI;
 import com.gobs.ui.InputMap;
 import java.util.List;
 
-public class InputSystem extends EntityProcessingSystem {
+public class InputSystem extends EntitySystem {
     private MapDisplay display;
     private InputHandler inputHandler;
     private ContextManager contextManager;
     private StateManager stateManager;
     private Layer mapLayer;
+    private Family family;
+    private ImmutableArray<Entity> entities;
 
     int repeat = 0;
     int repeatWait = 20;
@@ -47,7 +52,7 @@ public class InputSystem extends EntityProcessingSystem {
     }
 
     public InputSystem(MapDisplay display, InputHandler inputHandler, ContextManager contextManager, StateManager stateManager, Layer mapLayer, int repeat, int priority) {
-        super(Family.one(Controller.class, AI.class).get(), priority);
+        this.family = Family.one(Controller.class, AI.class).get();
 
         this.display = display;
         this.inputHandler = inputHandler;
@@ -58,6 +63,20 @@ public class InputSystem extends EntityProcessingSystem {
         repeatWait = repeat;
 
         registerActions();
+    }
+
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+
+        entities = engine.getEntitiesFor(family);
+    }
+
+    @Override
+    public void removedFromEngine(Engine engine) {
+        super.removedFromEngine(engine);
+
+        entities = null;
     }
 
     @Override
@@ -91,6 +110,11 @@ public class InputSystem extends EntityProcessingSystem {
             repeat = 0;
             rate = 1;
         }
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void processInputs() {
@@ -185,7 +209,7 @@ public class InputSystem extends EntityProcessingSystem {
     private void digMap() {
         int x = 0;
         int y = 0;
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
@@ -204,7 +228,7 @@ public class InputSystem extends EntityProcessingSystem {
     private void fillMap() {
         int x = 0;
         int y = 0;
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
@@ -221,7 +245,7 @@ public class InputSystem extends EntityProcessingSystem {
     }
 
     private void editMap(boolean edit) {
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             Controller controller = cm.get(entity);
             Hidden hidden = hm.get(entity);
 
@@ -254,7 +278,7 @@ public class InputSystem extends EntityProcessingSystem {
     private void setTarget() {
         int x = 0;
         int y = 0;
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             Controller controller = cm.get(entity);
             Position pos = pm.get(entity);
 
@@ -266,7 +290,7 @@ public class InputSystem extends EntityProcessingSystem {
             }
         }
 
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             AI ai = am.get(entity);
 
             if (ai != null) {
@@ -274,9 +298,5 @@ public class InputSystem extends EntityProcessingSystem {
                 break;
             }
         }
-    }
-
-    @Override
-    public void dispose() {
     }
 }

@@ -3,10 +3,12 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
+import com.gobs.GobsEngine;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
 
-public class TransformationSystem extends EntityProcessingSystem {
+public class TransformationSystem extends IteratingSystem {
     private static ComponentMapper<Transform> tm = ComponentMapper.getFor(Transform.class);
     private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
@@ -19,18 +21,17 @@ public class TransformationSystem extends EntityProcessingSystem {
     }
 
     @Override
-    public void update(float deltaTime) {
-        for (Entity entity : getEntities()) {
-            Position position = pm.get(entity);
-            Transform trans = tm.get(entity);
+    protected void processEntity(Entity entity, float deltaTime) {
+        Position position = pm.get(entity);
+        Transform trans = tm.get(entity);
 
-            position.translate(trans.getDX(), trans.getDY());
+        position.translate(trans.getDX(), trans.getDY());
 
-            entity.remove(Transform.class);
-        }
+        entity.remove(Transform.class);
     }
 
     @Override
-    public void dispose() {
+    public boolean checkProcessing() {
+        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 }

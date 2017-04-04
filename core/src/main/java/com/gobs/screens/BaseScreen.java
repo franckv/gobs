@@ -1,7 +1,7 @@
 package com.gobs.screens;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Screen;
+import com.gobs.GobsEngine;
 import com.gobs.display.DisplayManager;
 
 /**
@@ -9,46 +9,50 @@ import com.gobs.display.DisplayManager;
  */
 public class BaseScreen implements Screen {
     private DisplayManager displayManager;
-    private Engine engine;
+    private GobsEngine engine;
     private double accu = 0.0;
-    private float step = 1.0f/60f;
-    
-    public BaseScreen(DisplayManager displayManager, Engine engine) {
+    private float step = 1.0f / 60f;
+
+    public BaseScreen(DisplayManager displayManager, GobsEngine engine) {
         this.displayManager = displayManager;
         this.engine = engine;
     }
-    
+
     @Override
     public void show() {
     }
-    
+
     @Override
     public void render(float delta) {
         accu += delta;
-        
+
+        // first pass: update logic in fixed time steps (catchup if frames are skipped)
         while (accu >= step) {
             accu -= step;
-            engine.update(step);
+            engine.update(step, false);
         }
+
+        // second pass: render (time independant)
+        engine.update(0, true);
     }
-    
+
     @Override
     public void resize(int width, int height) {
         displayManager.resize(width, height);
     }
-    
+
     @Override
     public void pause() {
     }
-    
+
     @Override
     public void resume() {
     }
-    
+
     @Override
     public void hide() {
     }
-    
+
     @Override
     public void dispose() {
     }

@@ -1,15 +1,21 @@
 package com.gobs.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.gobs.GobsEngine;
 import com.gobs.components.Command;
 import com.gobs.components.Controller;
 import com.gobs.input.ContextManager;
 import java.util.List;
 
-public class ControllerSystem extends EntityProcessingSystem {
+public class ControllerSystem extends EntitySystem {
     private ContextManager contextManager;
+    private Family family;
+    private ImmutableArray<Entity> entities;
 
     private ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
 
@@ -20,7 +26,7 @@ public class ControllerSystem extends EntityProcessingSystem {
     }
 
     public ControllerSystem(ContextManager contextManager, int priority) {
-        super(Family.one(Controller.class).get(), priority);
+        this.family = Family.one(Controller.class).get();
 
         this.contextManager = contextManager;
 
@@ -28,8 +34,28 @@ public class ControllerSystem extends EntityProcessingSystem {
     }
 
     @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+
+        entities = engine.getEntitiesFor(family);
+
+    }
+
+    @Override
+    public void removedFromEngine(Engine engine) {
+        super.removedFromEngine(engine);
+
+        entities = null;
+    }
+
+    @Override
     public void update(float deltaTime) {
         processInputs();
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void processInputs() {
@@ -62,7 +88,7 @@ public class ControllerSystem extends EntityProcessingSystem {
 
     private boolean setCommand(Command.CommandType type) {
         Command command = new Command(type);
-        for (Entity entity : getEntities()) {
+        for (Entity entity : entities) {
             Controller controller = cm.get(entity);
 
             if (controller.isActive()) {
@@ -73,9 +99,4 @@ public class ControllerSystem extends EntityProcessingSystem {
 
         return false;
     }
-
-    @Override
-    public void dispose() {
-    }
-
 }

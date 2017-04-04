@@ -3,16 +3,14 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IntervalIteratingSystem;
+import com.gobs.GobsEngine;
 import com.gobs.components.AI;
 
 /**
  * Apply a behavior to an AI controlled entity
  */
-public class AISystem extends EntityProcessingSystem {
-
-    private float interval;
-    private float accumulator;
-
+public class AISystem extends IntervalIteratingSystem {
     private ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
 
     public AISystem(float interval) {
@@ -20,28 +18,17 @@ public class AISystem extends EntityProcessingSystem {
     }
 
     public AISystem(float interval, int priority) {
-        super(Family.all(AI.class).get(), priority);
-        this.interval = interval;
+        super(Family.all(AI.class).get(), interval, priority);
     }
 
     @Override
-    public void update(float deltaTime) {
-        accumulator += deltaTime;
-
-        while (accumulator >= interval) {
-            accumulator -= interval;
-            updateInterval();
-        }
-    }
-
-    private void updateInterval() {
-        for (Entity entity : getEntities()) {
-            AI ai = am.get(entity);
-            ai.getBehavior().update();
-        }
+    public boolean checkProcessing() {
+        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override
-    public void dispose() {
+    protected void processEntity(Entity entity) {
+        AI ai = am.get(entity);
+        ai.getBehavior().update();
     }
 }
