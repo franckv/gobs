@@ -7,7 +7,7 @@ public class DisplayManager {
     OrthographicDisplay overlayDisplay;
     PerspectiveDisplay fpvDisplay;
 
-    public DisplayManager(int screenWidth, int screenHeight, int worldWidth, int worldHeight, int tileSize) {
+    public DisplayManager(int screenWidth, int screenHeight, int tileSize) {
         this.tileSize = tileSize;
 
         mapDisplay = new MapDisplay(screenWidth, screenHeight, tileSize);

@@ -24,8 +24,8 @@ import com.gobs.GobsEngine;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.display.PerspectiveDisplay;
-import com.gobs.map.Layer;
 import com.gobs.map.LayerCell;
+import com.gobs.map.WorldMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +33,8 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
 
-    private Layer mapLayer;
+    private WorldMap worldMap;
     private PerspectiveDisplay display;
-    private int worldWidth;
-    private int worldHeight;
     private Environment environment;
     private ModelBatch modelBatch;
     private Model wall, floor;
@@ -46,17 +44,15 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private PointLight light;
     private Texture texture;
 
-    public FPVRenderingSystem(PerspectiveDisplay displayManager, int worldWidth, int worldHeight, Layer mapLayer) {
-        this(displayManager, worldWidth, worldHeight, mapLayer, 0);
+    public FPVRenderingSystem(PerspectiveDisplay displayManager, WorldMap worldMap) {
+        this(displayManager, worldMap, 0);
     }
 
-    public FPVRenderingSystem(PerspectiveDisplay displayManager, int worldWidth, int worldHeight, Layer mapLayer, int priority) {
+    public FPVRenderingSystem(PerspectiveDisplay displayManager, WorldMap worldMap, int priority) {
         super(Family.all(Camera.class).get(), priority);
 
-        this.mapLayer = mapLayer;
+        this.worldMap = worldMap;
         this.display = displayManager;
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
 
         texture = new Texture("textures/wall.png");
 
@@ -73,7 +69,7 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
         ModelBuilder modelBuilder = new ModelBuilder();
         wall = modelBuilder.createBox(step, step, step, mat, attr);
 
-        floor = modelBuilder.createBox(worldWidth * step, worldHeight * step, h,
+        floor = modelBuilder.createBox(worldMap.getWorldWidth() * step, worldMap.getWorldHeight() * step, h,
                 new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
     }
@@ -84,10 +80,9 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
         instances.clear();
 
         instance = new ModelInstance(floor);
-        instance.transform.translate(worldWidth * step / 2 - step / 2, worldHeight * step / 2 - step / 2, -(step + h) / 2);
+        instance.transform.translate(worldMap.getWorldWidth() * step / 2 - step / 2, worldMap.getWorldHeight() * step / 2 - step / 2, -(step + h) / 2);
         instances.add(instance);
-
-        for (LayerCell c : mapLayer) {
+        for (LayerCell c : worldMap.getCurrentLayer()) {
             if (c != null) {
                 switch (c.getType()) {
                     case WALL:
@@ -111,9 +106,8 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
 
         display.getCamera().update();
 
-        if (mapLayer.isDirty()) {
+        if (worldMap.getCurrentLayer().isDirty()) {
             buildScene();
-            mapLayer.setDirty(false);
         }
 
         modelBatch.begin(display.getCamera());

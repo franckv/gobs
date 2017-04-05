@@ -37,6 +37,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
     private OrthographicDisplay display;
     private StateManager stateManager;
+    private FontFactory fontManager;
     private Batch batch;
     private GdxGUI gui;
 
@@ -47,11 +48,11 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
     private int margin, spacing;
 
-    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch) {
-        this(display, tileManager, fontManager, stateManager, batch, 0);
+    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, StateManager stateManager, Batch batch) {
+        this(display, tileManager, stateManager, batch, 0);
     }
 
-    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, FontFactory fontManager, StateManager stateManager, Batch batch, int priority) {
+    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, StateManager stateManager, Batch batch, int priority) {
         super(priority);
 
         controllables = Family.all(Position.class, Controller.class).get();
@@ -60,6 +61,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         this.display = display;
         this.stateManager = stateManager;
         this.batch = batch;
+
+        fontManager = new FontFactory();
 
         gui = new GdxGUI(display, tileManager, batch);
 
@@ -278,5 +281,6 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
     @Override
     public void dispose() {
+        fontManager.dispose();
     }
 }

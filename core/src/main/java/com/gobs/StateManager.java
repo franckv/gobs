@@ -2,7 +2,6 @@ package com.gobs;
 
 import com.badlogic.ashley.core.Engine;
 import com.gobs.input.ContextManager;
-import com.gobs.map.Layer;
 import com.gobs.systems.AISystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.MapRenderingSystem;
@@ -17,12 +16,10 @@ public class StateManager {
     private State currentState;
     private Engine engine;
     private ContextManager contextManager;
-    private Layer mapLayer;
 
-    public StateManager(Engine engine, ContextManager contextManager, Layer mapLayer, State state) {
+    public StateManager(Engine engine, ContextManager contextManager, State state) {
         this.engine = engine;
         this.contextManager = contextManager;
-        this.mapLayer = mapLayer;
         this.currentState = state;
     }
 
@@ -31,7 +28,7 @@ public class StateManager {
         currentState = state;
         enterState(state);
     }
-    
+
     public State getState() {
         return currentState;
     }
@@ -68,7 +65,6 @@ public class StateManager {
         engine.getSystem(AISystem.class).setProcessing(true);
         engine.getSystem(FPVRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.CRAWLING);
-        mapLayer.setDirty(true);
     }
 
     private void exitCRAWL() {
@@ -80,7 +76,6 @@ public class StateManager {
         engine.getSystem(AISystem.class).setProcessing(false);
         engine.getSystem(MapRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.EDITMAP);
-        mapLayer.setDirty(true);
     }
 
     private void exitEDITMAP() {
@@ -92,7 +87,6 @@ public class StateManager {
         engine.getSystem(AISystem.class).setProcessing(false);
         engine.getSystem(MapRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.MAP);
-        mapLayer.setDirty(true);
     }
 
     private void exitMAP() {

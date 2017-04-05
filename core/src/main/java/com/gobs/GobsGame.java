@@ -11,20 +11,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.assets.DungeonFactory;
 import com.gobs.assets.EntityFactory;
-import com.gobs.assets.FontFactory;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.DisplayManager;
 import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
 import com.gobs.map.Layer;
-import com.gobs.map.TiledMapView;
+import com.gobs.map.WorldMap;
 import com.gobs.screens.MainScreen;
 import com.gobs.systems.AISystem;
 import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.ControllerInputSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
-import com.gobs.systems.MapInputSystem;
+import com.gobs.systems.MapUpdateSystem;
 import com.gobs.systems.MapRenderingSystem;
 import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
@@ -49,12 +48,10 @@ public class GobsGame extends Game {
 
     private InputHandler inputHandler;
     private TileFactory tileManager;
-    private FontFactory fontManager;
     private DisplayManager displayManager;
     private ContextManager contextManager;
     private CollisionManager<Entity> collisionManager;
-    private TiledMapView mapView;
-    private Layer mapLayer;
+    private WorldMap worldMap;
     private StateManager stateManager;
     private Batch batch;
 
@@ -69,11 +66,9 @@ public class GobsGame extends Game {
         int tileSize = config.getTileSize();
 
         tileManager = new TileFactory(config, tileSize);
-        fontManager = new FontFactory();
         contextManager = new ContextManager();
-        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), config.getWorldWidth(), config.getWorldHeight(), tileSize);
+        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), tileSize);
         collisionManager = new CollisionManager<>(config.getWorldWidth(), config.getWorldHeight());
-        mapView = new TiledMapView(tileManager, config.getWorldWidth(), config.getWorldHeight(), tileSize);
         batch = new SpriteBatch();
 
         screens = new HashMap<>();
@@ -81,11 +76,11 @@ public class GobsGame extends Game {
         currentScreen = SCREEN.WORLD;
         super.setScreen(screens.get(currentScreen));
 
-        loadMap();
+        worldMap = loadWorld();
         loadEntities(collisionManager, tileManager);
         setKeyBindings();
 
-        stateManager = new StateManager(engine, contextManager, mapLayer, StateManager.State.CRAWL);
+        stateManager = new StateManager(engine, contextManager, StateManager.State.CRAWL);
 
         initSystems();
 
@@ -99,9 +94,7 @@ public class GobsGame extends Game {
         for (Screen s : screens.values()) {
             s.dispose();
         }
-        mapView.dispose();
         tileManager.dispose();
-        fontManager.dispose();
         batch.dispose();
         for (EntitySystem system : engine.getSystems()) {
             if (system instanceof Disposable) {
@@ -114,25 +107,31 @@ public class GobsGame extends Game {
         // logic systems
         engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager));
         engine.addSystem(new ControllerInputSystem(contextManager));
-        engine.addSystem(new MapInputSystem(contextManager, stateManager, mapLayer));
+        engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem(config.getFPS()));
-        engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));
+        engine.addSystem(new CollisionSystem(collisionManager, worldMap));
         engine.addSystem(new TransformationSystem());
 
         // rendering systems
-        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), config.getWorldWidth(), config.getWorldHeight(), mapLayer));
-        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), mapView, mapLayer, batch), false);
-        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, fontManager, stateManager, batch));
+        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), worldMap));
+        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch), false);
+        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, stateManager, batch));
     }
 
-    public void loadMap() {
+    public WorldMap loadWorld() {
+        WorldMap map = new WorldMap(config.getWorldWidth(), config.getWorldHeight());
+
         try {
-            mapLayer = DungeonFactory.loadMap(config.getWorldWidth(), config.getWorldHeight(), "dungeon.map");
+            Layer layer = DungeonFactory.loadMap(config.getWorldWidth(), config.getWorldHeight(), "dungeon.map");
+
+            map.addLayer(layer);
         } catch (IOException ex) {
             Gdx.app.error("MAP", "Invalid map file");
             Gdx.app.exit();
         }
+
+        return map;
     }
 
     public void loadEntities(CollisionManager<Entity> collisionManager, TileFactory tileManager) {

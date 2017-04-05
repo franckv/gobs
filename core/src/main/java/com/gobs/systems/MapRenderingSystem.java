@@ -12,12 +12,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
+import com.gobs.assets.TileFactory;
 import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.components.Sprite;
 import com.gobs.display.MapDisplay;
-import com.gobs.map.Layer;
 import com.gobs.map.TiledMapView;
+import com.gobs.map.WorldMap;
 
 public class MapRenderingSystem extends IteratingSystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -26,20 +27,20 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
     private MapDisplay display;
     private OrthogonalTiledMapRenderer renderer;
     private Batch batch;
+    private WorldMap worldMap;
     private TiledMapView mapView;
-    private Layer mapLayer;
 
-    public MapRenderingSystem(MapDisplay display, TiledMapView mapView, Layer mapLayer, Batch batch) {
-        this(display, mapView, mapLayer, batch, 0);
+    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch) {
+        this(display, tileManager, worldMap, batch, 0);
     }
 
-    public MapRenderingSystem(MapDisplay display, TiledMapView mapView, Layer mapLayer, Batch batch, int priority) {
+    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch, int priority) {
         super(Family.all(Position.class, Sprite.class).exclude(Hidden.class).get(), priority);
 
         this.display = display;
-        this.mapView = mapView;
-        this.mapLayer = mapLayer;
+        this.worldMap = worldMap;
         this.batch = batch;
+        this.mapView = new TiledMapView(tileManager, worldMap.getWorldWidth(), worldMap.getWorldHeight(), display.getTileSize());
 
         TiledMap map = mapView.getMap();
 
@@ -54,7 +55,9 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
 
         // draw the tile map
-        mapView.drawLayer(mapLayer);
+        if (worldMap.getCurrentLayer().isDirty()) {
+            mapView.drawLayer(worldMap.getCurrentLayer());
+        }
         display.getCamera().update();
         renderer.setView(display.getCamera());
         renderer.render();
@@ -82,6 +85,7 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
 
     @Override
     public void dispose() {
+        mapView.dispose();
         renderer.dispose();
     }
 }

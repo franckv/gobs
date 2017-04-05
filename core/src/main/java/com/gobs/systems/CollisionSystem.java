@@ -12,15 +12,13 @@ import com.gobs.components.Animation;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
-import com.gobs.map.Layer;
 import com.gobs.map.LayerCell;
+import com.gobs.map.WorldMap;
 import com.gobs.util.CollisionManager;
 
 public class CollisionSystem extends IteratingSystem {
     private CollisionManager<Entity> collisionManager;
-    private int worldWidth;
-    private int worldHeight;
-    private Layer mapLayer;
+    private WorldMap worldMap;
 
     private ImmutableArray<Entity> colliders;
 
@@ -28,17 +26,15 @@ public class CollisionSystem extends IteratingSystem {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Collider> cm = ComponentMapper.getFor(Collider.class);
 
-    public CollisionSystem(CollisionManager<Entity> collisionManager, int worldWidth, int worldHeight, Layer mapLayer) {
-        this(collisionManager, worldWidth, worldHeight, mapLayer, 0);
+    public CollisionSystem(CollisionManager<Entity> collisionManager, WorldMap worldMap) {
+        this(collisionManager, worldMap, 0);
     }
 
-    public CollisionSystem(CollisionManager<Entity> collisionManager, int worldWidth, int worldHeight, Layer mapLayer, int priority) {
+    public CollisionSystem(CollisionManager<Entity> collisionManager, WorldMap worldMap, int priority) {
         super(Family.all(Position.class, Transform.class).get(), priority);
 
         this.collisionManager = collisionManager;
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-        this.mapLayer = mapLayer;
+        this.worldMap = worldMap;
     }
 
     @Override
@@ -61,7 +57,7 @@ public class CollisionSystem extends IteratingSystem {
 
         buildTree();
 
-        for (LayerCell cell : mapLayer) {
+        for (LayerCell cell : worldMap.getCurrentLayer()) {
             if (cell != null && cell.isBlockable()) {
                 collisionManager.addBlockable(cell.getX(), cell.getY());
             }
@@ -83,7 +79,7 @@ public class CollisionSystem extends IteratingSystem {
         Gdx.app.debug("CollisionSystem", x + dx + ":" + y + dy);
 
         // TODO: trigger scrolling if moving out of screen
-        if (checkBounds(x + dx, y + dy, worldWidth, worldHeight) || checkColliders(entity, x + dx, y + dy)) {
+        if (checkBounds(x + dx, y + dy, worldMap.getWorldWidth(), worldMap.getWorldHeight()) || checkColliders(entity, x + dx, y + dy)) {
             trans.setDX(0);
             trans.setDY(0);
             // TODO: check if animation type is translation

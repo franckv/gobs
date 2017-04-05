@@ -9,7 +9,8 @@ import java.util.NoSuchElementException;
  */
 public class Layer implements Iterable<LayerCell> {
     public enum LayerType {
-        MAP_LAYER
+        MAP_LAYER,
+        ANNOTATION
     }
 
     private int w;
@@ -90,7 +91,7 @@ public class Layer implements Iterable<LayerCell> {
                 while (idx < size) {
                     int x = idx % w;
                     int y = idx / w;
-                    
+
                     LayerCell cell = cells[x][y];
                     if (cell != null) {
                         return true;

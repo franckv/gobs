@@ -13,12 +13,14 @@ public class BaseScreen implements Screen {
     public BaseScreen(DisplayManager displayManager, GobsEngine engine, int fps) {
         this.displayManager = displayManager;
         this.engine = engine;
-        
+
         this.step = 1.0f / fps;
     }
 
     @Override
     public void show() {
+        // we render once to build the current level with dirty=true
+        engine.update(0, true);
     }
 
     @Override

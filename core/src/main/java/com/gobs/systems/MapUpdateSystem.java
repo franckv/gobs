@@ -13,16 +13,16 @@ import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
-import com.gobs.map.Layer;
 import com.gobs.map.LayerCell;
+import com.gobs.map.WorldMap;
 import java.util.List;
 
-public class MapInputSystem extends EntitySystem {
+public class MapUpdateSystem extends EntitySystem {
     private ContextManager contextManager;
     private Family family;
     private ImmutableArray<Entity> entities;
     private StateManager stateManager;
-    private Layer mapLayer;
+    private WorldMap worldMap;
 
     private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -30,16 +30,16 @@ public class MapInputSystem extends EntitySystem {
 
     private final String consummerID = "map";
 
-    public MapInputSystem(ContextManager contextManager, StateManager stateManager, Layer mapLayer) {
-        this(contextManager, stateManager, mapLayer, 0);
+    public MapUpdateSystem(ContextManager contextManager, StateManager stateManager, WorldMap worldMap) {
+        this(contextManager, stateManager, worldMap, 0);
     }
 
-    public MapInputSystem(ContextManager contextManager, StateManager stateManager, Layer mapLayer, int priority) {
+    public MapUpdateSystem(ContextManager contextManager, StateManager stateManager, WorldMap worldMap, int priority) {
         this.family = Family.all(Controller.class, Position.class).get();
 
         this.contextManager = contextManager;
         this.stateManager = stateManager;
-        this.mapLayer = mapLayer;
+        this.worldMap = worldMap;
 
         registerActions();
     }
@@ -61,6 +61,7 @@ public class MapInputSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+        worldMap.getCurrentLayer().setDirty(false);
         processInputs();
     }
 
@@ -81,6 +82,8 @@ public class MapInputSystem extends EntitySystem {
                     fillMap();
                     break;
                 case TOGGLE_EDIT:
+                    worldMap.getCurrentLayer().setDirty(true);
+
                     if (event.getContext() == ContextType.MAP) {
                         stateManager.setState(StateManager.State.EDITMAP);
                         editMap(true);
@@ -90,6 +93,16 @@ public class MapInputSystem extends EntitySystem {
                     }
                     break;
                 case TOGGLE_VIEW:
+                    worldMap.getCurrentLayer().setDirty(true);
+
+                    if (event.getContext() == ContextType.CRAWLING) {
+                        stateManager.setState(StateManager.State.MAP);
+                    } else if (event.getContext() == ContextType.EDITMAP) {
+                        stateManager.setState(StateManager.State.CRAWL);
+                        editMap(false);
+                    } else {
+                        stateManager.setState(StateManager.State.CRAWL);
+                    }
                     break;
             }
         }
@@ -103,20 +116,6 @@ public class MapInputSystem extends EntitySystem {
         contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.TOGGLE_VIEW);
         contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW);
         contextManager.registerConsumer(consummerID, ContextType.MAP, ContextManager.Action.TOGGLE_VIEW);
-
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateManager.setState(StateManager.State.CRAWL);
-            editMap(false);
-        });
-
-        contextManager.registerAction(ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateManager.setState(StateManager.State.MAP);
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.TOGGLE_VIEW, (action) -> {
-            stateManager.setState(StateManager.State.CRAWL);
-        });
-
     }
 
     private void digMap() {
@@ -134,8 +133,7 @@ public class MapInputSystem extends EntitySystem {
         }
 
         System.out.println("Dig at " + x + "," + y);
-        mapLayer.setCell(x, y, LayerCell.LayerCellType.FLOOR, false);
-        mapLayer.setDirty(true);
+        worldMap.getCurrentLayer().setCell(x, y, LayerCell.LayerCellType.FLOOR, false);
     }
 
     private void fillMap() {
@@ -153,8 +151,7 @@ public class MapInputSystem extends EntitySystem {
         }
 
         System.out.println("Fill " + x + "," + y);
-        mapLayer.setCell(x, y, LayerCell.LayerCellType.WALL, true);
-        mapLayer.setDirty(true);
+        worldMap.getCurrentLayer().setCell(x, y, LayerCell.LayerCellType.WALL, true);
     }
 
     private void editMap(boolean edit) {

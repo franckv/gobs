@@ -21,7 +21,9 @@ public class TiledMapView implements Disposable {
         this.tileManager = tileManager;
         map = new TiledMap();
 
-        map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
+        for (int i=0;i<LayerType.values().length;i++) {
+            map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
+        }
     }
 
     public TiledMap getMap() {
@@ -29,10 +31,6 @@ public class TiledMapView implements Disposable {
     }
 
     public void drawLayer(Layer layer) {
-        if (!layer.isDirty()) {
-            return;
-        }
-
         for (LayerCell c : layer) {
             if (c != null) {
                 Color color = null;
@@ -54,8 +52,6 @@ public class TiledMapView implements Disposable {
                 paintCell(getCell(c.getX(), c.getY(), layer.getType()), color, isFilled);
             }
         }
-
-        layer.setDirty(false);
     }
 
     private Cell getCell(int x, int y, LayerType type) {
