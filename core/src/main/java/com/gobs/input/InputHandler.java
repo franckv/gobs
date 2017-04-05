@@ -13,8 +13,8 @@ public class InputHandler extends InputAdapter {
 
     Map<Integer, Input> codes;
 
-    public InputHandler() {
-        inputMap = new InputMap(10, 5);
+    public InputHandler(int keyRepeat, int keyDelay) {
+        inputMap = new InputMap(keyRepeat, keyDelay);
 
         codes = new HashMap<>();
 

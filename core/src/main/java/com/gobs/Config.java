@@ -10,7 +10,8 @@ public class Config {
     private boolean logging;
     private int tileSize;
     private int worldWidth, worldHeight;
-    private int repeat;
+    private int keyRepeat;
+    private int keyDelay;
     private String frameSprite;
     private String frameSelectedSprite;
 
@@ -32,7 +33,8 @@ public class Config {
         tileSize = getInt("tilesize", 16);
         worldWidth = getInt("worldWidth", 100);
         worldHeight = getInt("worldHeight", 100);
-        repeat = getInt("repeat", 20);
+        keyDelay = getInt("keyDelay", 10);
+        keyRepeat = getInt("keyRepeat", 5);
         frameSprite = getString("frameSprite", "");
         frameSelectedSprite = getString("frameSelectedSprite", "");
     }
@@ -60,7 +62,7 @@ public class Config {
     public int getFPS() {
         return fps;
     }
-    
+
     public int getTileSize() {
         return tileSize;
     }
@@ -73,8 +75,12 @@ public class Config {
         return worldHeight;
     }
 
-    public int getRepeat() {
-        return repeat;
+    public int getKeyRepeat() {
+        return keyRepeat;
+    }
+
+    public int getKeyDelay() {
+        return keyDelay;
     }
 
     public String getFrameSprite() {

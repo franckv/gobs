@@ -57,10 +57,11 @@ public class GobsGame extends Game {
 
     @Override
     public void create() {
-        inputHandler = new InputHandler();
+        config = new Config("config.properties");
+
+        inputHandler = new InputHandler(config.getKeyDelay(), config.getKeyRepeat());
         Gdx.input.setInputProcessor(inputHandler);
 
-        config = new Config("config.properties");
         engine = new GobsEngine();
 
         int tileSize = config.getTileSize();
@@ -78,6 +79,7 @@ public class GobsGame extends Game {
 
         worldMap = loadWorld();
         loadEntities(collisionManager, tileManager);
+
         setKeyBindings();
 
         stateManager = new StateManager(engine, contextManager, StateManager.State.CRAWL);
