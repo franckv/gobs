@@ -12,20 +12,22 @@ public class InputMap {
     BitSet changed;
     int[] frames;
     int repeat;
+    int rate;
 
     int mouseX, mouseY;
     boolean mouseDown;
 
     public InputMap() {
-        this(0);
+        this(0, 1);
     }
 
-    public InputMap(int repeat) {
+    public InputMap(int repeat, int rate) {
         int len = Input.values().length;
         active = new BitSet(len);
         changed = new BitSet(len);
         frames = new int[len];
         this.repeat = repeat;
+        this.rate = rate;
 
         mouseDown = false;
     }
@@ -46,6 +48,9 @@ public class InputMap {
         changed.clear();
         for (int i = active.nextSetBit(0); i >= 0; i = active.nextSetBit(i + 1)) {
             frames[i]++;
+            if (frames[i] > repeat) {
+                frames[i] += rate - 1;
+            }
         }
     }
 
