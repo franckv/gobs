@@ -8,7 +8,6 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
 import com.gobs.StateManager;
 import com.gobs.components.AI;
@@ -36,10 +35,6 @@ public class InputSystem extends EntitySystem {
     private Family family;
     private ImmutableArray<Entity> entities;
 
-    int repeat = 0;
-    int repeatWait = 20;
-    int rate = 1;
-
     private String consummerID = "runtime";
 
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -59,8 +54,6 @@ public class InputSystem extends EntitySystem {
         this.stateManager = stateManager;
         this.contextManager = contextManager;
         this.mapLayer = mapLayer;
-
-        repeatWait = repeat;
 
         registerActions();
     }
@@ -83,33 +76,14 @@ public class InputSystem extends EntitySystem {
     public void update(float deltaTime) {
         InputMap inputMap = inputHandler.getInputMap();
 
-        GUI.acceptInput(inputMap);
-
-        if (inputHandler.hasInput()) {
-            if (inputHandler.hasChanged()) {
-                repeat = 0;
-                rate = 1;
-            }
-
-            if (repeat > repeatWait) {
-                repeat = 0;
-                rate += 5;
-                if (rate > 10) {
-                    rate = 10;
-                }
-            }
-
-            if (repeat == 0) {
-                contextManager.acceptInput(inputMap);
-                contextManager.dispatchInput(inputMap);
-                processInputs();
-            }
-
-            repeat += rate;
-        } else {
-            repeat = 0;
-            rate = 1;
+        if (inputMap.hasInput()) {
+            GUI.acceptInput(inputMap);
+            contextManager.acceptInput(inputMap);
+            contextManager.dispatchInput(inputMap);
+            processInputs();
         }
+
+        inputMap.done();
     }
 
     @Override

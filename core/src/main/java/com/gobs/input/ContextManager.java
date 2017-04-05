@@ -74,7 +74,7 @@ public class ContextManager {
     }
 
     public void dispatchInput(InputMap inputmap) {
-        for (Input input : inputmap.get()) {
+        for (Input input : inputmap.getPressed()) {
             for (ContextType context : inputMappings.keySet()) {
                 if (activeContexts.get(context.ordinal())) {
                     if (inputMappings.get(context).containsKey(input)) {
@@ -93,7 +93,7 @@ public class ContextManager {
 
     public List<Action> pollActions(String consummer) {
         List<Action> result = new ArrayList<>(dispatcher.get(consummer));
-        dispatcher.get(consummer).clear();;
+        dispatcher.get(consummer).clear();
         
         return result;
     }
@@ -119,7 +119,7 @@ public class ContextManager {
     }
 
     public boolean acceptInput(InputMap inputmap) {
-        for (Input input : inputmap.get()) {
+        for (Input input : inputmap.getPressed()) {
             if (acceptInput(input)) {
                 return true;
             }

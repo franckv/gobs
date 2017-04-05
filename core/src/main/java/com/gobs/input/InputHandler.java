@@ -10,13 +10,12 @@ import java.util.Map;
 
 public class InputHandler extends InputAdapter {
     InputMap inputMap;
-    InputMap last;
 
     Map<Integer, Input> codes;
 
     public InputHandler() {
-        inputMap = new InputMap();
-        last = new InputMap();
+        inputMap = new InputMap(10);
+
         codes = new HashMap<>();
 
         codes.put(Keys.LEFT, Input.LEFT);
@@ -63,7 +62,6 @@ public class InputHandler extends InputAdapter {
         boolean result = true;
 
         if (codes.containsKey(keycode)) {
-            last = new InputMap(inputMap);
             inputMap.set(codes.get(keycode));
         } else {
             result = false;
@@ -77,7 +75,6 @@ public class InputHandler extends InputAdapter {
         boolean result = true;
 
         if (codes.containsKey(keycode)) {
-            last = new InputMap(inputMap);
             inputMap.clear(codes.get(keycode));
         } else {
             result = false;
@@ -89,40 +86,28 @@ public class InputHandler extends InputAdapter {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         inputMap.setMouseDown(false);
-
         return true;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         inputMap.setMouseDown(true);
-
         return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
-
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
-
         return true;
     }
 
     public InputMap getInputMap() {
         return inputMap;
-    }
-
-    public boolean hasChanged() {
-        return inputMap.equals(last);
-    }
-
-    public boolean hasInput() {
-        return inputMap.hasInput();
     }
 }

@@ -128,12 +128,17 @@ public class ContextManagerTest {
 
         Assert.assertEquals(1, manager.dispatcher.get("test").size());
 
+        manager.pollActions("test");
+
         map.clear(Input.UP);
         map.set(Input.ESCAPE);
         manager.dispatchInput(map);
 
         Assert.assertEquals(2, manager.dispatcher.get("test").size());
         Assert.assertEquals(1, manager.dispatcher.get("test2").size());
+
+        manager.pollActions("test");
+        manager.pollActions("test2");
 
         map.clear(Input.D);
         manager.dispatchInput(map);

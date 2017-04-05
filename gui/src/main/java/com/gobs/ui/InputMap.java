@@ -8,62 +8,81 @@ import java.util.Set;
  * Represent a set of inputs for an entity
  */
 public class InputMap {
-    BitSet inputs;
+    BitSet active;
+    BitSet changed;
+    int[] frames;
+    int repeat;
+
     int mouseX, mouseY;
     boolean mouseDown;
 
     public InputMap() {
-        inputs = new BitSet(Input.values().length);
-        mouseDown = false;
+        this(0);
     }
 
-    public InputMap(InputMap clone) {
-        inputs = new BitSet(clone.inputs.length());
-        inputs.or(clone.inputs);
+    public InputMap(int repeat) {
+        int len = Input.values().length;
+        active = new BitSet(len);
+        changed = new BitSet(len);
+        frames = new int[len];
+        this.repeat = repeat;
+
         mouseDown = false;
     }
 
     public void set(Input input) {
-        inputs.set(input.ordinal());
+        active.set(input.ordinal());
+        changed.set(input.ordinal());
+        frames[input.ordinal()] = 0;
     }
 
     public void clear(Input input) {
-        inputs.clear(input.ordinal());
+        active.clear(input.ordinal());
+        changed.set(input.ordinal());
+        frames[input.ordinal()] = 0;
     }
 
-    public Set<Input> get() {
-        Set<Input> set = new HashSet<>();
-        
-        for (int i = inputs.nextSetBit(0); i >= 0; i = inputs.nextSetBit(i + 1)) {
-            set.add(Input.values()[i]);
+    public void done() {
+        changed.clear();
+        for (int i = active.nextSetBit(0); i >= 0; i = active.nextSetBit(i + 1)) {
+            frames[i]++;
         }
-        
+    }
+
+    public Set<Input> getActive() {
+        return get(active);
+    }
+
+    public Set<Input> getPressed() {
+        Set<Input> set = new HashSet<>();
+
+        for (int i = active.nextSetBit(0); i >= 0; i = active.nextSetBit(i + 1)) {
+            if (changed.get(i)) {
+                set.add(Input.values()[i]);
+            } else if (repeat > 0 && frames[i] % repeat == 0) {
+                set.add(Input.values()[i]);
+            }
+        }
+
         return set;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+    private Set<Input> get(BitSet input) {
+        Set<Input> set = new HashSet<>();
 
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null || getClass() != other.getClass()) {
-            return false;
+        for (int i = input.nextSetBit(0); i >= 0; i = input.nextSetBit(i + 1)) {
+            set.add(Input.values()[i]);
         }
 
-        return this.inputs.equals(((InputMap) other).inputs);
+        return set;
     }
 
     public boolean hasInput() {
-        return !inputs.isEmpty() || mouseDown;
+        return !active.isEmpty() || mouseDown;
     }
 
-    public boolean isPressed(Input input) {
-        return inputs.get(input.ordinal());
+    public boolean isActive(Input input) {
+        return active.get(input.ordinal());
     }
 
     public int getMouseX() {
