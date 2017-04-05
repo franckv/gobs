@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.gobs.GobsEngine;
+import com.gobs.components.Animation;
 import com.gobs.components.Camera;
 import com.gobs.components.Command;
 import com.gobs.components.Command.CommandType;
@@ -14,12 +15,17 @@ public class MovementSystem extends IteratingSystem {
     private ComponentMapper<Command> cm = ComponentMapper.getFor(Command.class);
     private ComponentMapper<Camera> km = ComponentMapper.getFor(Camera.class);
 
-    public MovementSystem() {
-        this(0);
+    private int translateFrames;
+    private int rotateFrames;
+
+    public MovementSystem(int fps) {
+        this(fps, 0);
     }
 
-    public MovementSystem(int priority) {
+    public MovementSystem(int fps, int priority) {
         super(Family.all(Command.class).get(), priority);
+        translateFrames = fps / 3;
+        rotateFrames = fps / 3;
     }
 
     @Override
@@ -31,43 +37,21 @@ public class MovementSystem extends IteratingSystem {
 
         if (command.getCommand() == CommandType.LEFT) {
             if (cam != null) {
-                switch (cam.getOrientation()) {
-                    case UP:
-                        cam.setOrientation(Camera.Orientation.LEFT);
-                        break;
-                    case DOWN:
-                        cam.setOrientation(Camera.Orientation.RIGHT);
-                        break;
-                    case RIGHT:
-                        cam.setOrientation(Camera.Orientation.UP);
-                        break;
-                    case LEFT:
-                        cam.setOrientation(Camera.Orientation.DOWN);
-                        break;
-                }
+                trans.rotate(-90);
+                entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
             } else {
                 trans.addX(-1);
+                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
             }
         }
 
         if (command.getCommand() == CommandType.RIGHT) {
             if (cam != null) {
-                switch (cam.getOrientation()) {
-                    case UP:
-                        cam.setOrientation(Camera.Orientation.RIGHT);
-                        break;
-                    case DOWN:
-                        cam.setOrientation(Camera.Orientation.LEFT);
-                        break;
-                    case RIGHT:
-                        cam.setOrientation(Camera.Orientation.DOWN);
-                        break;
-                    case LEFT:
-                        cam.setOrientation(Camera.Orientation.UP);
-                        break;
-                }
+                trans.rotate(90);
+                entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
             } else {
                 trans.addX(1);
+                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
             }
         }
         if (command.getCommand() == CommandType.UP) {
@@ -89,6 +73,7 @@ public class MovementSystem extends IteratingSystem {
             } else {
                 trans.addY(1);
             }
+            entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
         }
         if (command.getCommand() == CommandType.DOWN) {
             if (cam != null) {
@@ -109,6 +94,7 @@ public class MovementSystem extends IteratingSystem {
             } else {
                 trans.addY(-1);
             }
+            entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
         }
 
         entity.remove(Command.class);

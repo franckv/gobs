@@ -14,7 +14,7 @@ public class InputHandler extends InputAdapter {
     Map<Integer, Input> codes;
 
     public InputHandler() {
-        inputMap = new InputMap(30, 5);
+        inputMap = new InputMap(10, 5);
 
         codes = new HashMap<>();
 

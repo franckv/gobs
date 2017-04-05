@@ -8,6 +8,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.gobs.GobsEngine;
+import com.gobs.components.Animation;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
@@ -85,6 +86,8 @@ public class CollisionSystem extends IteratingSystem {
         if (checkBounds(x + dx, y + dy, worldWidth, worldHeight) || checkColliders(entity, x + dx, y + dy)) {
             trans.setDX(0);
             trans.setDY(0);
+            // TODO: check if animation type is translation
+            entity.remove(Animation.class);
         }
     }
 

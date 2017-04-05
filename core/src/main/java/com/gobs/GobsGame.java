@@ -77,7 +77,7 @@ public class GobsGame extends Game {
         batch = new SpriteBatch();
 
         screens = new HashMap<>();
-        screens.put(SCREEN.WORLD, new MainScreen(displayManager, engine));
+        screens.put(SCREEN.WORLD, new MainScreen(displayManager, engine, config.getFPS()));
         currentScreen = SCREEN.WORLD;
         super.setScreen(screens.get(currentScreen));
 
@@ -116,7 +116,7 @@ public class GobsGame extends Game {
         engine.addSystem(new ControllerInputSystem(contextManager));
         engine.addSystem(new MapInputSystem(contextManager, stateManager, mapLayer));
         engine.addSystem(new AISystem(0.5f));
-        engine.addSystem(new MovementSystem());
+        engine.addSystem(new MovementSystem(config.getFPS()));
         engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));
         engine.addSystem(new TransformationSystem());
 

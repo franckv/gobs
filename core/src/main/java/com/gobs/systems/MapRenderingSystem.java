@@ -72,7 +72,7 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
         TextureRegion img = sm.get(entity).getTexture();
         Position pos = pm.get(entity);
 
-        batch.draw(img, pos.getX(), pos.getY(), 1, 1);
+        batch.draw(img, pos.getX() + pos.getDX(), pos.getY() + pos.getDY(), 1, 1);
     }
 
     @Override

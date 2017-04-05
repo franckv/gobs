@@ -4,18 +4,17 @@ import com.badlogic.gdx.Screen;
 import com.gobs.GobsEngine;
 import com.gobs.display.DisplayManager;
 
-/**
- *
- */
 public class BaseScreen implements Screen {
     private DisplayManager displayManager;
     private GobsEngine engine;
     private double accu = 0.0;
-    private float step = 1.0f / 60f;
+    private float step;
 
-    public BaseScreen(DisplayManager displayManager, GobsEngine engine) {
+    public BaseScreen(DisplayManager displayManager, GobsEngine engine, int fps) {
         this.displayManager = displayManager;
         this.engine = engine;
+        
+        this.step = 1.0f / fps;
     }
 
     @Override

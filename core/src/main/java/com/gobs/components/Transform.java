@@ -7,10 +7,12 @@ import com.badlogic.ashley.core.Component;
  */
 public class Transform implements Component {
     int dx, dy;
+    int rotation;
 
     public Transform() {
         this.dx = 0;
         this.dy = 0;
+        this.rotation = 0;
     }
 
     public int getDX() {
@@ -21,6 +23,10 @@ public class Transform implements Component {
         return dy;
     }
 
+    public int getRotation() {
+        return rotation;
+    }
+    
     public void setDX(int dx) {
         this.dx = dx;
     }
@@ -35,5 +41,9 @@ public class Transform implements Component {
 
     public void addY(int y) {
         dy += y;
+    }
+    
+    public void rotate(int rotation) {
+        this.rotation = rotation;
     }
 }

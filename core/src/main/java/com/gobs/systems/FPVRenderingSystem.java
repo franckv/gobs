@@ -128,27 +128,16 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
         Camera cam = cm.get(entity);
         Position pos = pm.get(entity);
 
-        display.getCamera().position.set(pos.getX() * step, pos.getY() * step, 0f);
+        float x = pos.getX() + pos.getDX();
+        float y = pos.getY() + pos.getDY();
+        float angle = (float)Math.toRadians(cam.getRotation() + cam.getAngle());
+        
+        display.getCamera().position.set(x * step, y * step, 0f);
 
-        int dx = 0, dy = 0;
+        float dx = (float)Math.sin(angle);
+        float dy = (float)Math.cos(angle);
 
-        switch (cam.getOrientation()) {
-            case UP:
-                dy = 1;
-                break;
-            case DOWN:
-                dy = -1;
-                break;
-            case LEFT:
-                dx = -1;
-                break;
-            case RIGHT:
-                dx = 1;
-                break;
-
-        }
-
-        Vector3 vec = new Vector3((pos.getX() + dx) * step, (pos.getY() + dy) * step, 0f);
+        Vector3 vec = new Vector3((x + dx) * step, (y + dy) * step, 0f);
         display.getCamera().lookAt(vec);
     }
 

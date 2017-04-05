@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.gobs.GobsEngine;
+import com.gobs.components.Animation;
 import com.gobs.components.Command;
 import com.gobs.components.Controller;
 import com.gobs.input.ContextManager;
@@ -27,7 +28,7 @@ public class ControllerInputSystem extends EntitySystem {
     }
 
     public ControllerInputSystem(ContextManager contextManager, int priority) {
-        this.family = Family.one(Controller.class).get();
+        this.family = Family.one(Controller.class).exclude(Animation.class).get();
 
         this.contextManager = contextManager;
 
