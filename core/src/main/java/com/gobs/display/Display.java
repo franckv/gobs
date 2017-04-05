@@ -3,9 +3,8 @@ package com.gobs.display;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class Display {
-     protected int width;
-     protected int height;
-     protected float ratio;
+     private int width;
+     private int height;
      protected Viewport viewPort;
      
      public Display(int width, int height) {
@@ -26,6 +25,8 @@ public abstract class Display {
      }
      
      public void update(int width, int height) {
+         this.width = width;
+         this.height = height;
          viewPort.update(width, height);
      }
 }

@@ -78,7 +78,6 @@ public class MobBehavior implements AIBehavior {
         boolean giveup = true;
 
         if (goal != null && pos != null) {
-
             if (pos.getX() == goal.getX() && pos.getY() == goal.getY()) {
                 System.out.println("Target reached");
             } else if (!collisionManager.isBlocked(goal.getX(), goal.getY())) {

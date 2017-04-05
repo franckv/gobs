@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- *
- */
 public class DungeonFactory {
+    private DungeonFactory() {
+    }
+
     public static Layer loadMap(int worldWidth, int worldHeight, String res) throws IOException {
         Layer mapLayer = new Layer(worldWidth, worldHeight, Layer.LayerType.MAP_LAYER);
 

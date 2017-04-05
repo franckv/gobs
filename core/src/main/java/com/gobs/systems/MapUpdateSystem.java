@@ -28,7 +28,7 @@ public class MapUpdateSystem extends EntitySystem {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Hidden> hm = ComponentMapper.getFor(Hidden.class);
 
-    private final String consummerID = "map";
+    private final static String consummerID = "map";
 
     public MapUpdateSystem(ContextManager contextManager, StateManager stateManager, WorldMap worldMap) {
         this(contextManager, stateManager, worldMap, 0);

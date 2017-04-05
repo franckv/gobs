@@ -33,14 +33,15 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
 
+    private final static float step = 1f;
+    private final static float h = 0.1f;
+
     private WorldMap worldMap;
     private PerspectiveDisplay display;
     private Environment environment;
     private ModelBatch modelBatch;
     private Model wall, floor;
     private List<ModelInstance> instances = new ArrayList<>();
-    private float step = 1f;
-    private float h = 0.1f;
     private PointLight light;
     private Texture texture;
 

@@ -21,9 +21,7 @@ public class TiledMapView implements Disposable {
         this.tileManager = tileManager;
         map = new TiledMap();
 
-        for (int i=0;i<LayerType.values().length;i++) {
-            map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
-        }
+        map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
     }
 
     public TiledMap getMap() {

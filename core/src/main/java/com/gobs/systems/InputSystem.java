@@ -29,7 +29,7 @@ public class InputSystem extends EntitySystem {
     private Family family;
     private ImmutableArray<Entity> entities;
 
-    private final String consummerID = "runtime";
+    private final static String consummerID = "runtime";
 
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);

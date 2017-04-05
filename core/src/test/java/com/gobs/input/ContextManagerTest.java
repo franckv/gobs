@@ -52,7 +52,7 @@ public class ContextManagerTest {
 
         triggered = false;
         
-        Event event = manager.new Event(ContextType.CRAWLING, Action.MOVE_UP);
+        Event event = new Event(ContextType.CRAWLING, Action.MOVE_UP);
 
         handlers.get(0).triggerAction(event);
 

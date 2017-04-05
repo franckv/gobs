@@ -26,9 +26,9 @@ public class TileFactory implements Disposable {
     private Map<Color, TextureRegion> fullTiles;
     private Map<Color, TextureRegion> rectTiles;
 
-    public TileFactory(Config config, int tileSize) {
+    public TileFactory(Config config) {
         this.assetManager = new AssetManager();
-        this.tileSize = tileSize;
+        this.tileSize = config.getTileSize();
 
         fullTiles = new HashMap<>();
         rectTiles = new HashMap<>();
@@ -47,7 +47,7 @@ public class TileFactory implements Disposable {
         colors.add(Color.GOLD);
 
         initTiles(colors);
-        
+
         frameSprite = config.getFrameSprite();
         frameSelectedSprite = config.getFrameSelectedSprite();
     }

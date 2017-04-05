@@ -23,8 +23,8 @@ import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.ControllerInputSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
-import com.gobs.systems.MapUpdateSystem;
 import com.gobs.systems.MapRenderingSystem;
+import com.gobs.systems.MapUpdateSystem;
 import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
@@ -64,11 +64,9 @@ public class GobsGame extends Game {
 
         engine = new GobsEngine();
 
-        int tileSize = config.getTileSize();
-
-        tileManager = new TileFactory(config, tileSize);
+        tileManager = new TileFactory(config);
         contextManager = new ContextManager();
-        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), tileSize);
+        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), config.getTileSize());
         collisionManager = new CollisionManager<>(config.getWorldWidth(), config.getWorldHeight());
         batch = new SpriteBatch();
 
@@ -117,7 +115,7 @@ public class GobsGame extends Game {
 
         // rendering systems
         engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), worldMap));
-        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch), false);
+        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch, config.getTileSize()), false);
         engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, stateManager, batch));
     }
 

@@ -25,7 +25,7 @@ public class ContextManager {
         EXIT, DUMP
     }
 
-    public class Event {
+    public static class Event {
         ContextType context;
         Action action;
 

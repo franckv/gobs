@@ -13,9 +13,9 @@ public class FontFactory implements Disposable {
 
     public BitmapFont getFont(int size) {
         String file = "fonts/sazanami-mincho.ttf";
-        
+
         generator = new FreeTypeFontGenerator(Gdx.files.internal(file));
-        
+
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = size;
         BitmapFont font = generator.generateFont(parameter);
@@ -25,6 +25,8 @@ public class FontFactory implements Disposable {
 
     @Override
     public void dispose() {
-        generator.dispose();
+        if (generator != null) {
+            generator.dispose();
+        }
     }
 }

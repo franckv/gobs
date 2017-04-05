@@ -1,15 +1,11 @@
 package com.gobs.display;
 
 public class DisplayManager {
-    private int tileSize;
-
     MapDisplay mapDisplay;
     OrthographicDisplay overlayDisplay;
     PerspectiveDisplay fpvDisplay;
 
     public DisplayManager(int screenWidth, int screenHeight, int tileSize) {
-        this.tileSize = tileSize;
-
         mapDisplay = new MapDisplay(screenWidth, screenHeight, tileSize);
         overlayDisplay = new OrthographicDisplay(screenWidth, screenHeight);
         fpvDisplay = new PerspectiveDisplay(screenWidth, screenHeight);
@@ -31,9 +27,5 @@ public class DisplayManager {
         getMapDisplay().update(width, height);
         getOverlayDisplay().update(width, height);
         getFPVDisplay().update(width, height);
-    }
-
-    public int getTileSize() {
-        return tileSize;
     }
 }

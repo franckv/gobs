@@ -21,8 +21,6 @@ public class GdxGUI extends GUI implements Disposable {
     private Map<String, BitmapFont> fonts;
     private BitmapFont font;
     private Color color;
-    private TextureRegion frame;
-    private TextureRegion frameSelected;
     private ShapeRenderer renderer;
     private TileFactory tileManager;
     private OrthographicDisplay display;
@@ -35,10 +33,6 @@ public class GdxGUI extends GUI implements Disposable {
         fonts = new HashMap<>();
 
         color = Color.GREEN;
-
-        frame = tileManager.getFrame();
-        frameSelected = tileManager.getFrameSelected();
-
     }
 
     public void addFont(String name, BitmapFont font) {
@@ -91,10 +85,10 @@ public class GdxGUI extends GUI implements Disposable {
 
     @Override
     public void drawBox(float x, float y, float w, float h, boolean selected) {
-        TextureRegion r = frame;
+        TextureRegion r = tileManager.getFrame();
 
         if (selected) {
-            r = frameSelected;
+            r = tileManager.getFrameSelected();
         }
 
         batch.draw(r, x, y, w, h);
@@ -127,7 +121,7 @@ public class GdxGUI extends GUI implements Disposable {
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
         getRenderer().setColor(Color.RED);
         getRenderer().line(Gdx.graphics.getWidth() / 2.0f, 0, Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight());
-        getRenderer().line(0, Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 2);
+        getRenderer().line(0, Gdx.graphics.getHeight() / 2.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 2.0f);
 
         getRenderer().end();
     }

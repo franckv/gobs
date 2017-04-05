@@ -51,7 +51,7 @@ public class Camera implements Component {
                 orientation = Orientation.DOWN;
                 break;
             case 270:
-                orientation = orientation.LEFT;
+                orientation = Orientation.LEFT;
                 break;
         }
         this.angle = 0;

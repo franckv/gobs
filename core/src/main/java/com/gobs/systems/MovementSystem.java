@@ -8,7 +8,6 @@ import com.gobs.GobsEngine;
 import com.gobs.components.Animation;
 import com.gobs.components.Camera;
 import com.gobs.components.Command;
-import com.gobs.components.Command.CommandType;
 import com.gobs.components.Transform;
 
 public class MovementSystem extends IteratingSystem {
@@ -35,66 +34,67 @@ public class MovementSystem extends IteratingSystem {
 
         Transform trans = new Transform();
 
-        if (command.getCommand() == CommandType.LEFT) {
-            if (cam != null) {
-                trans.rotate(-90);
-                entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
-            } else {
-                trans.addX(-1);
-                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
-            }
-        }
-
-        if (command.getCommand() == CommandType.RIGHT) {
-            if (cam != null) {
-                trans.rotate(90);
-                entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
-            } else {
-                trans.addX(1);
-                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
-            }
-        }
-        if (command.getCommand() == CommandType.UP) {
-            if (cam != null) {
-                switch (cam.getOrientation()) {
-                    case UP:
-                        trans.addY(1);
-                        break;
-                    case DOWN:
-                        trans.addY(-1);
-                        break;
-                    case RIGHT:
-                        trans.addX(1);
-                        break;
-                    case LEFT:
-                        trans.addX(-1);
-                        break;
+        switch (command.getCommand()) {
+            case LEFT:
+                if (cam != null) {
+                    trans.rotate(-90);
+                    entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
+                } else {
+                    trans.addX(-1);
+                    entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
                 }
-            } else {
-                trans.addY(1);
-            }
-            entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
-        }
-        if (command.getCommand() == CommandType.DOWN) {
-            if (cam != null) {
-                switch (cam.getOrientation()) {
-                    case UP:
-                        trans.addY(-1);
-                        break;
-                    case DOWN:
-                        trans.addY(1);
-                        break;
-                    case RIGHT:
-                        trans.addX(-1);
-                        break;
-                    case LEFT:
-                        trans.addX(1);
-                        break;
+                break;
+            case RIGHT:
+                if (cam != null) {
+                    trans.rotate(90);
+                    entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
+                } else {
+                    trans.addX(1);
+                    entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
                 }
-            } else {
-                trans.addY(-1);
-            }
-            entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                break;
+            case UP:
+                if (cam != null) {
+                    switch (cam.getOrientation()) {
+                        case UP:
+                            trans.addY(1);
+                            break;
+                        case DOWN:
+                            trans.addY(-1);
+                            break;
+                        case RIGHT:
+                            trans.addX(1);
+                            break;
+                        case LEFT:
+                            trans.addX(-1);
+                            break;
+                    }
+                } else {
+                    trans.addY(1);
+                }
+                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                break;
+            case DOWN:
+                if (cam != null) {
+                    switch (cam.getOrientation()) {
+                        case UP:
+                            trans.addY(-1);
+                            break;
+                        case DOWN:
+                            trans.addY(1);
+                            break;
+                        case RIGHT:
+                            trans.addX(-1);
+                            break;
+                        case LEFT:
+                            trans.addX(1);
+                            break;
+                    }
+                } else {
+                    trans.addY(-1);
+                }
+                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                break;
         }
 
         entity.remove(Command.class);
