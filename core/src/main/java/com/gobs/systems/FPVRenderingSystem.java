@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
@@ -43,7 +43,7 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private List<ModelInstance> instances = new ArrayList<>();
     private float step = 1f;
     private float h = 0.1f;
-    private DirectionalLight light;
+    private PointLight light;
     private Texture texture;
 
     public FPVRenderingSystem(PerspectiveDisplay displayManager, int worldWidth, int worldHeight, Layer mapLayer) {
@@ -62,7 +62,7 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
 
         modelBatch = new ModelBatch();
 
-        light = new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 1f, 0f);
+        light = new PointLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, 0f, 1f);
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(light);
@@ -130,15 +130,15 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
 
         float x = pos.getX() + pos.getDX();
         float y = pos.getY() + pos.getDY();
-        float angle = (float)Math.toRadians(cam.getRotation() + cam.getAngle());
-        
+        float angle = (float) Math.toRadians(cam.getRotation() + cam.getAngle());
+
         display.getCamera().position.set(x * step, y * step, 0f);
+        light.setPosition(x * step, y * step, 0f);
 
-        float dx = (float)Math.sin(angle);
-        float dy = (float)Math.cos(angle);
+        float dx = (float) Math.sin(angle);
+        float dy = (float) Math.cos(angle);
 
-        Vector3 vec = new Vector3((x + dx) * step, (y + dy) * step, 0f);
-        display.getCamera().lookAt(vec);
+        display.getCamera().lookAt((x + dx) * step, (y + dy) * step, 0f);
     }
 
     @Override
