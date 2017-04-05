@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.width = 1024;
 		config.height = 768;
 		config.resizable = false;
+                config.foregroundFPS = 75;
 		new LwjglApplication(new GobsGame(), config);
 	}
 }
