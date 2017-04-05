@@ -2,6 +2,7 @@ package com.gobs.input;
 
 import com.gobs.input.ContextManager.Action;
 import com.gobs.input.ContextManager.ContextType;
+import com.gobs.input.ContextManager.Event;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
 import java.util.List;
@@ -37,8 +38,8 @@ public class ContextManagerTest {
     @Test
     public void testRegisterAction() {
         manager.registerAction(ContextType.CRAWLING,
-                Action.MOVE_UP, (action) -> {
-                    System.out.println("Trigger: " + action);
+                Action.MOVE_UP, (event) -> {
+                    System.out.println("Trigger: " + event);
                     triggered = true;
                 });
 
@@ -50,8 +51,10 @@ public class ContextManagerTest {
         Assert.assertEquals(1, handlers.size());
 
         triggered = false;
+        
+        Event event = manager.new Event(ContextType.CRAWLING, Action.MOVE_UP);
 
-        handlers.get(0).triggerAction(Action.MOVE_UP);
+        handlers.get(0).triggerAction(event);
 
         Assert.assertTrue(triggered);
     }
@@ -82,40 +85,40 @@ public class ContextManagerTest {
 
     @Test
     public void testRegisterConsumer() {
-        manager.registerConsumer("test", Action.DUMP);
+        manager.registerConsumer("test", ContextType.CRAWLING, Action.DUMP);
 
-        Assert.assertEquals(1, manager.consummerMappings.keySet().size());
-        Assert.assertEquals(1, manager.consummerMappings.get(Action.DUMP).size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
 
-        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
+        Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
 
-        manager.registerConsumer("test2", Action.DUMP);
+        manager.registerConsumer("test2", ContextType.CRAWLING, Action.DUMP);
 
-        Assert.assertEquals(1, manager.consummerMappings.keySet().size());
-        Assert.assertEquals(2, manager.consummerMappings.get(Action.DUMP).size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
 
-        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
-        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DUMP).get(1));
+        Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
+        Assert.assertEquals("test2", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(1));
 
-        manager.registerConsumer("test2", Action.DIG);
+        manager.registerConsumer("test2", ContextType.CRAWLING, Action.DIG);
 
-        Assert.assertEquals(2, manager.consummerMappings.keySet().size());
-        Assert.assertEquals(2, manager.consummerMappings.get(Action.DUMP).size());
-        Assert.assertEquals(1, manager.consummerMappings.get(Action.DIG).size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DIG).size());
 
-        Assert.assertEquals("test", manager.consummerMappings.get(Action.DUMP).get(0));
-        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DUMP).get(1));
-        Assert.assertEquals("test2", manager.consummerMappings.get(Action.DIG).get(0));
+        Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
+        Assert.assertEquals("test2", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(1));
+        Assert.assertEquals("test2", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DIG).get(0));
     }
 
     @Test
     public void testDispatchInput() {
-        manager.activateContext(ContextManager.ContextType.CRAWLING);
+        manager.activateContext(ContextType.CRAWLING);
         manager.mapInput(ContextType.CRAWLING, Input.D, Action.DUMP);
         manager.mapInput(ContextType.CRAWLING, Input.ESCAPE, Action.EXIT);
-        manager.registerConsumer("test", Action.DUMP);
-        manager.registerConsumer("test", Action.EXIT);
-        manager.registerConsumer("test2", Action.EXIT);
+        manager.registerConsumer("test", ContextType.CRAWLING, Action.DUMP);
+        manager.registerConsumer("test", ContextType.CRAWLING, Action.EXIT);
+        manager.registerConsumer("test2", ContextType.CRAWLING, Action.EXIT);
 
         InputMap map = new InputMap();
         map.set(Input.UP);
@@ -144,8 +147,8 @@ public class ContextManagerTest {
         manager.dispatchInput(map);
 
         Assert.assertEquals(1, manager.dispatcher.get("test").size());
-        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test").get(0));
+        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test").get(0).getAction());
         Assert.assertEquals(1, manager.dispatcher.get("test2").size());
-        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test2").get(0));
+        Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test2").get(0).getAction());
     }
 }

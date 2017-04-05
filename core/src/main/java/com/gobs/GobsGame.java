@@ -24,6 +24,7 @@ import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.ControllerSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
+import com.gobs.systems.MapInputSystem;
 import com.gobs.systems.MapRenderingSystem;
 import com.gobs.systems.MovementSystem;
 import com.gobs.systems.TransformationSystem;
@@ -111,8 +112,9 @@ public class GobsGame extends Game {
 
     public void initSystems() {
         // logic systems
-        engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager, stateManager, mapLayer, config.getRepeat()));
+        engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager));
         engine.addSystem(new ControllerSystem(contextManager));
+        engine.addSystem(new MapInputSystem(contextManager, stateManager, mapLayer));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new CollisionSystem(collisionManager, config.getWorldWidth(), config.getWorldHeight(), mapLayer));

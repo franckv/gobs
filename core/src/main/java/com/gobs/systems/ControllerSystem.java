@@ -10,6 +10,7 @@ import com.gobs.GobsEngine;
 import com.gobs.components.Command;
 import com.gobs.components.Controller;
 import com.gobs.input.ContextManager;
+import com.gobs.input.ContextManager.ContextType;
 import java.util.List;
 
 public class ControllerSystem extends EntitySystem {
@@ -59,10 +60,10 @@ public class ControllerSystem extends EntitySystem {
     }
 
     private void processInputs() {
-        List<ContextManager.Action> actions = contextManager.pollActions(consummerID);
+        List<ContextManager.Event> events = contextManager.pollActions(consummerID);
 
-        for (ContextManager.Action action : actions) {
-            switch (action) {
+        for (ContextManager.Event event : events) {
+            switch (event.getAction()) {
                 case MOVE_UP:
                     setCommand(Command.CommandType.UP);
                     break;
@@ -80,10 +81,15 @@ public class ControllerSystem extends EntitySystem {
     }
 
     private void registerActions() {
-        contextManager.registerConsumer(consummerID, ContextManager.Action.MOVE_UP);
-        contextManager.registerConsumer(consummerID, ContextManager.Action.MOVE_DOWN);
-        contextManager.registerConsumer(consummerID, ContextManager.Action.MOVE_LEFT);
-        contextManager.registerConsumer(consummerID, ContextManager.Action.MOVE_RIGHT);
+        contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.MOVE_UP);
+        contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.MOVE_DOWN);
+        contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.MOVE_LEFT);
+        contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.MOVE_RIGHT);
+
+        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.MOVE_UP);
+        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.MOVE_DOWN);
+        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.MOVE_LEFT);
+        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.MOVE_RIGHT);
     }
 
     private boolean setCommand(Command.CommandType type) {

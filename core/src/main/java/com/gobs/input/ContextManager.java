@@ -25,15 +25,33 @@ public class ContextManager {
         EXIT, DUMP
     }
 
+    public class Event {
+        ContextType context;
+        Action action;
+
+        public Event(ContextType context, Action action) {
+            this.context = context;
+            this.action = action;
+        }
+
+        public ContextType getContext() {
+            return context;
+        }
+
+        public Action getAction() {
+            return action;
+        }
+    }
+
     BitSet activeContexts;
     // map input to actions in a specific context
     Map<ContextType, Map<Input, Action>> inputMappings;
     // callback registration for actions
     Map<ContextType, Map<Action, List<ContextHandler>>> handlerMappings;
     // poll based consummer registration for actions
-    Map<Action, List<String>> consummerMappings;
-    // list of actions available for a specific consummer
-    Map<String, List<Action>> dispatcher;
+    Map<ContextType, Map<Action, List<String>>> consummerMappings;
+    // list of events available for a specific consummer
+    Map<String, List<Event>> dispatcher;
 
     public ContextManager() {
         activeContexts = new BitSet(ContextType.values().length);
@@ -63,11 +81,19 @@ public class ContextManager {
         inputMapping.put(input, action);
     }
 
-    public void registerConsumer(String consummer, Action action) {
-        if (!consummerMappings.containsKey(action)) {
-            consummerMappings.put(action, new ArrayList<>());
+    public void registerConsumer(String consummer, ContextType context, Action action) {
+        Map<Action, List<String>> consummerMapping;
+        if (!consummerMappings.containsKey(context)) {
+            consummerMapping = new HashMap<>();
+            consummerMappings.put(context, consummerMapping);
+        } else {
+            consummerMapping = consummerMappings.get(context);
         }
-        consummerMappings.get(action).add(consummer);
+
+        if (!consummerMapping.containsKey(action)) {
+            consummerMapping.put(action, new ArrayList<>());
+        }
+        consummerMapping.get(action).add(consummer);
         if (!dispatcher.containsKey(consummer)) {
             dispatcher.put(consummer, new ArrayList<>());
         }
@@ -80,9 +106,9 @@ public class ContextManager {
                     if (inputMappings.get(context).containsKey(input)) {
                         Action action = inputMappings.get(context).get(input);
 
-                        if (consummerMappings.containsKey(action)) {
-                            for (String consummer : consummerMappings.get(action)) {
-                                dispatcher.get(consummer).add(action);
+                        if (consummerMappings.containsKey(context) && consummerMappings.get(context).containsKey(action)) {
+                            for (String consummer : consummerMappings.get(context).get(action)) {
+                                dispatcher.get(consummer).add(new Event(context, action));
                             }
                         }
                     }
@@ -91,10 +117,10 @@ public class ContextManager {
         }
     }
 
-    public List<Action> pollActions(String consummer) {
-        List<Action> result = new ArrayList<>(dispatcher.get(consummer));
+    public List<Event> pollActions(String consummer) {
+        List<Event> result = new ArrayList<>(dispatcher.get(consummer));
         dispatcher.get(consummer).clear();
-        
+
         return result;
     }
 
@@ -136,7 +162,7 @@ public class ContextManager {
 
                     if (handlerMappings.containsKey(context) && handlerMappings.get(context).containsKey(action)) {
                         for (ContextHandler handler : handlerMappings.get(context).get(action)) {
-                            handler.triggerAction(action);
+                            handler.triggerAction(new Event(context, action));
                             return true;
                         }
                     }
@@ -144,9 +170,10 @@ public class ContextManager {
             }
         }
         return false;
+
     }
 
     public interface ContextHandler {
-        public void triggerAction(Action action);
+        public void triggerAction(Event event);
     }
 }
