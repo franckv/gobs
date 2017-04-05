@@ -13,7 +13,7 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import java.util.List;
 
-public class ControllerSystem extends EntitySystem {
+public class ControllerInputSystem extends EntitySystem {
     private ContextManager contextManager;
     private Family family;
     private ImmutableArray<Entity> entities;
@@ -22,11 +22,11 @@ public class ControllerSystem extends EntitySystem {
 
     private String consummerID = "controller";
 
-    public ControllerSystem(ContextManager contextManager) {
+    public ControllerInputSystem(ContextManager contextManager) {
         this(contextManager, 0);
     }
 
-    public ControllerSystem(ContextManager contextManager, int priority) {
+    public ControllerInputSystem(ContextManager contextManager, int priority) {
         this.family = Family.one(Controller.class).get();
 
         this.contextManager = contextManager;
