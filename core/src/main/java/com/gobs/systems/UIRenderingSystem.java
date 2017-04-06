@@ -33,7 +33,6 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Party> am = ComponentMapper.getFor(Party.class);
     private final ComponentMapper<HP> hm = ComponentMapper.getFor(HP.class);
     private final ComponentMapper<MP> mm = ComponentMapper.getFor(MP.class);
-    private final ComponentMapper<Hidden> dm = ComponentMapper.getFor(Hidden.class);
 
     private OrthographicDisplay display;
     private StateManager stateManager;
@@ -55,7 +54,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, StateManager stateManager, Batch batch, int priority) {
         super(priority);
 
-        controllables = Family.all(Position.class, Controller.class).get();
+        controllables = Family.all(Position.class, Controller.class).exclude(Hidden.class).get();
         characters = Family.all(Party.class, Name.class, HP.class, MP.class).get();
 
         this.display = display;
@@ -142,9 +141,6 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         // display player position
         for (Entity entity : controllablesEntities) {
-            if (dm.get(entity) != null) {
-                continue;
-            }
             Controller controller = cm.get(entity);
             if (controller == null || !controller.isActive()) {
                 continue;

@@ -94,8 +94,7 @@ public class MobBehavior implements AIBehavior {
                         commandType = CommandType.RIGHT;
                     } else if (nextPos.x - pos.getX() < 0) {
                         commandType = CommandType.LEFT;
-                    }
-                    if (nextPos.y - pos.getY() > 0) {
+                    } else if (nextPos.y - pos.getY() > 0) {
                         commandType = CommandType.UP;
                     } else if (nextPos.y - pos.getY() < 0) {
                         commandType = CommandType.DOWN;

@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.gobs.GobsEngine;
 import com.gobs.components.Animation;
 import com.gobs.components.Collider;
@@ -41,7 +40,7 @@ public class CollisionSystem extends IteratingSystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
 
-        colliders = engine.getEntitiesFor(Family.all(Collider.class).get());
+        colliders = engine.getEntitiesFor(Family.all(Collider.class, Position.class).get());
     }
 
     @Override
@@ -76,13 +75,12 @@ public class CollisionSystem extends IteratingSystem {
         int y = pos.getY();
         int dy = trans.getDY();
 
-        Gdx.app.debug("CollisionSystem", x + dx + ":" + y + dy);
-
         // TODO: trigger scrolling if moving out of screen
         if (checkBounds(x + dx, y + dy, worldMap.getWorldWidth(), worldMap.getWorldHeight()) || checkColliders(entity, x + dx, y + dy)) {
             trans.setDX(0);
             trans.setDY(0);
             // TODO: check if animation type is translation
+            // TODO: add bouncing animation
             entity.remove(Animation.class);
         }
     }
