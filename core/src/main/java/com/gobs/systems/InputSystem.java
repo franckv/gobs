@@ -13,7 +13,6 @@ import com.gobs.components.AI;
 import com.gobs.components.Controller;
 import com.gobs.components.Goal;
 import com.gobs.components.Position;
-import com.gobs.display.MapDisplay;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.InputHandler;
@@ -22,27 +21,25 @@ import com.gobs.ui.InputMap;
 import java.util.List;
 
 public class InputSystem extends EntitySystem {
-    private MapDisplay display;
     private InputHandler inputHandler;
     private ContextManager contextManager;
-    
+
     private Family family;
     private ImmutableArray<Entity> entities;
 
-    private final static String consummerID = "runtime";
+    private final static String consummerID = InputSystem.class.getName();
 
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
     private final ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
 
-    public InputSystem(MapDisplay display, InputHandler inputHandler, ContextManager contextManager) {
-        this(display, inputHandler, contextManager, 0);
+    public InputSystem(InputHandler inputHandler, ContextManager contextManager) {
+        this(inputHandler, contextManager, 0);
     }
 
-    public InputSystem(MapDisplay display, InputHandler inputHandler, ContextManager contextManager, int priority) {
+    public InputSystem(InputHandler inputHandler, ContextManager contextManager, int priority) {
         this.family = Family.one(Controller.class, AI.class).get();
 
-        this.display = display;
         this.inputHandler = inputHandler;
         this.contextManager = contextManager;
 
@@ -92,6 +89,10 @@ public class InputSystem extends EntitySystem {
                     break;
                 case DUMP:
                     dumpEntities();
+                    break;
+                case TARGET:
+                    setTarget();
+                    break;
             }
         }
     }
@@ -99,34 +100,7 @@ public class InputSystem extends EntitySystem {
     private void registerActions() {
         contextManager.registerConsumer(consummerID, ContextType.GLOBAL, ContextManager.Action.EXIT);
         contextManager.registerConsumer(consummerID, ContextType.GLOBAL, ContextManager.Action.DUMP);
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_UP, (action) -> {
-            display.getCamera().translate(0, 1);
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_DOWN, (action) -> {
-            display.getCamera().translate(0, -1);
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_LEFT, (action) -> {
-            display.getCamera().translate(-1, 0);
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.SCROLL_RIGHT, (action) -> {
-            display.getCamera().translate(1, 0);
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_IN, (action) -> {
-            display.getCamera().zoom -= 0.1f;
-        });
-
-        contextManager.registerAction(ContextType.MAP, ContextManager.Action.ZOOM_OUT, (action) -> {
-            display.getCamera().zoom += 0.1f;
-        });
-
-        contextManager.registerAction(ContextType.EDITMAP, ContextManager.Action.TARGET, (action) -> {
-            setTarget();
-        });
+        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.TARGET);
     }
 
     private void dumpEntities() {

@@ -35,7 +35,7 @@ public class EntityFactory {
         this.collisionManager = collisionManager;
         this.tileManager = tileManager;
     }
-    
+
     public List<Entity> loadEntities(String filename) {
         List<Entity> entities = new ArrayList<>();
 

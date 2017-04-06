@@ -14,20 +14,20 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import java.util.List;
 
-public class ControllerInputSystem extends EntitySystem {
+public class ControllerSystem extends EntitySystem {
     private ContextManager contextManager;
     private Family family;
     private ImmutableArray<Entity> entities;
 
     private ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
 
-    private String consummerID = "controller";
+    private String consummerID = ControllerSystem.class.getName();
 
-    public ControllerInputSystem(ContextManager contextManager) {
+    public ControllerSystem(ContextManager contextManager) {
         this(contextManager, 0);
     }
 
-    public ControllerInputSystem(ContextManager contextManager, int priority) {
+    public ControllerSystem(ContextManager contextManager, int priority) {
         this.family = Family.one(Controller.class).exclude(Animation.class).get();
 
         this.contextManager = contextManager;

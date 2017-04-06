@@ -5,8 +5,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class PerspectiveDisplay extends Display {
     private PerspectiveCamera camera;
+    private float stepSize;
     
-    public PerspectiveDisplay(int width, int height) {
+    public PerspectiveDisplay(int width, int height, float stepSize) {
         super(width, height);
 
         camera = new PerspectiveCamera(67, width, height);
@@ -16,9 +17,15 @@ public class PerspectiveDisplay extends Display {
 
         viewPort = new FitViewport(width, height, camera);
         viewPort.apply();
+        
+        this.stepSize = stepSize;
     }
     
     public PerspectiveCamera getCamera() {
         return camera;
+    }
+    
+    public float getStepSize() {
+        return stepSize;
     }
 }

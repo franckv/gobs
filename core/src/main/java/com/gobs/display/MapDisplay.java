@@ -12,4 +12,8 @@ public class MapDisplay extends OrthographicDisplay {
     public void update(int width, int height) {
         super.update(width / tileSize, height / tileSize);
     }
+    
+    public int getTileSize() {
+        return tileSize;
+    }
 }

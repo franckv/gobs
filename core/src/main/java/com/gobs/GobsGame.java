@@ -19,8 +19,9 @@ import com.gobs.map.Layer;
 import com.gobs.map.WorldMap;
 import com.gobs.screens.MainScreen;
 import com.gobs.systems.AISystem;
+import com.gobs.systems.CameraSystem;
 import com.gobs.systems.CollisionSystem;
-import com.gobs.systems.ControllerInputSystem;
+import com.gobs.systems.ControllerSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
 import com.gobs.systems.MapRenderingSystem;
@@ -66,7 +67,7 @@ public class GobsGame extends Game {
 
         tileManager = new TileFactory(config);
         contextManager = new ContextManager();
-        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), config.getTileSize());
+        displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), config.getTileSize(), 1f);
         collisionManager = new CollisionManager<>(config.getWorldWidth(), config.getWorldHeight());
         batch = new SpriteBatch();
 
@@ -105,17 +106,18 @@ public class GobsGame extends Game {
 
     public void initSystems() {
         // logic systems
-        engine.addSystem(new InputSystem(displayManager.getMapDisplay(), inputHandler, contextManager));
-        engine.addSystem(new ControllerInputSystem(contextManager));
+        engine.addSystem(new InputSystem(inputHandler, contextManager));
+        engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem(config.getFPS()));
         engine.addSystem(new CollisionSystem(collisionManager, worldMap));
         engine.addSystem(new TransformationSystem());
+        engine.addSystem(new CameraSystem(displayManager, contextManager));
 
         // rendering systems
         engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), worldMap));
-        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch, config.getTileSize()), false);
+        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch), false);
         engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, stateManager, batch));
     }
 

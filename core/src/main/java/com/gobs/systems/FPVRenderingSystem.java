@@ -1,9 +1,6 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
@@ -21,19 +18,13 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
-import com.gobs.components.Camera;
-import com.gobs.components.Position;
 import com.gobs.display.PerspectiveDisplay;
 import com.gobs.map.LayerCell;
 import com.gobs.map.WorldMap;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FPVRenderingSystem extends IteratingSystem implements Disposable {
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
-
-    private final static float step = 1f;
+public class FPVRenderingSystem extends EntitySystem implements Disposable {
     private final static float h = 0.1f;
 
     private WorldMap worldMap;
@@ -44,16 +35,17 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
     private List<ModelInstance> instances = new ArrayList<>();
     private PointLight light;
     private Texture texture;
+    private float step;
 
-    public FPVRenderingSystem(PerspectiveDisplay displayManager, WorldMap worldMap) {
-        this(displayManager, worldMap, 0);
+    public FPVRenderingSystem(PerspectiveDisplay display, WorldMap worldMap) {
+        this(display, worldMap, 0);
     }
 
-    public FPVRenderingSystem(PerspectiveDisplay displayManager, WorldMap worldMap, int priority) {
-        super(Family.all(Camera.class).get(), priority);
+    public FPVRenderingSystem(PerspectiveDisplay display, WorldMap worldMap, int priority) {
+        super(priority);
 
         this.worldMap = worldMap;
-        this.display = displayManager;
+        this.display = display;
 
         texture = new Texture("textures/wall.png");
 
@@ -66,6 +58,8 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
 
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         Material mat = new Material(TextureAttribute.createDiffuse(texture));
+
+        step = display.getStepSize();
 
         ModelBuilder modelBuilder = new ModelBuilder();
         wall = modelBuilder.createBox(step, step, step, mat, attr);
@@ -111,29 +105,13 @@ public class FPVRenderingSystem extends IteratingSystem implements Disposable {
             buildScene();
         }
 
+        light.setPosition(display.getCamera().position);
+
         modelBatch.begin(display.getCamera());
 
         modelBatch.render(instances, environment);
 
         modelBatch.end();
-    }
-
-    @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Camera cam = cm.get(entity);
-        Position pos = pm.get(entity);
-
-        float x = pos.getX() + pos.getDX();
-        float y = pos.getY() + pos.getDY();
-        float angle = (float) Math.toRadians(cam.getRotation() + cam.getAngle());
-
-        display.getCamera().position.set(x * step, y * step, 0f);
-        light.setPosition(x * step, y * step, 0f);
-
-        float dx = (float) Math.sin(angle);
-        float dy = (float) Math.cos(angle);
-
-        display.getCamera().lookAt((x + dx) * step, (y + dy) * step, 0f);
     }
 
     @Override

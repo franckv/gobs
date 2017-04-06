@@ -30,22 +30,22 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
     private WorldMap worldMap;
     private TiledMapView mapView;
 
-    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch, int tileSize) {
-        this(display, tileManager, worldMap, batch, tileSize, 0);
+    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch) {
+        this(display, tileManager, worldMap, batch, 0);
     }
 
-    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch, int tileSize, int priority) {
+    public MapRenderingSystem(MapDisplay display, TileFactory tileManager, WorldMap worldMap, Batch batch, int priority) {
         super(Family.all(Position.class, Sprite.class).exclude(Hidden.class).get(), priority);
 
         this.display = display;
         this.worldMap = worldMap;
         this.batch = batch;
-        this.mapView = new TiledMapView(tileManager, worldMap.getWorldWidth(), worldMap.getWorldHeight(), tileSize);
+        this.mapView = new TiledMapView(tileManager, worldMap.getWorldWidth(), worldMap.getWorldHeight(), display.getTileSize());
 
         TiledMap map = mapView.getMap();
 
         // Scale world coordinates to pixel coordinates
-        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / tileSize, batch);
+        renderer = new OrthogonalTiledMapRenderer(map, 1.0f / display.getTileSize(), batch);
         renderer.setView(display.getCamera());
     }
 
