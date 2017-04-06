@@ -133,7 +133,7 @@ public class MapUpdateSystem extends EntitySystem {
         }
 
         System.out.println("Dig at " + x + "," + y);
-        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.FLOOR, false);
+        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.FLOOR);
     }
 
     private void fillMap() {
@@ -151,7 +151,7 @@ public class MapUpdateSystem extends EntitySystem {
         }
 
         System.out.println("Fill " + x + "," + y);
-        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.WALL, true);
+        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.WALL);
     }
 
     private void editMap(boolean edit) {

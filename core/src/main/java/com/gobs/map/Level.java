@@ -21,9 +21,9 @@ public class Level implements Iterable<LevelCell> {
         this.cells = new LevelCell[w][h];
     }
 
-    public void setCell(int x, int y, LevelCellType cellType, boolean block) {
+    public void setCell(int x, int y, LevelCellType cellType) {
         if (x >= 0 && x < w && y >= 0 && y < h) {
-            cells[x][y] = new LevelCell(x, y, cellType, block);
+            cells[x][y] = new LevelCell(x, y, cellType);
         }
 
         this.dirty = true;

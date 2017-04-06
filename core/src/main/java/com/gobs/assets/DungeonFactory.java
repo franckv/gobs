@@ -36,11 +36,11 @@ public class DungeonFactory {
                 int i = 0;
                 for (char c : lines.get(j).toCharArray()) {
                     if (c == 'w') {
-                        level.setCell(i, j, LevelCellType.WALL, true);
+                        level.setCell(i, j, LevelCellType.WALL);
                     } else if (c == '.') {
-                        level.setCell(i, j, LevelCellType.FLOOR, false);
+                        level.setCell(i, j, LevelCellType.FLOOR);
                     } else if (c == '@') {
-                        level.setCell(i, j, LevelCellType.STAIRS, false);
+                        level.setCell(i, j, LevelCellType.STAIRS);
                     }
                     i += 1;
                 }
