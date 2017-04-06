@@ -94,8 +94,7 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
 
     @Override
     public void update(float deltaTime) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
+        clearScreen();
 
         super.update(deltaTime);
 
@@ -117,6 +116,11 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
     @Override
     public boolean checkProcessing() {
         return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+    }
+
+    private void clearScreen() {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
     }
 
     @Override

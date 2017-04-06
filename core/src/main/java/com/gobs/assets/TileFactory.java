@@ -45,6 +45,7 @@ public class TileFactory implements Disposable {
         colors.add(Color.BLUE);
         colors.add(Color.YELLOW);
         colors.add(Color.GOLD);
+        colors.add(Color.CLEAR);
 
         initTiles(colors);
 

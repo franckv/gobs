@@ -1,8 +1,8 @@
 package com.gobs.map;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
@@ -10,18 +10,23 @@ import com.badlogic.gdx.utils.Disposable;
 import com.gobs.assets.TileFactory;
 import com.gobs.map.Layer.LayerType;
 
-/**
- *
- */
 public class TiledMapView implements Disposable {
     private TiledMap map;
     private TileFactory tileManager;
+
+    private TiledMapTile floorTile;
+    private TiledMapTile stairsTile;
+    private TiledMapTile wallTile;
 
     public TiledMapView(TileFactory tileManager, int width, int height, int tileSize) {
         this.tileManager = tileManager;
         map = new TiledMap();
 
         map.getLayers().add(new TiledMapTileLayer(width, height, tileSize, tileSize));
+
+        floorTile = new StaticTiledMapTile(tileManager.getFullTile(Color.LIGHT_GRAY));
+        stairsTile = new StaticTiledMapTile(tileManager.getFullTile(Color.BLUE));
+        wallTile = new StaticTiledMapTile(tileManager.getFullTile(Color.CLEAR));
     }
 
     public TiledMap getMap() {
@@ -31,28 +36,25 @@ public class TiledMapView implements Disposable {
     public void drawLayer(Layer layer) {
         for (LayerCell c : layer) {
             if (c != null) {
-                Color color = null;
-                boolean isFilled = false;
+                TiledMapTile tile = null;
+
                 switch (c.getType()) {
                     case STAIRS:
-                        color = Color.BLUE;
-                        isFilled = true;
+                        tile = stairsTile;
                         break;
                     case FLOOR:
-                        color = Color.LIGHT_GRAY;
-                        isFilled = true;
+                        tile = floorTile;
                         break;
                     case WALL:
-                        color = Color.DARK_GRAY;
-                        isFilled = true;
+                        tile = wallTile;
                         break;
                 }
-                paintCell(getCell(c.getX(), c.getY(), layer.getType()), color, isFilled);
+                paintCell(c.getX(), c.getY(), layer.getType(), tile);
             }
         }
     }
 
-    private Cell getCell(int x, int y, LayerType type) {
+    private void paintCell(int x, int y, LayerType type, TiledMapTile tile) {
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(type.ordinal());
 
         Cell cell = layer.getCell(x, y);
@@ -61,23 +63,8 @@ public class TiledMapView implements Disposable {
             cell = new Cell();
             layer.setCell(x, y, cell);
         }
-        return cell;
-    }
 
-    private void paintCell(TiledMapTileLayer.Cell cell, Color color, boolean fill) {
-        TextureRegion tile;
-
-        if (fill) {
-            tile = tileManager.getFullTile(color);
-        } else {
-            tile = tileManager.getRectTile(color);
-        }
-
-        if (cell.getTile() == null) {
-            cell.setTile(new StaticTiledMapTile(tile));
-        } else {
-            cell.getTile().setTextureRegion(tile);
-        }
+        cell.setTile(tile);
     }
 
     @Override

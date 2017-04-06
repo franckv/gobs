@@ -3,7 +3,6 @@ package com.gobs;
 import com.badlogic.ashley.core.Engine;
 import com.gobs.input.ContextManager;
 import com.gobs.systems.AISystem;
-import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.MapRenderingSystem;
 
 public class StateManager {
@@ -63,12 +62,10 @@ public class StateManager {
 
     private void enterCRAWL() {
         engine.getSystem(AISystem.class).setProcessing(true);
-        engine.getSystem(FPVRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.CRAWLING);
     }
 
     private void exitCRAWL() {
-        engine.getSystem(FPVRenderingSystem.class).setProcessing(false);
         contextManager.disableContext(ContextManager.ContextType.CRAWLING);
     }
 
