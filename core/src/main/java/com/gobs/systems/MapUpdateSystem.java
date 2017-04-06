@@ -13,7 +13,7 @@ import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
-import com.gobs.map.LayerCell;
+import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class MapUpdateSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        worldMap.getCurrentLayer().setDirty(false);
+        worldMap.getCurrentLevel().setDirty(false);
         processInputs();
     }
 
@@ -82,7 +82,7 @@ public class MapUpdateSystem extends EntitySystem {
                     fillMap();
                     break;
                 case TOGGLE_EDIT:
-                    worldMap.getCurrentLayer().setDirty(true);
+                    worldMap.getCurrentLevel().setDirty(true);
 
                     if (event.getContext() == ContextType.MAP) {
                         stateManager.setState(StateManager.State.EDITMAP);
@@ -93,7 +93,7 @@ public class MapUpdateSystem extends EntitySystem {
                     }
                     break;
                 case TOGGLE_VIEW:
-                    worldMap.getCurrentLayer().setDirty(true);
+                    worldMap.getCurrentLevel().setDirty(true);
 
                     if (event.getContext() == ContextType.CRAWLING) {
                         stateManager.setState(StateManager.State.MAP);
@@ -133,7 +133,7 @@ public class MapUpdateSystem extends EntitySystem {
         }
 
         System.out.println("Dig at " + x + "," + y);
-        worldMap.getCurrentLayer().setCell(x, y, LayerCell.LayerCellType.FLOOR, false);
+        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.FLOOR, false);
     }
 
     private void fillMap() {
@@ -151,7 +151,7 @@ public class MapUpdateSystem extends EntitySystem {
         }
 
         System.out.println("Fill " + x + "," + y);
-        worldMap.getCurrentLayer().setCell(x, y, LayerCell.LayerCellType.WALL, true);
+        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.WALL, true);
     }
 
     private void editMap(boolean edit) {

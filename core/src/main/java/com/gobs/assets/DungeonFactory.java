@@ -1,8 +1,8 @@
 package com.gobs.assets;
 
 import com.badlogic.gdx.Gdx;
-import com.gobs.map.Layer;
-import com.gobs.map.LayerCell.LayerCellType;
+import com.gobs.map.Level;
+import com.gobs.map.LevelCell.LevelCellType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,8 +15,8 @@ public class DungeonFactory {
     private DungeonFactory() {
     }
 
-    public static Layer loadMap(int worldWidth, int worldHeight, String res) throws IOException {
-        Layer mapLayer = new Layer(worldWidth, worldHeight, Layer.LayerType.MAP_LAYER);
+    public static Level loadMap(int worldWidth, int worldHeight, String res) throws IOException {
+        Level level = new Level(worldWidth, worldHeight);
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 Gdx.files.internal(res).read(), Charset.forName("UTF-8")))) {
@@ -36,17 +36,17 @@ public class DungeonFactory {
                 int i = 0;
                 for (char c : lines.get(j).toCharArray()) {
                     if (c == 'w') {
-                        mapLayer.setCell(i, j, LayerCellType.WALL, true);
+                        level.setCell(i, j, LevelCellType.WALL, true);
                     } else if (c == '.') {
-                        mapLayer.setCell(i, j, LayerCellType.FLOOR, false);
+                        level.setCell(i, j, LevelCellType.FLOOR, false);
                     } else if (c == '@') {
-                        mapLayer.setCell(i, j, LayerCellType.STAIRS, false);
+                        level.setCell(i, j, LevelCellType.STAIRS, false);
                     }
                     i += 1;
                 }
             }
         }
 
-        return mapLayer;
+        return level;
     }
 }

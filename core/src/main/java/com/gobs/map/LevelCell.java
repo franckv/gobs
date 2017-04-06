@@ -3,16 +3,16 @@ package com.gobs.map;
 /**
  * A cell in a level
  */
-public class LayerCell {
+public class LevelCell {
     private boolean isBlockable;
     private int x, y;
-    private LayerCellType type;
+    private LevelCellType type;
     
-    public enum LayerCellType {
+    public enum LevelCellType {
         FLOOR, WALL, STAIRS
     }
     
-    public LayerCell(int x, int y, LayerCellType type, boolean block) {
+    public LevelCell(int x, int y, LevelCellType type, boolean block) {
         this.x = x;
         this.y = y;
         this.type = type;
@@ -31,7 +31,7 @@ public class LayerCell {
         return y;
     }
     
-    public LayerCellType getType() {
+    public LevelCellType getType() {
         return type;
     }
 }

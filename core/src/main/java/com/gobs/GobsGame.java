@@ -15,7 +15,7 @@ import com.gobs.assets.TileFactory;
 import com.gobs.display.DisplayManager;
 import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
-import com.gobs.map.Layer;
+import com.gobs.map.Level;
 import com.gobs.map.WorldMap;
 import com.gobs.screens.MainScreen;
 import com.gobs.systems.AISystem;
@@ -125,7 +125,7 @@ public class GobsGame extends Game {
         WorldMap map = new WorldMap(config.getWorldWidth(), config.getWorldHeight());
 
         try {
-            Layer layer = DungeonFactory.loadMap(config.getWorldWidth(), config.getWorldHeight(), "dungeon.map");
+            Level layer = DungeonFactory.loadMap(config.getWorldWidth(), config.getWorldHeight(), "dungeon.map");
 
             map.addLayer(layer);
         } catch (IOException ex) {

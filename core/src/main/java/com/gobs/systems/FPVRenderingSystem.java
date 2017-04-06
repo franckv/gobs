@@ -19,7 +19,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
 import com.gobs.display.PerspectiveDisplay;
-import com.gobs.map.LayerCell;
+import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +77,7 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
         instance = new ModelInstance(floor);
         instance.transform.translate(worldMap.getWorldWidth() * step / 2 - step / 2, worldMap.getWorldHeight() * step / 2 - step / 2, -(step + h) / 2);
         instances.add(instance);
-        for (LayerCell c : worldMap.getCurrentLayer()) {
+        for (LevelCell c : worldMap.getCurrentLevel()) {
             if (c != null) {
                 switch (c.getType()) {
                     case WALL:
@@ -100,7 +100,7 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
 
         display.getCamera().update();
 
-        if (worldMap.getCurrentLayer().isDirty()) {
+        if (worldMap.getCurrentLevel().isDirty()) {
             buildScene();
         }
 

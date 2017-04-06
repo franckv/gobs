@@ -50,8 +50,8 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
     @Override
     public void update(float deltaTime) {
         // draw the tile map
-        if (worldMap.getCurrentLayer().isDirty()) {
-            mapView.drawLayer(worldMap.getCurrentLayer());
+        if (worldMap.getCurrentLevel().isDirty()) {
+            mapView.drawLayer(worldMap.getCurrentLevel());
         }
         display.getCamera().update();
         renderer.setView(display.getCamera());

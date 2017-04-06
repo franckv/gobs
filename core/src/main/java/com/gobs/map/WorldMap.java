@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorldMap {
-    List<Layer> levels;
+    List<Level> levels;
     int currentLevel;
     int worldWidth;
     int worldHeight;
@@ -16,18 +16,18 @@ public class WorldMap {
         this.worldHeight = worldHeight;
     }
 
-    public void addLayer(Layer layer) {
+    public void addLayer(Level layer) {
         levels.add(layer);
         if (currentLevel == 0) {
             currentLevel = 1;
         }
     }
 
-    public int getCurrentLevel() {
+    public int getCurrentLevelIndex() {
         return currentLevel;
     }
 
-    public Layer getCurrentLayer() {
+    public Level getCurrentLevel() {
         return levels.get(currentLevel - 1);
     }
 

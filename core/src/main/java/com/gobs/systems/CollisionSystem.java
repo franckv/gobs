@@ -12,7 +12,7 @@ import com.gobs.components.Animation;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
-import com.gobs.map.LayerCell;
+import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
 import com.gobs.util.CollisionManager;
 
@@ -57,7 +57,7 @@ public class CollisionSystem extends IteratingSystem {
 
         buildTree();
 
-        for (LayerCell cell : worldMap.getCurrentLayer()) {
+        for (LevelCell cell : worldMap.getCurrentLevel()) {
             if (cell != null && cell.isBlockable()) {
                 collisionManager.addBlockable(cell.getX(), cell.getY());
             }

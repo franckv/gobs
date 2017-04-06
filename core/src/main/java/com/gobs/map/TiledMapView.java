@@ -8,7 +8,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.assets.TileFactory;
-import com.gobs.map.Layer.LayerType;
 
 public class TiledMapView implements Disposable {
     private TiledMap map;
@@ -33,8 +32,8 @@ public class TiledMapView implements Disposable {
         return map;
     }
 
-    public void drawLayer(Layer layer) {
-        for (LayerCell c : layer) {
+    public void drawLayer(Level layer) {
+        for (LevelCell c : layer) {
             if (c != null) {
                 TiledMapTile tile = null;
 
@@ -49,13 +48,13 @@ public class TiledMapView implements Disposable {
                         tile = wallTile;
                         break;
                 }
-                paintCell(c.getX(), c.getY(), layer.getType(), tile);
+                paintCell(c.getX(), c.getY(), tile);
             }
         }
     }
 
-    private void paintCell(int x, int y, LayerType type, TiledMapTile tile) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(type.ordinal());
+    private void paintCell(int x, int y, TiledMapTile tile) {
+        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
 
         Cell cell = layer.getCell(x, y);
 
