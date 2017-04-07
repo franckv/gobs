@@ -12,11 +12,9 @@ import java.util.logging.Logger;
 class JsonGUILoader {
     private class JsonFragment {
         private JsonValue value;
-        private String fragment;
         private boolean enabled;
 
-        private JsonFragment(String fragment, JsonValue value) {
-            this.fragment = fragment;
+        private JsonFragment(JsonValue value) {
             this.value = value;
             this.enabled = true;
         }
@@ -40,7 +38,10 @@ class JsonGUILoader {
         for (JsonValue value : root) {
             if (value.has("fragment") && value.has("content")) {
                 String fragmentName = value.getString("fragment");
-                JsonFragment fragment = new JsonFragment(fragmentName, value.get("content"));
+                JsonFragment fragment = new JsonFragment(value.get("content"));
+                if (value.has("enabled") && value.getString("enabled").equalsIgnoreCase("false")) {
+                    fragment.enabled = false;
+                }
                 fragments.put(fragmentName, fragment);
             }
         }

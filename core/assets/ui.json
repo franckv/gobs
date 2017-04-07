@@ -21,6 +21,10 @@
                             {
                                 "type": "reference",
                                 "id": "characters"
+                            },
+                            {
+                                "type": "reference",
+                                "id": "inventory"
                             }
                         ]
                     }
@@ -161,6 +165,7 @@
     },
     {
         "fragment": "inventory",
+        "enabled": "false",
         "content": [
             {
                 "type": "layout",
