@@ -25,7 +25,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private TileFactory tileManager;
     private OrthographicDisplay display;
     private JsonGUILoader JsonLoader;
-    
+
     public GdxGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
         this.display = display;
         this.tileManager = tileManager;
@@ -34,7 +34,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
         fonts = new HashMap<>();
 
         color = Color.GREEN;
-        
+
         JsonLoader = new JsonGUILoader(this);
     }
 
@@ -104,10 +104,15 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     public void load(String resource) {
         JsonLoader.load(Gdx.files.internal(resource).reader());
     }
-    
+
     @Override
     public void showFragment(String fragment, Map<String, String> resolver) {
         JsonLoader.showFragment(fragment, resolver);
+    }
+
+    @Override
+    public void enableFragment(String fragment, boolean enabled) {
+        JsonLoader.enableFragment(fragment, enabled);
     }
 
     private ShapeRenderer getRenderer() {

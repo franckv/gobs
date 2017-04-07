@@ -1,5 +1,34 @@
 [
     {
+        "fragment": "ui",
+        "content": [
+            {
+                "type": "layout",
+                "name": "Screen",
+                "direction": "None",
+                "margin": 5,
+                "spacing": 30,
+                "children": [
+                    {
+                        "type": "reference",
+                        "id": "statusbar"
+                    },
+                    {
+                        "type": "layout",
+                        "name": "ui",
+                        "direction": "Vertical",
+                        "children": [
+                            {
+                                "type": "reference",
+                                "id": "characters"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "fragment": "statusbar",
         "content": [
             {
@@ -40,6 +69,71 @@
         ]
     },
     {
+        "fragment": "character",
+        "content": [
+            {
+                "type": "layout",
+                "name": "Portrait",
+                "direction": "None",
+                "children": [
+                    {
+                        "type": "frame",
+                        "width": 250,
+                        "height": 150
+                    },
+                    {
+                        "type": "layout",
+                        "name": "Details",
+                        "direction": "Vertical",
+                        "marginX": 20,
+                        "marginY": 15,
+                        "spacing": 10,
+                        "children": [
+                            {
+                                "type": "font",
+                                "font": "large",
+                                "color": "white"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$name${i}"
+                            },
+                            {
+                                "type": "spacer",
+                                "value": 5
+                            },
+                            {
+                                "type": "font",
+                                "font": "medium",
+                                "color": "$hpColor${i}"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$hp${i}"
+                            },
+                            {
+                                "type": "font",
+                                "color": "$mpColor${i}"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$mp${i}"
+                            },
+                            {
+                                "type": "font",
+                                "color": "white"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$lvl${i}"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "fragment": "characters",
         "content": [
             {
@@ -56,148 +150,92 @@
                         "count": 3,
                         "content": [
                             {
-                                "type": "layout",
-                                "name": "Portrait",
-                                "direction": "None",
-                                "children": [
-                                    {
-                                        "type": "frame",
-                                        "width": 250,
-                                        "height": 150
-                                    },
-                                    {
-                                        "type": "layout",
-                                        "name": "Details",
-                                        "direction": "Vertical",
-                                        "marginX": 20,
-                                        "marginY": 15,
-                                        "spacing": 10,
-                                        "children": [
-                                            {
-                                                "type": "font",
-                                                "font": "large",
-                                                "color": "white"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "label": "$name${i}"
-                                            },
-                                            {
-                                                "type": "spacer",
-                                                "value": 5
-                                            },
-                                            {
-                                                "type": "font",
-                                                "font": "medium",
-                                                "color": "$hpColor${i}"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "label": "$hp${i}"
-                                            },
-                                            {
-                                                "type": "font",
-                                                "color": "$mpColor${i}"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "label": "$mp${i}"
-                                            },
-                                            {
-                                                "type": "font",
-                                                "color": "white"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "label": "$lvl${i}"
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "type": "reference",
+                                "id": "character"
                             }
                         ]
                     }
                 ]
-            },
+            }
+        ]
+    },
+    {
+        "fragment": "inventory",
+        "content": [
             {
-                "fragment": "inventory",
-                "content": [
+                "type": "layout",
+                "name": "inventory",
+                "direction": "None",
+                "children": [
+                    {
+                        "type": "frame",
+                        "width": 400,
+                        "height": 400
+                    },
                     {
                         "type": "layout",
-                        "name": "inventory",
-                        "direction": "None",
+                        "name": "",
+                        "direction": "Horizontal",
+                        "margin": 50,
                         "children": [
-                            {
-                                "type": "frame",
-                                "width": 400,
-                                "height": 400
+                            {   
+                                "type": "layout",
+                                "name": "",
+                                "direction": "Vertical",
+                                "children": [
+                                    {
+                                        "type": "repeater",
+                                        "count": 4,
+                                        "content":
+                                                {
+
+                                                    "type": "layout",
+                                                    "name": "",
+                                                    "direction": "Horizontal",
+                                                    "children": [
+                                                        {   
+                                                            "type": "box",
+                                                            "id": "Item${i}0",
+                                                            "width": 50,
+                                                            "height": 50
+                                                        }, 
+                                                        {   
+                                                            "type": "box",
+                                                            "id": "Item${i}1",
+                                                            "width": 50,
+                                                            "height": 50
+                                                        }
+                                                    ]
+                                                }
+                                    }
+                                ]
                             },
                             {
                                 "type": "layout",
                                 "name": "",
-                                "direction": "Horizontal",
-                                "margin": 50,
+                                "direction": "Vertical",
                                 "children": [
-                                    {   
-                                        "type": "layout",
-                                        "name": "",
-                                        "direction": "Vertical",
-                                        "children": [
-                                            {
-                                                "type": "repeater",
-                                                "count": 4,
-                                                "content":
-                                                        {
-
-                                                            "type": "layout",
-                                                            "name": "",
-                                                            "direction": "Horizontal",
-                                                            "children": [
-                                                                {   
-                                                                    "type": "box",
-                                                                    "id": "Item${i}0",
-                                                                    "width": 50,
-                                                                    "height": 50
-                                                                }, 
-                                                                {   
-                                                                    "type": "box",
-                                                                    "id": "Item${i}1",
-                                                                    "width": 50,
-                                                                    "height": 50
-                                                                }
-                                                            ]
-                                                        }
-                                            }
-                                        ]
-                                    },
                                     {
-                                        "type": "layout",
-                                        "name": "",
-                                        "direction": "Vertical",
-                                        "children": [
-                                            {
-                                                "type": "spacer",
-                                                "value": 150
-                                            }
-                                        ]
-                                    },
+                                        "type": "spacer",
+                                        "value": 150
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "layout",
+                                "name": "",
+                                "direction": "Vertical",
+                                "children": [
                                     {
-                                        "type": "layout",
-                                        "name": "",
-                                        "direction": "Vertical",
-                                        "children": [
-                                            {
-                                                "type": "repeater",
-                                                "count": 4,
-                                                "content": 
-                                                        {
-                                                            "type": "box",
-                                                            "id": "Equip${i}",
-                                                            "width": 50,
-                                                            "height": 50
-                                                        }    
-                                            }
-                                        ]
+                                        "type": "repeater",
+                                        "count": 4,
+                                        "content": 
+                                                {
+                                                    "type": "box",
+                                                    "id": "Equip${i}",
+                                                    "width": 50,
+                                                    "height": 50
+                                                }    
                                     }
                                 ]
                             }

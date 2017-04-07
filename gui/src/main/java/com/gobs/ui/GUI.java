@@ -165,6 +165,8 @@ public abstract class GUI<Color, Font> {
     public abstract void setFontColor(Color color);
 
     public abstract void load(String resource);
-    
+
     public abstract void showFragment(String fragment, Map<String, String> resolver);
+
+    public abstract void enableFragment(String fragment, boolean enabled);
 }

@@ -103,7 +103,19 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         gui.begin();
 
-        drawGUI();
+        //drawGUI();
+        Map<String, String> resolver = new HashMap<String, String>();
+
+        resolveStatus(resolver);
+
+        if (stateManager.getState() == State.CRAWL) {
+            resolveCharactersStats(resolver);
+            gui.enableFragment("characters", true);
+        } else {
+            gui.enableFragment("characters", false);
+        }
+
+        gui.showFragment("ui", resolver);
 
         gui.end();
 
@@ -117,63 +129,21 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
-    private void drawGUI() {
-        gui.createSection("Screen", GUILayout.FlowDirection.NONE);
-
-        gui.setMargin(margin);
-        gui.setSpacing(spacing);
-
-        drawStatusBar();
-
-        gui.createSection("ui", GUILayout.FlowDirection.VERTICAL);
-        if (stateManager.getState() == State.CRAWL) {
-            drawCharactersStats();
-            //drawInventory();
-        }
-        gui.endSection();
-
-        gui.endSection();
-    }
-
-    private void drawStatusBar() {
-        Map<String, String> resolver = new HashMap<String, String>();
-
+    private void resolveStatus(Map<String, String> resolver) {
         String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + getEngine().getEntities().size();
         resolver.put("$status1", msg);
 
         Position pos = getPlayerPosition();
         msg = "Position: " + pos.getX() + "," + pos.getY();
         resolver.put("$status2", msg);
-
-        gui.showFragment("statusbar", resolver);
     }
 
-    private Position getPlayerPosition() {
-        Position pos = null;
-
-        // display player position
-        for (Entity entity : controllablesEntities) {
-            Controller controller = cm.get(entity);
-            if (controller == null || !controller.isActive()) {
-                continue;
-            }
-
-            pos = pm.get(entity);
-
-            break;
-        }
-
-        return pos;
-    }
-
-    private void drawCharactersStats() {
+    private void resolveCharactersStats(Map<String, String> resolver) {
         int nPlayers = charactersEntities.size();
         int boxW = 250;
 
         float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
         float space = (display.getViewPort().getWorldWidth() - size) / 2;
-
-        Map<String, String> resolver = new HashMap<String, String>();
 
         resolver.put("$spacing", Integer.toString((int) space));
 
@@ -218,12 +188,24 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                 }
             }
         }
-
-        gui.showFragment("characters", resolver);
     }
 
-    private void drawInventory() {
-        gui.showFragment("inventory", new HashMap<String, String>());
+    private Position getPlayerPosition() {
+        Position pos = null;
+
+        // display player position
+        for (Entity entity : controllablesEntities) {
+            Controller controller = cm.get(entity);
+            if (controller == null || !controller.isActive()) {
+                continue;
+            }
+
+            pos = pm.get(entity);
+
+            break;
+        }
+
+        return pos;
     }
 
     @Override

@@ -9,44 +9,61 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- */
-public class JsonGUILoader {
+class JsonGUILoader {
+    private class JsonFragment {
+        private JsonValue value;
+        private String fragment;
+        private boolean enabled;
+
+        private JsonFragment(String fragment, JsonValue value) {
+            this.fragment = fragment;
+            this.value = value;
+            this.enabled = true;
+        }
+    }
+
     private GUI gui;
     private JsonValue root;
-    private Map<String, JsonValue> fragments;
-    
-    public JsonGUILoader(GUI gui) {
+    private Map<String, JsonFragment> fragments;
+
+    JsonGUILoader(GUI gui) {
         this.gui = gui;
-        
+
         fragments = new HashMap<>();
     }
-    
-    public void load(Reader file) {
+
+    void load(Reader file) {
         JsonReader reader = new JsonReader();
-        
+
         root = reader.parse(file);
-        
+
         for (JsonValue value : root) {
             if (value.has("fragment") && value.has("content")) {
-                String fragment = value.getString("fragment");
-                fragments.put(fragment, value.get("content"));
+                String fragmentName = value.getString("fragment");
+                JsonFragment fragment = new JsonFragment(fragmentName, value.get("content"));
+                fragments.put(fragmentName, fragment);
             }
         }
     }
-    
-    public void showFragment(String fragment, Map<String, String> resolver) {
-        if (fragments.containsKey(fragment)) {
-            parse(fragments.get(fragment), resolver);
+
+    void showFragment(String fragment, Map<String, String> resolver) {
+        if (fragments.containsKey(fragment)
+                && fragments.get(fragment).enabled) {
+            parse(fragments.get(fragment).value, resolver);
         }
     }
-    
+
+    void enableFragment(String fragment, boolean enabled) {
+        if (fragments.containsKey(fragment)) {
+            fragments.get(fragment).enabled = enabled;
+        }
+    }
+
     private void parse(JsonValue value, Map<String, String> resolver) {
         if (value == null) {
             return;
         }
-        
+
         if (value.isArray()) {
             for (JsonValue child : value) {
                 parse(child, resolver);
@@ -75,16 +92,19 @@ public class JsonGUILoader {
                 case "font":
                     parseFont(value, resolver);
                     break;
+                case "reference":
+                    parseReference(value, resolver);
+                    break;
             }
         }
     }
-    
+
     private void parseLayout(JsonValue value, Map<String, String> resolver) {
         String name = value.getString("name");
         String direction = value.getString("direction");
-        
+
         GUILayout.FlowDirection flowDirection = GUILayout.FlowDirection.NONE;
-        
+
         switch (direction) {
             case "Horizontal":
                 flowDirection = GUILayout.FlowDirection.HORIZONTAL;
@@ -93,51 +113,51 @@ public class JsonGUILoader {
                 flowDirection = GUILayout.FlowDirection.VERTICAL;
                 break;
         }
-        
+
         gui.createSection(name, flowDirection);
-        
+
         if (value.has("margin")) {
             gui.setMargin(value.getInt("margin"));
         }
-        
+
         if (value.has("marginX") && value.has("marginY")) {
             gui.setMargin(value.getInt("marginX"), value.getInt("marginY"));
         }
-        
+
         if (value.has("spacing")) {
             gui.setSpacing(value.getInt("spacing"));
         }
-        
+
         if (value.has("children")) {
             for (JsonValue child : value.get("children")) {
                 parse(child, resolver);
             }
         }
-        
+
         gui.endSection();
     }
-    
+
     private void parseLabel(JsonValue value, Map<String, String> resolver) {
         String label = resolve(value, "label", resolver);
-        
+
         gui.Label(label);
     }
-    
+
     private void parseFrame(JsonValue value) {
         int width = value.getInt("width");
         int height = value.getInt("height");
-        
+
         gui.Frame(width, height);
     }
-    
+
     private void parseBox(JsonValue value, Map<String, String> resolver) {
         String id = resolve(value, "id", resolver);
         int width = value.getInt("width");
         int height = value.getInt("height");
-        
+
         gui.Box(id, width, height);
     }
-    
+
     private void parsePusher(JsonValue value, Map<String, String> resolver) {
         if (value.has("value")) {
             gui.pushToEnd(value.getFloat("value"));
@@ -149,7 +169,7 @@ public class JsonGUILoader {
             gui.pushToEnd(gui.getLabelWidth(label));
         }
     }
-    
+
     private void parseSpacer(JsonValue value, Map<String, String> resolver) {
         if (value.has("value")) {
             gui.Spacer(value.getFloat("value"));
@@ -157,25 +177,25 @@ public class JsonGUILoader {
             gui.Spacer(Integer.parseInt(resolve(value, "valueStr", resolver)));
         }
     }
-    
+
     private void parseRepeater(JsonValue value, Map<String, String> resolver) {
         int count = value.getInt("count");
-        
+
         for (int i = 0; i < count; i++) {
             resolver.put("${i}", Integer.toString(i));
             parse(value.get("content"), resolver);
         }
     }
-    
+
     private void parseFont(JsonValue value, Map<String, String> resolver) {
         if (value.has("font")) {
             gui.setFont(value.getString("font"));
         }
         if (value.has("color")) {
             String colorName = resolve(value, "color", resolver);
-            
+
             Color color = Color.GREEN;
-            
+
             try {
                 color = (Color) Color.class
                         .getDeclaredField(colorName.toUpperCase()).get(null);
@@ -187,7 +207,13 @@ public class JsonGUILoader {
             gui.setFontColor(color);
         }
     }
-    
+
+    private void parseReference(JsonValue value, Map<String, String> resolver) {
+        String id = value.getString("id");
+
+        showFragment(id, resolver);
+    }
+
     private String resolve(JsonValue value, String name, Map<String, String> resolver) {
         String label = value.getString(name);
 
@@ -195,11 +221,11 @@ public class JsonGUILoader {
         if (resolver.containsKey("${i}")) {
             label = label.replace("${i}", resolver.get("${i}"));
         }
-        
+
         for (Map.Entry<String, String> entry : resolver.entrySet()) {
             label = label.replace(entry.getKey(), entry.getValue());
         }
-        
+
         return label;
     }
 }
