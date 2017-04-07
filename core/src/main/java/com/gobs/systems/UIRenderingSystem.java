@@ -25,10 +25,7 @@ import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
-import com.gobs.ui.GUILayout;
 import com.gobs.ui.GdxGUI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -103,19 +100,16 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         gui.begin();
 
-        //drawGUI();
-        Map<String, String> resolver = new HashMap<String, String>();
-
-        resolveStatus(resolver);
+        updateStatus();
 
         if (stateManager.getState() == State.CRAWL) {
-            resolveCharactersStats(resolver);
+            updateCharactersStats();
             gui.enableFragment("characters", true);
         } else {
             gui.enableFragment("characters", false);
         }
 
-        gui.showFragment("ui", resolver);
+        gui.showFragment("ui");
 
         gui.end();
 
@@ -129,29 +123,31 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
-    private void resolveStatus(Map<String, String> resolver) {
+    private void updateStatus() {
         String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + getEngine().getEntities().size();
-        resolver.put("$status1", msg);
+
+        gui.setStringValue("fpsStatus", "label", msg);
 
         Position pos = getPlayerPosition();
         msg = "Position: " + pos.getX() + "," + pos.getY();
-        resolver.put("$status2", msg);
+
+        gui.setStringValue("positionStatus", "label", msg);
     }
 
-    private void resolveCharactersStats(Map<String, String> resolver) {
+    private void updateCharactersStats() {
         int nPlayers = charactersEntities.size();
         int boxW = 250;
 
         float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
         float space = (display.getViewPort().getWorldWidth() - size) / 2;
 
-        resolver.put("$spacing", Integer.toString((int) space));
+        gui.setIntValue("charactersSpacing", "value", (int) space);
 
         for (int i = 0; i < nPlayers; i++) {
             for (Entity e : charactersEntities) {
                 if (am.get(e).getPos() == i + 1) {
 
-                    resolver.put("$name" + i, nm.get(e).getName());
+                    gui.setStringValue("name." + i, "label", nm.get(e).getName());
 
                     int hp = hm.get(e).getHP();
                     int maxHP = hm.get(e).getMaxHP();
@@ -164,9 +160,12 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                     } else {
                         hpColor = "gold";
                     }
-                    resolver.put("$hpColor" + i, hpColor);
+
+                    gui.setStringValue("hpColor." + i, "color", hpColor);
+
                     String hpLabel = String.format("HP: %d / %d", hp, maxHP);
-                    resolver.put("$hp" + i, hpLabel);
+
+                    gui.setStringValue("hp." + i, "label", hpLabel);
 
                     int mp = mm.get(e).getMP();
                     int maxMP = mm.get(e).getMaxMP();
@@ -179,12 +178,14 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                     } else {
                         mpColor = "gold";
                     }
-                    resolver.put("$mpColor" + i, mpColor);
+
+                    gui.setStringValue("mpColor." + i, "color", mpColor);
+
                     String mpLabel = String.format("MP: %d / %d", mp, maxMP);
-                    resolver.put("$mp" + i, mpLabel);
 
-                    resolver.put("$lvl" + i, "LV: 99");
+                    gui.setStringValue("mp." + i, "label", mpLabel);
 
+                    gui.setStringValue("lvl." + i, "label", "LV: 99");
                 }
             }
         }

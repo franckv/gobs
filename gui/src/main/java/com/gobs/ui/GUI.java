@@ -2,7 +2,6 @@ package com.gobs.ui;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Map;
 
 public abstract class GUI<Color, Font> {
     public enum FontSize {
@@ -11,7 +10,7 @@ public abstract class GUI<Color, Font> {
 
     private static InputMap inputs;
 
-    String hot, active;
+    private String hot, active;
 
     private GUILayout layout;
     private Deque<GUILayout> layouts;
@@ -124,6 +123,17 @@ public abstract class GUI<Color, Font> {
         layout.pushToEnd(size);
     }
 
+    public void pushToEnd(String label) {
+        switch (layout.getFlowDirection()) {
+            case HORIZONTAL:
+                pushToEnd(getLabelWidth(label));
+                break;
+            case VERTICAL:
+                pushToEnd(getLabelHeight(label));
+                break;
+        }
+    }
+
     public void setMargin(int margin) {
         setMargin(margin, margin);
     }
@@ -166,7 +176,11 @@ public abstract class GUI<Color, Font> {
 
     public abstract void load(String resource);
 
-    public abstract void showFragment(String fragment, Map<String, String> resolver);
+    public abstract void showFragment(String fragment);
 
     public abstract void enableFragment(String fragment, boolean enabled);
+
+    public abstract void setStringValue(String id, String field, String value);
+
+    public abstract void setIntValue(String id, String field, int value);
 }

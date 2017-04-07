@@ -12,7 +12,7 @@ public class GUILayout {
     private String name;
 
     private GUILayout parent;
-    
+
     private FlowDirection flow;
 
     private float top, bottom, left, right;
@@ -26,14 +26,14 @@ public class GUILayout {
 
     GUILayout(String name, GUILayout parent, GUILayout.FlowDirection flow, float maxWidth, float maxHeight) {
         this.name = name;
-        
+
         this.parent = parent;
 
         this.flow = flow;
 
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
-        
+
         if (parent != null) {
             this.marginX = parent.marginX;
             this.marginY = parent.marginY;
@@ -77,15 +77,19 @@ public class GUILayout {
         return posY - height;
     }
 
+    FlowDirection getFlowDirection() {
+        return flow;
+    }
+
     void setPosition(float x, float y) {
         if (flow != FlowDirection.NONE) {
             return;
         }
-        
+
         if (x < 0 || x > maxWidth || y < 0 || y > maxHeight) {
             return;
         }
-        
+
         posX = x;
         posY = y;
         top = y;
@@ -93,7 +97,7 @@ public class GUILayout {
         left = x;
         right = x;
     }
-    
+
     void update(float width, float height) {
         switch (flow) {
             case VERTICAL:

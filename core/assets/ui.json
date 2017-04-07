@@ -47,7 +47,9 @@
                 "children": [
                     {
                         "type": "pusher",
-                        "height": "$status1"
+                        "id": "fpsStatus",
+                        "label": "",
+                        "value": 0
                     },
                     {
                         "type": "layout",
@@ -56,15 +58,19 @@
                         "children": [
                             {
                                 "type": "label",
-                                "label": "$status1"
+                                "id": "fpsStatus",
+                                "label": ""
                             },
                             {
                                 "type": "pusher",
-                                "width": "$status2"
-                            },
+                                "id": "positionStatus",
+                                "label": "",
+                                "value": 0
+                            },        
                             {
                                 "type": "label",
-                                "label": "$status2"
+                                "id": "positionStatus",
+                                "label": ""
                             }
                         ]
                     }
@@ -100,7 +106,7 @@
                             },
                             {
                                 "type": "label",
-                                "label": "$name${i}"
+                                "id": "name.${i}"
                             },
                             {
                                 "type": "spacer",
@@ -109,19 +115,19 @@
                             {
                                 "type": "font",
                                 "font": "medium",
-                                "color": "$hpColor${i}"
+                                "id": "hpColor.${i}"
                             },
                             {
                                 "type": "label",
-                                "label": "$hp${i}"
+                                "id": "hp.${i}"
                             },
                             {
                                 "type": "font",
-                                "color": "$mpColor${i}"
+                                "id": "mpColor.${i}"
                             },
                             {
                                 "type": "label",
-                                "label": "$mp${i}"
+                                "id": "mp.${i}"
                             },
                             {
                                 "type": "font",
@@ -129,7 +135,7 @@
                             },
                             {
                                 "type": "label",
-                                "label": "$lvl${i}"
+                                "id": "lvl.${i}"
                             }
                         ]
                     }
@@ -147,7 +153,7 @@
                 "children": [
                     {
                         "type": "spacer",
-                        "valueStr": "$spacing"
+                        "id": "charactersSpacing"
                     },
                     {
                         "type": "repeater",

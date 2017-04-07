@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class JsonGUILoader {
-    private class JsonFragment {
+    private static class JsonFragment {
         private JsonValue value;
         private boolean enabled;
 
@@ -20,14 +20,42 @@ class JsonGUILoader {
         }
     }
 
+    private static class JsonSubstitution {
+        private enum JsonSubstitutionType {
+            STR, INT
+        };
+
+        private String field;
+        private JsonSubstitutionType type;
+        private String strValue;
+        private int intValue;
+
+        private JsonSubstitution(String field, String value) {
+            this.field = field;
+            this.type = JsonSubstitutionType.STR;
+            this.strValue = value;
+        }
+
+        private JsonSubstitution(String field, int value) {
+            this.field = field;
+            this.type = JsonSubstitutionType.INT;
+            this.intValue = value;
+        }
+    }
+
     private GUI gui;
     private JsonValue root;
     private Map<String, JsonFragment> fragments;
+    private Map<String, JsonSubstitution> substitutions;
+    private int idx;
 
     JsonGUILoader(GUI gui) {
         this.gui = gui;
 
         fragments = new HashMap<>();
+        substitutions = new HashMap<>();
+
+        idx = 0;
     }
 
     void load(Reader file) {
@@ -47,10 +75,10 @@ class JsonGUILoader {
         }
     }
 
-    void showFragment(String fragment, Map<String, String> resolver) {
+    void showFragment(String fragment) {
         if (fragments.containsKey(fragment)
                 && fragments.get(fragment).enabled) {
-            parse(fragments.get(fragment).value, resolver);
+            parse(fragments.get(fragment).value);
         }
     }
 
@@ -60,47 +88,57 @@ class JsonGUILoader {
         }
     }
 
-    private void parse(JsonValue value, Map<String, String> resolver) {
+    void setStringValue(String id, String field, String value) {
+        substitutions.put(id, new JsonSubstitution(field, value));
+    }
+
+    void setIntValue(String id, String field, int value) {
+        substitutions.put(id, new JsonSubstitution(field, value));
+    }
+
+    private void parse(JsonValue value) {
         if (value == null) {
             return;
         }
 
         if (value.isArray()) {
             for (JsonValue child : value) {
-                parse(child, resolver);
+                parse(child);
             }
         } else if (value.has("type")) {
             switch (value.getString("type")) {
                 case "layout":
-                    parseLayout(value, resolver);
+                    parseLayout(value);
                     break;
                 case "label":
-                    parseLabel(value, resolver);
+                    parseLabel(value);
                     break;
                 case "frame":
                     parseFrame(value);
                     break;
                 case "box":
-                    parseBox(value, resolver);
+                    parseBox(value);
                     break;
                 case "pusher":
-                    parsePusher(value, resolver);
+                    parsePusher(value);
                     break;
                 case "repeater":
-                    parseRepeater(value, resolver);
+                    parseRepeater(value);
+                    break;
                 case "spacer":
-                    parseSpacer(value, resolver);
+                    parseSpacer(value);
+                    break;
                 case "font":
-                    parseFont(value, resolver);
+                    parseFont(value);
                     break;
                 case "reference":
-                    parseReference(value, resolver);
+                    parseReference(value);
                     break;
             }
         }
     }
 
-    private void parseLayout(JsonValue value, Map<String, String> resolver) {
+    private void parseLayout(JsonValue value) {
         String name = value.getString("name");
         String direction = value.getString("direction");
 
@@ -131,15 +169,15 @@ class JsonGUILoader {
 
         if (value.has("children")) {
             for (JsonValue child : value.get("children")) {
-                parse(child, resolver);
+                parse(child);
             }
         }
 
         gui.endSection();
     }
 
-    private void parseLabel(JsonValue value, Map<String, String> resolver) {
-        String label = resolve(value, "label", resolver);
+    private void parseLabel(JsonValue value) {
+        String label = getString(value, "label");
 
         gui.Label(label);
     }
@@ -151,50 +189,43 @@ class JsonGUILoader {
         gui.Frame(width, height);
     }
 
-    private void parseBox(JsonValue value, Map<String, String> resolver) {
-        String id = resolve(value, "id", resolver);
+    private void parseBox(JsonValue value) {
+        String id = getString(value, "id");
         int width = value.getInt("width");
         int height = value.getInt("height");
 
         gui.Box(id, width, height);
     }
 
-    private void parsePusher(JsonValue value, Map<String, String> resolver) {
-        if (value.has("value")) {
+    private void parsePusher(JsonValue value) {
+        if (value.has("id")) {
+            JsonSubstitution sub = substitutions.get(value.getString("id"));
+            gui.pushToEnd(sub.strValue);
+        } else if (value.has("value")) {
             gui.pushToEnd(value.getFloat("value"));
-        } else if (value.has("height")) {
-            String label = resolve(value, "height", resolver);
-            gui.pushToEnd(gui.getLabelHeight(label));
-        } else if (value.has("width")) {
-            String label = resolve(value, "width", resolver);
-            gui.pushToEnd(gui.getLabelWidth(label));
         }
     }
 
-    private void parseSpacer(JsonValue value, Map<String, String> resolver) {
-        if (value.has("value")) {
-            gui.Spacer(value.getFloat("value"));
-        } else if (value.has("valueStr")) {
-            gui.Spacer(Integer.parseInt(resolve(value, "valueStr", resolver)));
-        }
+    private void parseSpacer(JsonValue value) {
+        gui.Spacer(getInt(value, "value"));
     }
 
-    private void parseRepeater(JsonValue value, Map<String, String> resolver) {
+    private void parseRepeater(JsonValue value) {
         int count = value.getInt("count");
 
-        for (int i = 0; i < count; i++) {
-            resolver.put("${i}", Integer.toString(i));
-            parse(value.get("content"), resolver);
+        for (idx = 0; idx < count; idx++) {
+            parse(value.get("content"));
         }
     }
 
-    private void parseFont(JsonValue value, Map<String, String> resolver) {
-        if (value.has("font")) {
+    private void parseFont(JsonValue value) {
+        String font = getString(value, "font");
+        if (font != null) {
             gui.setFont(value.getString("font"));
         }
-        if (value.has("color")) {
-            String colorName = resolve(value, "color", resolver);
 
+        String colorName = getString(value, "color");
+        if (colorName != null) {
             Color color = Color.GREEN;
 
             try {
@@ -209,24 +240,35 @@ class JsonGUILoader {
         }
     }
 
-    private void parseReference(JsonValue value, Map<String, String> resolver) {
+    private void parseReference(JsonValue value) {
         String id = value.getString("id");
 
-        showFragment(id, resolver);
+        showFragment(id);
     }
 
-    private String resolve(JsonValue value, String name, Map<String, String> resolver) {
-        String label = value.getString(name);
-
-        // loop counter may be embeded in variable name: do 2 pass resolution
-        if (resolver.containsKey("${i}")) {
-            label = label.replace("${i}", resolver.get("${i}"));
+    private String getString(JsonValue value, String name) {
+        if (value.has("id")) {
+            String id = value.getString("id").replace("${i}", Integer.toString(idx));
+            if (substitutions.containsKey(id) && substitutions.get(id).field.equals(name)) {
+                return substitutions.get(id).strValue;
+            }
         }
 
-        for (Map.Entry<String, String> entry : resolver.entrySet()) {
-            label = label.replace(entry.getKey(), entry.getValue());
+        if (value.has(name)) {
+            return value.getString(name).replace("${i}", Integer.toString(idx));
         }
 
-        return label;
+        return null;
+    }
+
+    private int getInt(JsonValue value, String name) {
+        if (value.has("id")) {
+            String id = value.getString("id").replace("${i}", Integer.toString(idx));
+            if (substitutions.containsKey(id) && substitutions.get(id).field.equals(name)) {
+                return substitutions.get(id).intValue;
+            }
+        }
+
+        return value.getInt(name);
     }
 }

@@ -106,13 +106,23 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     }
 
     @Override
-    public void showFragment(String fragment, Map<String, String> resolver) {
-        JsonLoader.showFragment(fragment, resolver);
+    public void showFragment(String fragment) {
+        JsonLoader.showFragment(fragment);
     }
 
     @Override
     public void enableFragment(String fragment, boolean enabled) {
         JsonLoader.enableFragment(fragment, enabled);
+    }
+
+    @Override
+    public void setStringValue(String id, String field, String value) {
+        JsonLoader.setStringValue(id, field, value);
+    }
+
+    @Override
+    public void setIntValue(String id, String field, int value) {
+        JsonLoader.setIntValue(id, field, value);
     }
 
     private ShapeRenderer getRenderer() {
