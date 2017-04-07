@@ -3,8 +3,6 @@ package com.gobs.assets;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gobs.ai.AIBehavior;
@@ -19,15 +17,12 @@ import com.gobs.components.MP;
 import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
-import com.gobs.components.Sprite;
+import com.gobs.components.SpriteRef;
 import com.gobs.util.CollisionManager;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EntityFactory {
-    private static Pattern resourcePattern = Pattern.compile("(^.*)!(\\d+),(\\d+):(\\d+),(\\d+)$");
     private CollisionManager<Entity> collisionManager;
     private TileFactory tileManager;
 
@@ -87,23 +82,7 @@ public class EntityFactory {
             case "sprite":
                 if (component.has("res")) {
                     String res = component.getString("res");
-                    c = new Sprite(getTexture(res));
-                } else {
-                    String colorValue = component.getString("color");
-
-                    Color color = Color.BLACK;
-                    try {
-                        color = (Color) Color.class.getDeclaredField(colorValue).get(null);
-                    } catch (NoSuchFieldException | SecurityException
-                            | IllegalArgumentException | IllegalAccessException ex) {
-                        Gdx.app.error("JSON", "Invalid color: " + colorValue);
-                    }
-
-                    if (!component.has("fill") || component.getBoolean("fill")) {
-                        c = new Sprite(tileManager.getFullTile(color));
-                    } else {
-                        c = new Sprite(tileManager.getRectTile(color));
-                    }
+                    c = new SpriteRef(res);
                 }
                 break;
             case "collider":
@@ -144,25 +123,5 @@ public class EntityFactory {
         }
 
         return c;
-    }
-
-    private TextureRegion getTexture(String res) {
-        String textureName = res;
-
-        Matcher matcher = resourcePattern.matcher(res);
-        if (matcher.matches()) {
-            textureName = matcher.group(1);
-        }
-
-        if (matcher.matches()) {
-            int x = Integer.parseInt(matcher.group(2));
-            int y = Integer.parseInt(matcher.group(3));
-            int w = Integer.parseInt(matcher.group(4));
-            int h = Integer.parseInt(matcher.group(5));
-
-            return tileManager.getTile(textureName, x, y, w, h);
-        } else {
-            return tileManager.getTile(textureName);
-        }
     }
 }

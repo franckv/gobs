@@ -1,5 +1,6 @@
 package com.gobs.assets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Factory for color tiles
@@ -25,6 +28,9 @@ public class TileFactory implements Disposable {
 
     private Map<Color, TextureRegion> fullTiles;
     private Map<Color, TextureRegion> rectTiles;
+
+    private static Pattern fileResourcePattern = Pattern.compile("^file:(.*)!(\\d+),(\\d+):(\\d+),(\\d+)$");
+    private static Pattern colorResourcePattern = Pattern.compile("^color:(.*)!(\\d+)$");
 
     public TileFactory(Config config) {
         this.assetManager = new AssetManager();
@@ -118,6 +124,40 @@ public class TileFactory implements Disposable {
         Texture tex = assetManager.get(res, Texture.class);
 
         return tex;
+    }
+
+    public TextureRegion resolveTexture(String path) {
+        Matcher fileMatcher = fileResourcePattern.matcher(path);
+        Matcher colorMatcher = colorResourcePattern.matcher(path);
+
+        if (fileMatcher.matches()) {
+            String textureName = fileMatcher.group(1);
+            int x = Integer.parseInt(fileMatcher.group(2));
+            int y = Integer.parseInt(fileMatcher.group(3));
+            int w = Integer.parseInt(fileMatcher.group(4));
+            int h = Integer.parseInt(fileMatcher.group(5));
+
+            return getTile(textureName, x, y, w, h);
+        } else if (colorMatcher.matches()) {
+            String colorName = colorMatcher.group(1);
+            int fill = Integer.parseInt(colorMatcher.group(2));
+
+            Color color = Color.BLACK;
+            try {
+                color = (Color) Color.class.getDeclaredField(colorName).get(null);
+            } catch (NoSuchFieldException | SecurityException
+                    | IllegalArgumentException | IllegalAccessException ex) {
+                Gdx.app.error("JSON", "Invalid color: " + colorName);
+            }
+
+            if (fill == 1) {
+                return getFullTile(color);
+            } else {
+                return getRectTile(color);
+            }
+        } else {
+            return getTile(path);
+        }
     }
 
     @Override

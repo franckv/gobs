@@ -19,6 +19,7 @@ import com.gobs.map.Level;
 import com.gobs.map.WorldMap;
 import com.gobs.screens.MainScreen;
 import com.gobs.systems.AISystem;
+import com.gobs.systems.AssetSystem;
 import com.gobs.systems.CameraSystem;
 import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.ControllerSystem;
@@ -106,6 +107,7 @@ public class GobsGame extends Game {
 
     public void initSystems() {
         // logic systems
+        engine.addSystem(new AssetSystem(tileManager));
         engine.addSystem(new InputSystem(inputHandler, contextManager));
         engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));

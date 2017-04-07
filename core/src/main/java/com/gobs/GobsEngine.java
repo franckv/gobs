@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.EntitySystem;
 
 public class GobsEngine extends Engine {
     private boolean rendering = false;
-    
+
     public boolean isRendering() {
         return rendering;
     }
@@ -14,7 +14,7 @@ public class GobsEngine extends Engine {
         system.setProcessing(processing);
         super.addSystem(system);
     }
-    
+
     public void update(float deltaTime, boolean rendering) {
         this.rendering = rendering;
         super.update(deltaTime);
