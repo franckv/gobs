@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *
  */
-public class GdxGUI extends GUI implements Disposable {
+public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private Batch batch;
     private Map<String, BitmapFont> fonts;
     private BitmapFont font;
@@ -35,18 +35,21 @@ public class GdxGUI extends GUI implements Disposable {
         color = Color.GREEN;
     }
 
+    @Override
     public void addFont(String name, BitmapFont font) {
         fonts.put(name, font);
         this.font = font;
     }
 
+    @Override
     public void setFont(String name) {
         if (fonts.containsKey(name)) {
             font = fonts.get(name);
         }
     }
 
-    public void setColor(Color color) {
+    @Override
+    public void setFontColor(Color color) {
         this.color = color;
     }
 
@@ -92,6 +95,11 @@ public class GdxGUI extends GUI implements Disposable {
         }
 
         batch.draw(r, x, y, w, h);
+    }
+
+    @Override
+    public void load(String resource, String fragment, Map<String, String> resolver) {
+        JsonGUILoader.load(this, Gdx.files.internal(resource).reader(), fragment, resolver);
     }
 
     private ShapeRenderer getRenderer() {

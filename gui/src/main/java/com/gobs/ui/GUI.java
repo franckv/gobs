@@ -2,11 +2,9 @@ package com.gobs.ui;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Map;
 
-/**
- *
- */
-public abstract class GUI {
+public abstract class GUI<Color, Font> {
     public enum FontSize {
         SMALL, MEDIUM, LARGE
     }
@@ -41,8 +39,6 @@ public abstract class GUI {
         }
     }
 
-    
-    
     private boolean isActivated() {
         return (inputs != null && inputs.isMouseDown());
     }
@@ -151,9 +147,9 @@ public abstract class GUI {
     }
 
     public abstract float getMaxWidth();
-    
+
     public abstract float getMaxHeight();
-    
+
     public abstract float getLabelWidth(String text);
 
     public abstract float getLabelHeight(String text);
@@ -161,4 +157,12 @@ public abstract class GUI {
     public abstract void drawText(String text, float x, float y);
 
     public abstract void drawBox(float x, float y, float w, float h, boolean selected);
+
+    public abstract void addFont(String fontName, Font font);
+
+    public abstract void setFont(String fontName);
+
+    public abstract void setFontColor(Color color);
+
+    public abstract void load(String resource, String fragment, Map<String, String> resolver);
 }

@@ -9,6 +9,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
 import com.gobs.StateManager;
@@ -23,8 +24,12 @@ import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
+import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.GdxGUI;
+import com.gobs.ui.JsonGUILoader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UIRenderingSystem extends EntitySystem implements Disposable {
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -38,7 +43,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private StateManager stateManager;
     private FontFactory fontManager;
     private Batch batch;
-    private GdxGUI gui;
+    private GUI<Color, BitmapFont> gui;
 
     private Family controllables;
     private Family characters;
@@ -97,6 +102,21 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
         gui.begin();
 
+        drawGUI();
+
+        gui.end();
+
+        batch.end();
+
+        //gui.showCenters();
+    }
+
+    @Override
+    public boolean checkProcessing() {
+        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+    }
+
+    private void drawGUI() {
         gui.createSection("Screen", GUILayout.FlowDirection.NONE);
 
         gui.setMargin(margin);
@@ -112,32 +132,23 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         gui.endSection();
 
         gui.endSection();
-
-        gui.end();
-
-        batch.end();
-
-        //gui.showCenters();
-    }
-
-    @Override
-    public boolean checkProcessing() {
-        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void drawStatusBar() {
-        gui.setFont("small");
-        gui.setColor(Color.GREEN);
-
-        gui.createSection("PushToBottom", GUILayout.FlowDirection.VERTICAL);
+        Map<String, String> resolver = new HashMap<String, String>();
 
         String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + getEngine().getEntities().size();
+        resolver.put("$status1", msg);
 
-        gui.pushToEnd(gui.getLabelHeight(msg));
+        Position pos = getPlayerPosition();
+        msg = "Position: " + pos.getX() + "," + pos.getY();
+        resolver.put("$status2", msg);
 
-        gui.createSection("StatusBar", GUILayout.FlowDirection.HORIZONTAL);
+        gui.load("ui.json", "statusbar", resolver);
+    }
 
-        gui.Label(msg);
+    private Position getPlayerPosition() {
+        Position pos = null;
 
         // display player position
         for (Entity entity : controllablesEntities) {
@@ -146,23 +157,12 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                 continue;
             }
 
-            Position pos = pm.get(entity);
-
-            int x = pos.getX();
-            int y = pos.getY();
-
-            msg = "Position: " + x + "," + y;
-
-            gui.pushToEnd(gui.getLabelWidth(msg));
-
-            gui.Label(msg);
+            pos = pm.get(entity);
 
             break;
         }
 
-        gui.endSection();
-
-        gui.endSection();
+        return pos;
     }
 
     private void drawCharactersStats() {
@@ -180,53 +180,43 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         for (int i = 0; i < nPlayers; i++) {
             for (Entity e : charactersEntities) {
                 if (am.get(e).getPos() == i + 1) {
-                    gui.createSection("Portrait", GUILayout.FlowDirection.NONE);
-                    gui.Frame(boxW, boxH);
+                    Map<String, String> resolver = new HashMap<String, String>();
 
-                    gui.createSection("Details", GUILayout.FlowDirection.VERTICAL);
-                    {
-                        gui.setMargin(20, 15);
-                        gui.setSpacing(10);
+                    resolver.put("$name", nm.get(e).getName());
 
-                        gui.setColor(Color.WHITE);
-                        gui.setFont("large");
-                        gui.Label(nm.get(e).getName());
+                    int hp = hm.get(e).getHP();
+                    int maxHP = hm.get(e).getMaxHP();
+                    String hpColor;
 
-                        gui.Spacer(5);
-
-                        // HP
-                        gui.setFont("medium");
-                        int hp = hm.get(e).getHP();
-                        int maxHP = hm.get(e).getMaxHP();
-                        if (hp == maxHP) {
-                            gui.setColor(Color.WHITE);
-                        } else if (hp < maxHP / 4) {
-                            gui.setColor(Color.RED);
-                        } else {
-                            gui.setColor(Color.GOLD);
-                        }
-                        gui.Label(String.format("HP: %d / %d", hp, maxHP));
-
-                        // MP
-                        gui.setColor(Color.WHITE);
-                        int mp = mm.get(e).getMP();
-                        int maxMP = mm.get(e).getMaxMP();
-                        if (mp == maxMP) {
-                            gui.setColor(Color.WHITE);
-                        } else if (mp < maxMP / 4) {
-                            gui.setColor(Color.RED);
-                        } else {
-                            gui.setColor(Color.GOLD);
-                        }
-                        gui.Label(String.format("MP: %d / %d", mp, maxMP));
-
-                        // LVL
-                        gui.setColor(Color.WHITE);
-                        gui.Label("LV: 99");
+                    if (hp == maxHP) {
+                        hpColor = "white";
+                    } else if (hp < maxHP / 4) {
+                        hpColor = "red";
+                    } else {
+                        hpColor = "gold";
                     }
-                    gui.endSection();
+                    resolver.put("${hpColor}", hpColor);
+                    String hpLabel = String.format("HP: %d / %d", hp, maxHP);
+                    resolver.put("$hp", hpLabel);
 
-                    gui.endSection();
+                    int mp = mm.get(e).getMP();
+                    int maxMP = mm.get(e).getMaxMP();
+                    String mpColor;
+
+                    if (mp == maxMP) {
+                        mpColor = "white";
+                    } else if (mp < maxMP / 4) {
+                        mpColor = "red";
+                    } else {
+                        mpColor = "gold";
+                    }
+                    resolver.put("${mpColor}", mpColor);
+                    String mpLabel = String.format("MP: %d / %d", mp, maxMP);
+                    resolver.put("$mp", mpLabel);
+
+                    resolver.put("$lvl", "LV: 99");
+
+                    gui.load("ui.json", "character", resolver);
                 }
             }
         }
@@ -235,44 +225,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     }
 
     private void drawInventory() {
-        gui.createSection("inventory", GUILayout.FlowDirection.NONE);
-        {
-            gui.Frame(400, 400);
-
-            gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
-            {
-                gui.setMargin(50);
-
-                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
-                {
-
-                    for (int i = 0; i < 4; i++) {
-                        gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
-                        gui.Box("Item" + (2 * i), 50, 50);
-                        gui.Box("Item" + (2 * i + 1), 50, 50);
-                        gui.endSection();
-                    }
-                }
-                gui.endSection();
-
-                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
-                {
-                    gui.Spacer(150);
-                }
-                gui.endSection();
-
-                gui.createSection("", GUILayout.FlowDirection.VERTICAL);
-                {
-                    gui.Box("Equip1", 50, 50);
-                    gui.Box("Equip2", 50, 50);
-                    gui.Box("Equip3", 50, 50);
-                    gui.Box("Equip4", 50, 50);
-                }
-                gui.endSection();
-            }
-            gui.endSection();
-        }
-        gui.endSection();
+        gui.load("ui.json", "inventory", new HashMap<String, String>());
     }
 
     @Override

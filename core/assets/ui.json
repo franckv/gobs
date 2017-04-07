@@ -1,0 +1,193 @@
+[
+    {
+        "fragment": "statusbar",
+        "content": [
+            {
+                "type": "font",
+                "font": "small",
+                "color": "green"
+            },
+            {
+                "type": "layout",
+                "name": "PushToBottom",
+                "direction": "Vertical",
+                "children": [
+                    {
+                        "type": "pusher",
+                        "height": "$status1"
+                    },
+                    {
+                        "type": "layout",
+                        "name": "StatusBar",
+                        "direction": "Horizontal",
+                        "children": [
+                            {
+                                "type": "label",
+                                "label": "$status1"
+                            },
+                            {
+                                "type": "pusher",
+                                "width": "$status2"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$status2"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "fragment": "character",
+        "content": [
+            {
+                "type": "layout",
+                "name": "Portrait",
+                "direction": "None",
+                "children": [
+                    {
+                        "type": "frame",
+                        "width": 250,
+                        "height": 150
+                    },
+                    {
+                        "type": "layout",
+                        "name": "Details",
+                        "direction": "Vertical",
+                        "marginX": 20,
+                        "marginY": 15,
+                        "spacing": 10,
+                        "children": [
+                            {
+                                "type": "font",
+                                "font": "large",
+                                "color": "white"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$name"
+                            },
+                            {
+                                "type": "spacer",
+                                "value": 5
+                            },
+                            {
+                                "type": "font",
+                                "font": "medium",
+                                "color": "${hpColor}"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$hp"
+                            },
+                            {
+                                "type": "font",
+                                "color": "${mpColor}"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$mp"
+                            },
+                            {
+                                "type": "font",
+                                "color": "white"
+                            },
+                            {
+                                "type": "label",
+                                "label": "$lvl"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "fragment": "inventory",
+        "content": [
+            {
+                "type": "layout",
+                "name": "inventory",
+                "direction": "None",
+                "children": [
+                    {
+                        "type": "frame",
+                        "width": 400,
+                        "height": 400
+                    },
+                    {
+                        "type": "layout",
+                        "name": "",
+                        "direction": "Horizontal",
+                        "margin": 50,
+                        "children": [
+                            {   
+                                "type": "layout",
+                                "name": "",
+                                "direction": "Vertical",
+                                "children": [
+                                    {
+                                        "type": "repeater",
+                                        "count": 4,
+                                        "content":
+                                                {
+
+                                                    "type": "layout",
+                                                    "name": "",
+                                                    "direction": "Horizontal",
+                                                    "children": [
+                                                        {   
+                                                            "type": "box",
+                                                            "id": "Item${i}0",
+                                                            "width": 50,
+                                                            "height": 50
+                                                        }, 
+                                                        {   
+                                                            "type": "box",
+                                                            "id": "Item${i}1",
+                                                            "width": 50,
+                                                            "height": 50
+                                                        }
+                                                    ]
+                                                }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "layout",
+                                "name": "",
+                                "direction": "Vertical",
+                                "children": [
+                                    {
+                                        "type": "spacer",
+                                        "value": 150
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "layout",
+                                "name": "",
+                                "direction": "Vertical",
+                                "children": [
+                                    {
+                                        "type": "repeater",
+                                        "count": 4,
+                                        "content": 
+                                                {
+                                                    "type": "box",
+                                                    "id": "Equip${i}",
+                                                    "width": 50,
+                                                    "height": 50
+                                                }    
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
