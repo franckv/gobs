@@ -27,7 +27,6 @@ import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.GdxGUI;
-import com.gobs.ui.JsonGUILoader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,21 +167,19 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     private void drawCharactersStats() {
         int nPlayers = charactersEntities.size();
         int boxW = 250;
-        int boxH = 150;
 
         float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
         float space = (display.getViewPort().getWorldWidth() - size) / 2;
 
-        gui.createSection("Portraits", GUILayout.FlowDirection.HORIZONTAL);
+        Map<String, String> resolver = new HashMap<String, String>();
 
-        gui.Spacer(space);
+        resolver.put("$spacing", Integer.toString((int) space));
 
         for (int i = 0; i < nPlayers; i++) {
             for (Entity e : charactersEntities) {
                 if (am.get(e).getPos() == i + 1) {
-                    Map<String, String> resolver = new HashMap<String, String>();
 
-                    resolver.put("$name", nm.get(e).getName());
+                    resolver.put("$name" + i, nm.get(e).getName());
 
                     int hp = hm.get(e).getHP();
                     int maxHP = hm.get(e).getMaxHP();
@@ -195,9 +192,9 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                     } else {
                         hpColor = "gold";
                     }
-                    resolver.put("${hpColor}", hpColor);
+                    resolver.put("$hpColor" + i, hpColor);
                     String hpLabel = String.format("HP: %d / %d", hp, maxHP);
-                    resolver.put("$hp", hpLabel);
+                    resolver.put("$hp" + i, hpLabel);
 
                     int mp = mm.get(e).getMP();
                     int maxMP = mm.get(e).getMaxMP();
@@ -210,18 +207,17 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
                     } else {
                         mpColor = "gold";
                     }
-                    resolver.put("${mpColor}", mpColor);
+                    resolver.put("$mpColor" + i, mpColor);
                     String mpLabel = String.format("MP: %d / %d", mp, maxMP);
-                    resolver.put("$mp", mpLabel);
+                    resolver.put("$mp" + i, mpLabel);
 
-                    resolver.put("$lvl", "LV: 99");
+                    resolver.put("$lvl" + i, "LV: 99");
 
-                    gui.load("ui.json", "character", resolver);
                 }
             }
         }
 
-        gui.endSection();
+        gui.load("ui.json", "characters", resolver);
     }
 
     private void drawInventory() {

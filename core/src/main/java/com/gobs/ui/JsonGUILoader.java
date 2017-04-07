@@ -61,7 +61,7 @@ public class JsonGUILoader {
                 case "repeater":
                     parseRepeater(gui, value, resolver);
                 case "spacer":
-                    parseSpacer(gui, value);
+                    parseSpacer(gui, value, resolver);
                 case "font":
                     parseFont(gui, value, resolver);
                     break;
@@ -108,11 +108,7 @@ public class JsonGUILoader {
     }
 
     private static void parseLabel(GUI gui, JsonValue value, Map<String, String> resolver) {
-        String label = value.getString("label");
-
-        if (resolver.containsKey(label)) {
-            label = resolver.get(label);
-        }
+        String label = resolve(value, "label", resolver);
 
         gui.Label(label);
     }
@@ -144,9 +140,11 @@ public class JsonGUILoader {
         }
     }
 
-    private static void parseSpacer(GUI gui, JsonValue value) {
+    private static void parseSpacer(GUI gui, JsonValue value, Map<String, String> resolver) {
         if (value.has("value")) {
             gui.Spacer(value.getFloat("value"));
+        } else if (value.has("valueStr")) {
+            gui.Spacer(Integer.parseInt(resolve(value, "valueStr", resolver)));
         }
     }
 
@@ -182,6 +180,11 @@ public class JsonGUILoader {
 
     private static String resolve(JsonValue value, String name, Map<String, String> resolver) {
         String label = value.getString(name);
+
+        // loop counter may be embeded in variable name: do 2 pass resolution
+        if (resolver.containsKey("${i}")) {
+            label = label.replace("${i}", resolver.get("${i}"));
+        }
 
         for (Map.Entry<String, String> entry : resolver.entrySet()) {
             label = label.replace(entry.getKey(), entry.getValue());
