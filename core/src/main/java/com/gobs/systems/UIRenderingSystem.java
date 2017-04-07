@@ -73,6 +73,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         gui.addFont("medium", fontManager.getFont(24));
         gui.addFont("large", fontManager.getFont(30));
 
+        gui.load("ui.json");
+
         margin = 5;
         spacing = 30;
     }
@@ -143,7 +145,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         msg = "Position: " + pos.getX() + "," + pos.getY();
         resolver.put("$status2", msg);
 
-        gui.load("ui.json", "statusbar", resolver);
+        gui.showFragment("statusbar", resolver);
     }
 
     private Position getPlayerPosition() {
@@ -217,11 +219,11 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
             }
         }
 
-        gui.load("ui.json", "characters", resolver);
+        gui.showFragment("characters", resolver);
     }
 
     private void drawInventory() {
-        gui.load("ui.json", "inventory", new HashMap<String, String>());
+        gui.showFragment("inventory", new HashMap<String, String>());
     }
 
     @Override

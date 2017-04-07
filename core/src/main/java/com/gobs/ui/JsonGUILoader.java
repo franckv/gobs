@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,69 +13,78 @@ import java.util.logging.Logger;
  *
  */
 public class JsonGUILoader {
-    public static class JsonGUILoaderException extends Exception {
-        JsonGUILoaderException(String message) {
-            super(message);
-        }
+    private GUI gui;
+    private JsonValue root;
+    private Map<String, JsonValue> fragments;
+    
+    public JsonGUILoader(GUI gui) {
+        this.gui = gui;
+        
+        fragments = new HashMap<>();
     }
-
-    public static void load(GUI gui, Reader file, String fragment, Map<String, String> resolver) {
+    
+    public void load(Reader file) {
         JsonReader reader = new JsonReader();
-
-        JsonValue json = reader.parse(file);
-
-        for (JsonValue value : json) {
-            if (value.has("fragment") && value.getString("fragment").equals(fragment)) {
-                parse(gui, value.get("content"), resolver);
-            } else {
-                parse(gui, value, resolver);
+        
+        root = reader.parse(file);
+        
+        for (JsonValue value : root) {
+            if (value.has("fragment") && value.has("content")) {
+                String fragment = value.getString("fragment");
+                fragments.put(fragment, value.get("content"));
             }
         }
     }
-
-    private static void parse(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    public void showFragment(String fragment, Map<String, String> resolver) {
+        if (fragments.containsKey(fragment)) {
+            parse(fragments.get(fragment), resolver);
+        }
+    }
+    
+    private void parse(JsonValue value, Map<String, String> resolver) {
         if (value == null) {
             return;
         }
-
+        
         if (value.isArray()) {
             for (JsonValue child : value) {
-                parse(gui, child, resolver);
+                parse(child, resolver);
             }
         } else if (value.has("type")) {
             switch (value.getString("type")) {
                 case "layout":
-                    parseLayout(gui, value, resolver);
+                    parseLayout(value, resolver);
                     break;
                 case "label":
-                    parseLabel(gui, value, resolver);
+                    parseLabel(value, resolver);
                     break;
                 case "frame":
-                    parseFrame(gui, value);
+                    parseFrame(value);
                     break;
                 case "box":
-                    parseBox(gui, value, resolver);
+                    parseBox(value, resolver);
                     break;
                 case "pusher":
-                    parsePusher(gui, value, resolver);
+                    parsePusher(value, resolver);
                     break;
                 case "repeater":
-                    parseRepeater(gui, value, resolver);
+                    parseRepeater(value, resolver);
                 case "spacer":
-                    parseSpacer(gui, value, resolver);
+                    parseSpacer(value, resolver);
                 case "font":
-                    parseFont(gui, value, resolver);
+                    parseFont(value, resolver);
                     break;
             }
         }
     }
-
-    private static void parseLayout(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseLayout(JsonValue value, Map<String, String> resolver) {
         String name = value.getString("name");
         String direction = value.getString("direction");
-
+        
         GUILayout.FlowDirection flowDirection = GUILayout.FlowDirection.NONE;
-
+        
         switch (direction) {
             case "Horizontal":
                 flowDirection = GUILayout.FlowDirection.HORIZONTAL;
@@ -83,52 +93,52 @@ public class JsonGUILoader {
                 flowDirection = GUILayout.FlowDirection.VERTICAL;
                 break;
         }
-
+        
         gui.createSection(name, flowDirection);
-
+        
         if (value.has("margin")) {
             gui.setMargin(value.getInt("margin"));
         }
-
+        
         if (value.has("marginX") && value.has("marginY")) {
             gui.setMargin(value.getInt("marginX"), value.getInt("marginY"));
         }
-
+        
         if (value.has("spacing")) {
             gui.setSpacing(value.getInt("spacing"));
         }
-
+        
         if (value.has("children")) {
             for (JsonValue child : value.get("children")) {
-                parse(gui, child, resolver);
+                parse(child, resolver);
             }
         }
-
+        
         gui.endSection();
     }
-
-    private static void parseLabel(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseLabel(JsonValue value, Map<String, String> resolver) {
         String label = resolve(value, "label", resolver);
-
+        
         gui.Label(label);
     }
-
-    private static void parseFrame(GUI gui, JsonValue value) {
+    
+    private void parseFrame(JsonValue value) {
         int width = value.getInt("width");
         int height = value.getInt("height");
-
+        
         gui.Frame(width, height);
     }
-
-    private static void parseBox(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseBox(JsonValue value, Map<String, String> resolver) {
         String id = resolve(value, "id", resolver);
         int width = value.getInt("width");
         int height = value.getInt("height");
-
+        
         gui.Box(id, width, height);
     }
-
-    private static void parsePusher(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parsePusher(JsonValue value, Map<String, String> resolver) {
         if (value.has("value")) {
             gui.pushToEnd(value.getFloat("value"));
         } else if (value.has("height")) {
@@ -139,33 +149,33 @@ public class JsonGUILoader {
             gui.pushToEnd(gui.getLabelWidth(label));
         }
     }
-
-    private static void parseSpacer(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseSpacer(JsonValue value, Map<String, String> resolver) {
         if (value.has("value")) {
             gui.Spacer(value.getFloat("value"));
         } else if (value.has("valueStr")) {
             gui.Spacer(Integer.parseInt(resolve(value, "valueStr", resolver)));
         }
     }
-
-    private static void parseRepeater(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseRepeater(JsonValue value, Map<String, String> resolver) {
         int count = value.getInt("count");
-
+        
         for (int i = 0; i < count; i++) {
             resolver.put("${i}", Integer.toString(i));
-            parse(gui, value.get("content"), resolver);
+            parse(value.get("content"), resolver);
         }
     }
-
-    private static void parseFont(GUI gui, JsonValue value, Map<String, String> resolver) {
+    
+    private void parseFont(JsonValue value, Map<String, String> resolver) {
         if (value.has("font")) {
             gui.setFont(value.getString("font"));
         }
         if (value.has("color")) {
             String colorName = resolve(value, "color", resolver);
-
+            
             Color color = Color.GREEN;
-
+            
             try {
                 color = (Color) Color.class
                         .getDeclaredField(colorName.toUpperCase()).get(null);
@@ -177,19 +187,19 @@ public class JsonGUILoader {
             gui.setFontColor(color);
         }
     }
-
-    private static String resolve(JsonValue value, String name, Map<String, String> resolver) {
+    
+    private String resolve(JsonValue value, String name, Map<String, String> resolver) {
         String label = value.getString(name);
 
         // loop counter may be embeded in variable name: do 2 pass resolution
         if (resolver.containsKey("${i}")) {
             label = label.replace("${i}", resolver.get("${i}"));
         }
-
+        
         for (Map.Entry<String, String> entry : resolver.entrySet()) {
             label = label.replace(entry.getKey(), entry.getValue());
         }
-
+        
         return label;
     }
 }
