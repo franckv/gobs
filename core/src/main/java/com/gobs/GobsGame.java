@@ -24,6 +24,7 @@ import com.gobs.systems.AssetSystem;
 import com.gobs.systems.CameraSystem;
 import com.gobs.systems.CollisionSystem;
 import com.gobs.systems.ControllerSystem;
+import com.gobs.systems.DesignationSystem;
 import com.gobs.systems.FPVRenderingSystem;
 import com.gobs.systems.InputSystem;
 import com.gobs.systems.MapRenderingSystem;
@@ -112,6 +113,7 @@ public class GobsGame extends Game {
         engine.addSystem(new InputSystem(inputHandler, contextManager));
         engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));
+        engine.addSystem(new DesignationSystem(contextManager, stateManager, worldMap));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem(config.getFPS()));
         engine.addSystem(new CollisionSystem(collisionManager, worldMap));
@@ -121,7 +123,7 @@ public class GobsGame extends Game {
 
         // rendering systems
         engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), worldMap));
-        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, worldMap, batch), false);
+        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, stateManager, worldMap, batch), false);
         engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, stateManager, batch));
     }
 
@@ -169,13 +171,14 @@ public class GobsGame extends Game {
 
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.D, ContextManager.Action.DIG);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.F, ContextManager.Action.FILL);
-        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.ENTER, ContextManager.Action.TARGET);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.T, ContextManager.Action.TARGET);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.SPACE, ContextManager.Action.TOGGLE_EDIT);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.LEFT, ContextManager.Action.MOVE_LEFT);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.UP, ContextManager.Action.MOVE_UP);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.DOWN, ContextManager.Action.MOVE_DOWN);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.ENTER, ContextManager.Action.DESIGNATE);
 
         contextManager.activateContext(ContextManager.ContextType.CRAWLING);
         contextManager.activateContext(ContextManager.ContextType.GLOBAL);

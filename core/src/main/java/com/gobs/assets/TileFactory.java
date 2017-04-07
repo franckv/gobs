@@ -28,6 +28,7 @@ public class TileFactory implements Disposable {
 
     private Map<Color, TextureRegion> fullTiles;
     private Map<Color, TextureRegion> rectTiles;
+    private Map<Color, TextureRegion> transTiles;
 
     private static Pattern fileResourcePattern = Pattern.compile("^file:(.*)!(\\d+),(\\d+):(\\d+),(\\d+)$");
     private static Pattern colorResourcePattern = Pattern.compile("^color:(.*)!(\\d+)$");
@@ -38,6 +39,7 @@ public class TileFactory implements Disposable {
 
         fullTiles = new HashMap<>();
         rectTiles = new HashMap<>();
+        transTiles = new HashMap<>();
 
         List<Color> colors = new ArrayList<>();
 
@@ -60,7 +62,7 @@ public class TileFactory implements Disposable {
     }
 
     private void initTiles(List<Color> colors) {
-        pixmap = new Pixmap(colors.size() * tileSize, 2 * tileSize, Pixmap.Format.RGBA8888);
+        pixmap = new Pixmap(colors.size() * tileSize, 3 * tileSize, Pixmap.Format.RGBA8888);
 
         for (int i = 0; i < colors.size(); i++) {
             Color color = colors.get(i);
@@ -68,6 +70,8 @@ public class TileFactory implements Disposable {
             pixmap.setColor(color);
             pixmap.fillRectangle(i * tileSize, 0, tileSize, tileSize);
             pixmap.drawRectangle(i * tileSize, tileSize, tileSize, tileSize);
+            pixmap.setColor(color.a, color.g, color.b, 0.4f);
+            pixmap.fillRectangle(i * tileSize, 2*tileSize, tileSize, tileSize);
         }
 
         texture = new Texture(pixmap);
@@ -76,6 +80,7 @@ public class TileFactory implements Disposable {
             Color color = colors.get(i);
             fullTiles.put(color, new TextureRegion(texture, i * tileSize, 0, tileSize, tileSize));
             rectTiles.put(color, new TextureRegion(texture, i * tileSize, tileSize, tileSize, tileSize));
+            transTiles.put(color, new TextureRegion(texture, i * tileSize, 2*tileSize, tileSize, tileSize));
         }
     }
 
@@ -95,6 +100,14 @@ public class TileFactory implements Disposable {
         }
     }
 
+    public TextureRegion getTransparentTile(Color color) {
+        if (transTiles.containsKey(color)) {
+            return transTiles.get(color);
+        } else {
+            return transTiles.get(Color.DARK_GRAY);
+        }
+    }
+    
     public TextureRegion getFrame() {
         return getTile(frameSprite);
     }

@@ -13,7 +13,7 @@ import com.gobs.components.Hidden;
 import com.gobs.components.Position;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
-import com.gobs.map.LevelCell;
+import com.gobs.input.ContextManager.Event;
 import com.gobs.map.WorldMap;
 import java.util.List;
 
@@ -71,16 +71,10 @@ public class MapUpdateSystem extends EntitySystem {
     }
 
     private void processInputs() {
-        List<ContextManager.Event> events = contextManager.pollActions(consummerID);
+        List<Event> events = contextManager.pollActions(consummerID);
 
-        for (ContextManager.Event event : events) {
+        for (Event event : events) {
             switch (event.getAction()) {
-                case DIG:
-                    digMap();
-                    break;
-                case FILL:
-                    fillMap();
-                    break;
                 case TOGGLE_EDIT:
                     worldMap.getCurrentLevel().setDirty(true);
 
@@ -109,49 +103,11 @@ public class MapUpdateSystem extends EntitySystem {
     }
 
     private void registerActions() {
-        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.DIG);
-        contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.FILL);
-        contextManager.registerConsumer(consummerID, ContextType.MAP, ContextManager.Action.TOGGLE_EDIT);
         contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.TOGGLE_EDIT);
         contextManager.registerConsumer(consummerID, ContextType.EDITMAP, ContextManager.Action.TOGGLE_VIEW);
         contextManager.registerConsumer(consummerID, ContextType.CRAWLING, ContextManager.Action.TOGGLE_VIEW);
         contextManager.registerConsumer(consummerID, ContextType.MAP, ContextManager.Action.TOGGLE_VIEW);
-    }
-
-    private void digMap() {
-        int x = 0;
-        int y = 0;
-        for (Entity entity : entities) {
-            Controller controller = cm.get(entity);
-            Position pos = pm.get(entity);
-
-            if (controller.isActive()) {
-                x = pos.getX();
-                y = pos.getY();
-                break;
-            }
-        }
-
-        System.out.println("Dig at " + x + "," + y);
-        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.FLOOR);
-    }
-
-    private void fillMap() {
-        int x = 0;
-        int y = 0;
-        for (Entity entity : entities) {
-            Controller controller = cm.get(entity);
-            Position pos = pm.get(entity);
-
-            if (controller.isActive()) {
-                x = pos.getX();
-                y = pos.getY();
-                break;
-            }
-        }
-
-        System.out.println("Fill " + x + "," + y);
-        worldMap.getCurrentLevel().setCell(x, y, LevelCell.LevelCellType.WALL);
+        contextManager.registerConsumer(consummerID, ContextType.MAP, ContextManager.Action.TOGGLE_EDIT);
     }
 
     private void editMap(boolean edit) {
