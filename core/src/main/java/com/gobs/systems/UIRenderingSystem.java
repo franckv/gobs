@@ -1,17 +1,15 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.artemis.Aspect;
+import com.artemis.BaseSystem;
+import com.artemis.ComponentMapper;
+import com.artemis.EntitySubscription;
+import com.artemis.annotations.Wire;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Disposable;
-import com.gobs.GobsEngine;
 import com.gobs.StateManager;
 import com.gobs.StateManager.State;
 import com.gobs.assets.FontFactory;
@@ -27,42 +25,45 @@ import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GdxGUI;
 
-public class UIRenderingSystem extends EntitySystem implements Disposable {
-    private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
-    private final ComponentMapper<Name> nm = ComponentMapper.getFor(Name.class);
-    private final ComponentMapper<Party> am = ComponentMapper.getFor(Party.class);
-    private final ComponentMapper<HP> hm = ComponentMapper.getFor(HP.class);
-    private final ComponentMapper<MP> mm = ComponentMapper.getFor(MP.class);
+public class UIRenderingSystem extends BaseSystem implements Disposable {
+    private ComponentMapper<Position> pm;
+    private ComponentMapper<Controller> cm;
+    private ComponentMapper<Name> nm;
+    private ComponentMapper<Party> am;
+    private ComponentMapper<HP> hm;
+    private ComponentMapper<MP> mm;
+
+    @Wire
+    private TileFactory tileManager;
+    @Wire
+    private StateManager stateManager;
+    @Wire(name = "batch")
+    private Batch batch;
+
+    private EntitySubscription controllables;
+    private EntitySubscription characters;
+    private EntitySubscription allEntities;
 
     private OrthographicDisplay display;
-    private StateManager stateManager;
     private FontFactory fontManager;
-    private Batch batch;
     private GUI<Color, BitmapFont> gui;
-
-    private Family controllables;
-    private Family characters;
-    private ImmutableArray<Entity> controllablesEntities;
-    private ImmutableArray<Entity> charactersEntities;
 
     private int margin, spacing;
 
-    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, StateManager stateManager, Batch batch) {
-        this(display, tileManager, stateManager, batch, 0);
+    public UIRenderingSystem(OrthographicDisplay display) {
+        this.display = display;
+
+        this.fontManager = new FontFactory();
+
+        margin = 5;
+        spacing = 30;
     }
 
-    public UIRenderingSystem(OrthographicDisplay display, TileFactory tileManager, StateManager stateManager, Batch batch, int priority) {
-        super(priority);
-
-        controllables = Family.all(Position.class, Controller.class).exclude(Hidden.class).get();
-        characters = Family.all(Party.class, Name.class, HP.class, MP.class).get();
-
-        this.display = display;
-        this.stateManager = stateManager;
-        this.batch = batch;
-
-        fontManager = new FontFactory();
+    @Override
+    protected void initialize() {
+        this.controllables = getWorld().getAspectSubscriptionManager().get(Aspect.all(Position.class, Controller.class).exclude(Hidden.class));
+        this.characters = getWorld().getAspectSubscriptionManager().get(Aspect.all(Party.class, Name.class, HP.class, MP.class));
+        this.allEntities = getWorld().getAspectSubscriptionManager().get(Aspect.all());
 
         gui = new GdxGUI(display, tileManager, batch);
 
@@ -71,27 +72,10 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         gui.addFont("large", fontManager.getFont(30));
 
         gui.load("ui.json");
-
-        margin = 5;
-        spacing = 30;
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        controllablesEntities = engine.getEntitiesFor(controllables);
-        charactersEntities = engine.getEntitiesFor(characters);
-    }
-
-    @Override
-    public void removedFromEngine(Engine engine) {
-        controllablesEntities = null;
-        charactersEntities = null;
-    }
-
-    @Override
-    public void update(float deltaTime) {
+    protected void processSystem() {
         // overlay text is displayed using absolute screen coordinates to avoid scaling font
         display.getCamera().update();
         batch.setProjectionMatrix(display.getCamera().combined);
@@ -120,11 +104,12 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
     @Override
     public boolean checkProcessing() {
-        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void updateStatus() {
-        String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + getEngine().getEntities().size();
+        String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + allEntities.getEntities().size();
 
         gui.setStringValue("fpsStatus", "label", msg);
 
@@ -135,7 +120,7 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
     }
 
     private void updateCharactersStats() {
-        int nPlayers = charactersEntities.size();
+        int nPlayers = characters.getEntities().size();
         int boxW = 250;
 
         float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
@@ -144,13 +129,15 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         gui.setIntValue("charactersSpacing", "value", (int) space);
 
         for (int i = 0; i < nPlayers; i++) {
-            for (Entity e : charactersEntities) {
-                if (am.get(e).getPos() == i + 1) {
+            for (int j = 0; j < characters.getEntities().size(); j++) {
+                int character = characters.getEntities().get(j);
 
-                    gui.setStringValue("name." + i, "label", nm.get(e).getName());
+                if (am.get(character).getPos() == i + 1) {
 
-                    int hp = hm.get(e).getHP();
-                    int maxHP = hm.get(e).getMaxHP();
+                    gui.setStringValue("name." + i, "label", nm.get(character).getName());
+
+                    int hp = hm.get(character).getHP();
+                    int maxHP = hm.get(character).getMaxHP();
                     String hpColor;
 
                     if (hp == maxHP) {
@@ -167,8 +154,8 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
 
                     gui.setStringValue("hp." + i, "label", hpLabel);
 
-                    int mp = mm.get(e).getMP();
-                    int maxMP = mm.get(e).getMaxMP();
+                    int mp = mm.get(character).getMP();
+                    int maxMP = mm.get(character).getMaxMP();
                     String mpColor;
 
                     if (mp == maxMP) {
@@ -195,13 +182,15 @@ public class UIRenderingSystem extends EntitySystem implements Disposable {
         Position pos = null;
 
         // display player position
-        for (Entity entity : controllablesEntities) {
-            Controller controller = cm.get(entity);
+        for (int i = 0; i < controllables.getEntities().size(); i++) {
+            int entityId = controllables.getEntities().get(i);
+
+            Controller controller = cm.get(entityId);
             if (controller == null || !controller.isActive()) {
                 continue;
             }
 
-            pos = pm.get(entity);
+            pos = pm.get(entityId);
 
             break;
         }

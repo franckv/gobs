@@ -1,19 +1,12 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-public class Designation implements Component {
+public class Designation extends Component {
     private int x;
     private int y;
-    private int width;
-    private int height;
-
-    public Designation(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.width = 1;
-        this.height = 1;
-    }
+    private int width = 1;
+    private int height = 1;
 
     public int getWidth() {
         return width;

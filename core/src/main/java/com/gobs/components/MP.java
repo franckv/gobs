@@ -1,25 +1,25 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-/**
- *
- */
-public class MP implements Component {
+public class MP extends Component {
     private int mp;
     private int maxMP;
-
-    public MP(int mp, int maxMP) {
-        this.mp = mp;
-        this.maxMP = maxMP;
-    }
 
     public int getMP() {
         return mp;
     }
 
+    public void setMP(int mp) {
+        this.mp = mp;
+    }
+
     public int getMaxMP() {
         return maxMP;
+    }
+
+    public void setMaxMP(int maxMP) {
+        this.maxMP = maxMP;
     }
 
     public void addMP(int d) {
@@ -30,11 +30,11 @@ public class MP implements Component {
             mp = maxMP;
         }
     }
-    
+
     public void addMaxMP(int d) {
         maxMP += d;
     }
-    
+
     public void setToMax() {
         mp = maxMP;
     }

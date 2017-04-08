@@ -1,7 +1,6 @@
 package com.gobs.ai;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
+import com.artemis.ComponentMapper;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.pfa.Connection;
@@ -22,18 +21,21 @@ import java.util.Random;
  * AI behavior for basic mob
  */
 public class MobBehavior implements AIBehavior {
-    private Entity entity;
-    private CollisionManager<Entity> collisionManager;
+    private static ComponentMapper<Position> pm;
+    private static ComponentMapper<Command> cm;
+    private static ComponentMapper<Goal> gm;
+
+    private int entity;
+    private CollisionManager<Integer> collisionManager;
 
     private static Random rnd = new Random();
-    private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private static ComponentMapper<Goal> gm = ComponentMapper.getFor(Goal.class);
-
+    
     StateMachine<MobBehavior, MobState> stateMachine;
 
-    public MobBehavior(CollisionManager<Entity> collisionManager, Entity entity) {
+    public MobBehavior(CollisionManager<Integer> collisionManager, int entity) {
         this.stateMachine = new DefaultStateMachine<>(this, MobState.WAITING);
         this.collisionManager = collisionManager;
+
         this.entity = entity;
     }
 
@@ -101,15 +103,15 @@ public class MobBehavior implements AIBehavior {
                     }
 
                     if (commandType != null) {
-                        Command cmd = new Command(commandType);
-                        entity.add(cmd);
+                        Command cmd = cm.create(entity);
+                        cmd.setCommand(commandType);
                     }
                 }
             }
         }
 
         if (giveup) {
-            entity.remove(Goal.class);
+            gm.remove(entity);
             System.out.println("Give up chase");
             stateMachine.changeState(MobState.WAITING);
         }
@@ -137,8 +139,8 @@ public class MobBehavior implements AIBehavior {
         }
 
         if (commandType != null) {
-            Command cmd = new Command(commandType);
-            entity.add(cmd);
+            Command cmd = cm.create(entity);
+            cmd.setCommand(commandType);
         }
     }
 

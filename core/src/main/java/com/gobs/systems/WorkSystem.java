@@ -1,12 +1,9 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.BaseEntitySystem;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
 import com.gobs.components.Designation;
 import com.gobs.components.Pending;
 import com.gobs.components.Progress;
@@ -15,62 +12,41 @@ import com.gobs.map.LevelCell;
 import com.gobs.map.LevelCell.LevelCellType;
 import com.gobs.map.WorldMap;
 
-public class WorkSystem extends EntitySystem {
-    ImmutableArray<Entity> entities;
-    Family family;
+public class WorkSystem extends BaseEntitySystem {
+    private static ComponentMapper<WorkItem> wm;
+    private static ComponentMapper<Designation> dm;
+    private static ComponentMapper<Progress> sm;
+
+    @Wire
     private WorldMap worldMap;
 
-    private static ComponentMapper<WorkItem> wm = ComponentMapper.getFor(WorkItem.class);
-    private static ComponentMapper<Designation> dm = ComponentMapper.getFor(Designation.class);
-    private static ComponentMapper<Progress> sm = ComponentMapper.getFor(Progress.class);
-
-    public WorkSystem(WorldMap worldMap) {
-        this(worldMap, 0);
-    }
-
-    public WorkSystem(WorldMap worldMap, int priority) {
-        super(0);
-
-        family = Family.all(WorkItem.class, Designation.class, Progress.class).exclude(Pending.class).get();
-        this.worldMap = worldMap;
+    public WorkSystem() {
+        super(Aspect.all(WorkItem.class, Designation.class, Progress.class).exclude(Pending.class));
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
+    protected void processSystem() {
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
 
-        for (Entity entity : entities) {
-            Progress progress = sm.get(entity);
+            Progress progress = sm.get(entityId);
 
             progress.advance();
 
             if (progress.isComplete()) {
-                performTask(entity);
-                getEngine().removeEntity(entity);
+                performTask(entityId);
+                getWorld().delete(entityId);
             }
         }
     }
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        entities = getEngine().getEntitiesFor(family);
-    }
-
-    @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-        entities = null;
-    }
-
-    private void performTask(Entity task) {
+    private void performTask(int task) {
         WorkItem work = wm.get(task);
 
         switch (work.getType()) {
@@ -83,15 +59,15 @@ public class WorkSystem extends EntitySystem {
         }
     }
 
-    private void digMap(Entity entity) {
-        Designation design = dm.get(entity);
+    private void digMap(int entityId) {
+        Designation design = dm.get(entityId);
         System.out.println("Dig at " + design.getX() + "," + design.getY());
 
         fillArea(design, LevelCell.LevelCellType.FLOOR);
     }
 
-    private void fillMap(Entity entity) {
-        Designation design = dm.get(entity);
+    private void fillMap(int entityId) {
+        Designation design = dm.get(entityId);
         System.out.println("Fill " + design.getX() + "," + design.getY());
 
         fillArea(design, LevelCell.LevelCellType.WALL);

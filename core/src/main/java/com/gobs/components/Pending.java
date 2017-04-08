@@ -1,6 +1,6 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-public class Pending implements Component {
+public class Pending extends Component {
 }

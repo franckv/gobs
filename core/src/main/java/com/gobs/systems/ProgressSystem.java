@@ -1,40 +1,29 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.artemis.Aspect;
+import com.artemis.BaseEntitySystem;
+import com.artemis.ComponentMapper;
 import com.gobs.components.Animation;
 import com.gobs.components.Progress;
 import com.gobs.components.WorkItem;
 
-public class ProgressSystem extends LogicSystem {
-    ImmutableArray<Entity> entities;
-    Family family;
-
-    private static ComponentMapper<Animation> am = ComponentMapper.getFor(Animation.class);
-    private static ComponentMapper<WorkItem> wm = ComponentMapper.getFor(WorkItem.class);
-    private static ComponentMapper<Progress> sm = ComponentMapper.getFor(Progress.class);
+public class ProgressSystem extends BaseEntitySystem {
+    private static ComponentMapper<Animation> am;
+    private static ComponentMapper<WorkItem> wm;
+    private static ComponentMapper<Progress> sm;
 
     public ProgressSystem() {
-        this(0);
-    }
-
-    public ProgressSystem(int priority) {
-        super(priority);
-
-        family = Family.one(Animation.class, WorkItem.class).get();
+        super(Aspect.one(Animation.class, WorkItem.class));
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
+    protected void processSystem() {
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
 
-        for (Entity entity : entities) {
-            Progress progress = sm.get(entity);
-            Animation anim = am.get(entity);
-            WorkItem work = wm.get(entity);
+            Progress progress = sm.get(entityId);
+            Animation anim = am.get(entityId);
+            WorkItem work = wm.get(entityId);
 
             if (progress == null) {
                 int duration = 0;
@@ -44,23 +33,9 @@ public class ProgressSystem extends LogicSystem {
                     duration = work.getDuration();
                 }
 
-                progress = new Progress(duration);
-                entity.add(progress);
+                progress = sm.create(entityId);
+                progress.setDuration(duration);
             }
         }
-    }
-
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        entities = getEngine().getEntitiesFor(family);
-    }
-
-    @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-        entities = null;
     }
 }

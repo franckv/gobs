@@ -1,33 +1,27 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.systems.IteratingSystem;
 import com.gobs.components.Animation;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.components.Transform;
 
 public class TransformationSystem extends IteratingSystem {
-    private static ComponentMapper<Transform> tm = ComponentMapper.getFor(Transform.class);
-    private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private static ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
+    private static ComponentMapper<Transform> tm;
+    private static ComponentMapper<Position> pm;
+    private static ComponentMapper<Camera> cm;
 
     public TransformationSystem() {
-        this(0);
-    }
-
-    public TransformationSystem(int priority) {
-        super(Family.all(Position.class, Transform.class).exclude(Animation.class).get(), priority);
+        super(Aspect.all(Position.class, Transform.class).exclude(Animation.class));
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Position position = pm.get(entity);
-        Transform trans = tm.get(entity);
-        Camera cam = cm.get(entity);
+    protected void process(int entityId) {
+        Position position = pm.get(entityId);
+        Transform trans = tm.get(entityId);
+        Camera cam = cm.get(entityId);
 
         position.translate(trans.getDX(), trans.getDY());
 
@@ -35,11 +29,12 @@ public class TransformationSystem extends IteratingSystem {
             cam.rotate(trans.getRotation());
         }
 
-        entity.remove(Transform.class);
+        tm.remove(entityId);
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 }

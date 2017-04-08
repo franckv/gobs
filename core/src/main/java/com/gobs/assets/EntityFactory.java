@@ -1,9 +1,8 @@
 package com.gobs.assets;
 
-import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
+import com.artemis.ComponentMapper;
+import com.artemis.World;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gobs.ai.AIBehavior;
@@ -22,105 +21,106 @@ import com.gobs.components.SpriteRef;
 import com.gobs.util.CollisionManager;
 
 public class EntityFactory {
-    private CollisionManager<Entity> collisionManager;
-    private TileFactory tileManager;
+    private ComponentMapper<Position> pm;
+    private ComponentMapper<SpriteRef> rm;
+    private ComponentMapper<Collider> dm;
+    private ComponentMapper<Hidden> nm;
+    private ComponentMapper<Party> tm;
+    private ComponentMapper<HP> hm;
+    private ComponentMapper<MP> mm;
+    private ComponentMapper<Name> am;
+    private ComponentMapper<Controller> lm;
+    private ComponentMapper<Camera> em;
+    private ComponentMapper<AI> im;
 
-    public EntityFactory(CollisionManager<Entity> collisionManager, TileFactory tileManager) {
+    private CollisionManager<Integer> collisionManager;
+    private TileFactory tileManager;
+ 
+    public EntityFactory(CollisionManager<Integer> collisionManager, TileFactory tileManager) {
         this.collisionManager = collisionManager;
         this.tileManager = tileManager;
     }
 
-    public Array<Entity> loadEntities(String filename) {
-        Array<Entity> entities = new Array<>();
-
+    public void loadEntities(World world, String filename) {
         JsonReader reader = new JsonReader();
 
         JsonValue json = reader.parse(Gdx.files.internal(filename));
 
         for (JsonValue entity = json.child; entity != null; entity = entity.next) {
-            Entity e = parseEntity(entity);
-            if (e != null) {
-                entities.add(e);
-            }
+            parseEntity(world, entity);
         }
-
-        return entities;
     }
 
-    private Entity parseEntity(JsonValue entity) {
+    private void parseEntity(World world, JsonValue entity) {
         JsonValue disabled = entity.get("disabled");
         if (disabled != null && disabled.asBoolean()) {
-            return null;
+            return;
         }
 
-        Entity e = new Entity();
+        int entityId = world.create();
 
         JsonValue components = entity.get("components");
 
         for (JsonValue component = components.child; component != null; component = component.next) {
-            Component c = parseComponent(e, component);
-            if (c != null) {
-                e.add(c);
-            }
+            parseComponent(entityId, world, component);
         }
-
-        return e;
     }
 
-    private Component parseComponent(Entity e, JsonValue component) {
-        Component c = null;
-
+    private void parseComponent(int entityId, World world, JsonValue component) {
         String type = component.getString("type");
 
         switch (type) {
             case "position":
                 int x = component.getInt("x");
                 int y = component.getInt("y");
-                c = new Position(x, y);
+                pm.create(entityId).setPosition(x, y);
                 break;
             case "sprite":
                 if (component.has("res")) {
                     String res = component.getString("res");
-                    c = new SpriteRef(res);
+                    rm.create(entityId).setPath(res);
                 }
                 break;
             case "collider":
-                c = new Collider();
+                dm.create(entityId);
                 break;
             case "hidden":
-                c = new Hidden();
+                nm.create(entityId);
                 break;
             case "party":
                 int pos = component.getInt("pos");
-                c = new Party(pos);
+                tm.create(entityId).setPos(pos);
                 break;
             case "hp":
                 int hp = component.getInt("hp");
                 int maxHP = component.getInt("maxHP");
-                c = new HP(hp, maxHP);
+                HP h = hm.create(entityId);
+                h.setHP(hp);
+                h.setMaxHP(maxHP);
                 break;
             case "mp":
                 int mp = component.getInt("mp");
                 int maxMP = component.getInt("maxMP");
-                c = new MP(mp, maxMP);
+                MP m = mm.create(entityId);
+                m.setMP(mp);
+                m.setMaxMP(maxMP);
                 break;
             case "name":
                 String name = component.getString("name");
-                c = new Name(name);
+                am.create(entityId).setName(name);
                 break;
             case "controller":
                 boolean active = component.getBoolean("active");
-                c = new Controller(active);
+                lm.create(entityId).setActive(active);
                 break;
             case "camera":
-                c = new Camera(Camera.Orientation.UP);
+                em.create(entityId).setOrientation(Camera.Orientation.UP);
                 break;
             case "ai":
-                AIBehavior behavior = new MobBehavior(collisionManager, e);
-                c = new AI(behavior);
+                AIBehavior behavior = new MobBehavior(collisionManager, entityId);
+                world.inject(behavior);
+                im.create(entityId).setBehavior(behavior);
                 break;
         }
-
-        return c;
     }
 }

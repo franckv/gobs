@@ -1,21 +1,14 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
 /**
  * Assign a position to an entity
  */
-public class Position implements Component {
+public class Position extends Component {
     int x, y;
     // intermediary positions used for animation
     float dx, dy;
-
-    public Position(int x, int y) {
-        this.x = x;
-        this.dx = 0;
-        this.y = y;
-        this.dy = 0;
-    }
 
     public int getX() {
         return x;
@@ -23,6 +16,13 @@ public class Position implements Component {
 
     public int getY() {
         return y;
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.dx = 0;
+        this.y = y;
+        this.dy = 0;
     }
 
     public float getDX() {

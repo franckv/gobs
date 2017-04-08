@@ -1,56 +1,57 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.systems.IteratingSystem;
 import com.gobs.components.Animation;
 import com.gobs.components.Camera;
 import com.gobs.components.Command;
 import com.gobs.components.Transform;
 
 public class MovementSystem extends IteratingSystem {
-    private ComponentMapper<Command> cm = ComponentMapper.getFor(Command.class);
-    private ComponentMapper<Camera> km = ComponentMapper.getFor(Camera.class);
+    private ComponentMapper<Command> cm;
+    private ComponentMapper<Animation> am;
+    private ComponentMapper<Transform> tm;
+    private ComponentMapper<Camera> km;
 
     private int translateFrames;
     private int rotateFrames;
 
     public MovementSystem(int fps) {
-        this(fps, 0);
-    }
-
-    public MovementSystem(int fps, int priority) {
-        super(Family.all(Command.class).get(), priority);
+        super(Aspect.all(Command.class));
         translateFrames = fps / 3;
         rotateFrames = fps / 3;
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Command command = cm.get(entity);
-        Camera cam = km.get(entity);
+    protected void process(int entityId) {
+        Command command = cm.get(entityId);
+        Camera cam = km.get(entityId);
 
-        Transform trans = new Transform();
+        Transform trans = tm.create(entityId);
+        Animation anim = am.create(entityId);
 
         switch (command.getCommand()) {
             case LEFT:
                 if (cam != null) {
                     trans.rotate(-90);
-                    entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
+                    anim.setType(Animation.AnimationType.ROTATE);
+                    anim.setDuration(rotateFrames);
                 } else {
                     trans.addX(-1);
-                    entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                    anim.setType(Animation.AnimationType.TRANSLATE);
+                    anim.setDuration(translateFrames);
                 }
                 break;
             case RIGHT:
                 if (cam != null) {
                     trans.rotate(90);
-                    entity.add(new Animation(Animation.AnimationType.ROTATE, rotateFrames));
+                    anim.setType(Animation.AnimationType.ROTATE);
+                    anim.setDuration(rotateFrames);
                 } else {
                     trans.addX(1);
-                    entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                    anim.setType(Animation.AnimationType.TRANSLATE);
+                    anim.setDuration(translateFrames);
                 }
                 break;
             case UP:
@@ -72,7 +73,8 @@ public class MovementSystem extends IteratingSystem {
                 } else {
                     trans.addY(1);
                 }
-                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                anim.setType(Animation.AnimationType.TRANSLATE);
+                anim.setDuration(translateFrames);
                 break;
             case DOWN:
                 if (cam != null) {
@@ -93,16 +95,17 @@ public class MovementSystem extends IteratingSystem {
                 } else {
                     trans.addY(-1);
                 }
-                entity.add(new Animation(Animation.AnimationType.TRANSLATE, translateFrames));
+                anim.setType(Animation.AnimationType.TRANSLATE);
+                anim.setDuration(translateFrames);
                 break;
         }
 
-        entity.remove(Command.class);
-        entity.add(trans);
+        cm.remove(entityId);
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 }

@@ -1,8 +1,8 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-public class WorkItem implements Component {
+public class WorkItem extends Component {
     public enum WorkType {
         DIGGING,
         FILLING
@@ -11,16 +11,19 @@ public class WorkItem implements Component {
     private WorkType type;
     private int duration;
 
-    public WorkItem(WorkType type, int duration) {
-        this.type = type;
-        this.duration = duration;
-    }
-
     public WorkType getType() {
         return type;
     }
 
+    public void setType(WorkType type) {
+        this.type = type;
+    }
+
     public int getDuration() {
         return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 }

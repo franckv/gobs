@@ -1,25 +1,25 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-/**
- *
- */
-public class HP implements Component {
+public class HP extends Component {
     private int hp;
     private int maxHP;
-
-    public HP(int hp, int maxHP) {
-        this.hp = hp;
-        this.maxHP = maxHP;
-    }
 
     public int getHP() {
         return hp;
     }
 
+    public void setHP(int hp) {
+        this.hp = hp;
+    }
+
     public int getMaxHP() {
         return maxHP;
+    }
+
+    public void setMaxHP(int maxHP) {
+        this.maxHP = maxHP;
     }
 
     public void addHP(int d) {
@@ -30,11 +30,11 @@ public class HP implements Component {
             hp = maxHP;
         }
     }
-    
+
     public void addMaxHP(int d) {
         maxHP += d;
     }
-    
+
     public void setToMax() {
         hp = maxHP;
     }

@@ -1,6 +1,7 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.EntitySystem;
+import com.artemis.BaseSystem;
+import com.artemis.annotations.Wire;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL30;
@@ -18,15 +19,16 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.gobs.GobsEngine;
 import com.gobs.display.PerspectiveDisplay;
 import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
 
-public class FPVRenderingSystem extends EntitySystem implements Disposable {
+public class FPVRenderingSystem extends BaseSystem implements Disposable {
     private final static float h = 0.1f;
 
+    @Wire
     private WorldMap worldMap;
+
     private PerspectiveDisplay display;
     private Environment environment;
     private ModelBatch modelBatch;
@@ -35,17 +37,14 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
     private PointLight light;
     private Texture texture;
     private float step;
+    private boolean init = true;
 
-    public FPVRenderingSystem(PerspectiveDisplay display, WorldMap worldMap) {
-        this(display, worldMap, 0);
+    public FPVRenderingSystem(PerspectiveDisplay display) {
+        this.display = display;
     }
 
-    public FPVRenderingSystem(PerspectiveDisplay display, WorldMap worldMap, int priority) {
-        super(priority);
-
-        this.worldMap = worldMap;
-        this.display = display;
-
+    @Override
+    protected void initialize() {
         texture = new Texture("textures/wall.png");
 
         modelBatch = new ModelBatch();
@@ -92,15 +91,14 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
     }
 
     @Override
-    public void update(float deltaTime) {
+    protected void processSystem() {
         clearScreen();
-
-        super.update(deltaTime);
 
         display.getCamera().update();
 
-        if (worldMap.getCurrentLevel().isDirty()) {
+        if (init || worldMap.getCurrentLevel().isDirty()) {
             buildScene();
+            init = false;
         }
 
         light.setPosition(display.getCamera().position);
@@ -114,7 +112,8 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
 
     @Override
     public boolean checkProcessing() {
-        return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void clearScreen() {

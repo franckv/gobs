@@ -1,12 +1,11 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
+import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.utils.Array;
-import com.gobs.GobsEngine;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.display.DisplayManager;
@@ -14,43 +13,40 @@ import com.gobs.display.PerspectiveDisplay;
 import com.gobs.input.ContextManager;
 
 public class CameraSystem extends IteratingSystem {
-    private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<Camera> cm;
+    private ComponentMapper<Position> pm;
+
+    @Wire
+    private DisplayManager displayManager;
+    @Wire
+    private ContextManager contextManager;
 
     private final static String consummerID = CameraSystem.class.getName();
 
-    private DisplayManager displayManager;
-    private ContextManager contextManager;
-
-    public CameraSystem(DisplayManager displayManager, ContextManager contextManager) {
-        this(displayManager, contextManager, 0);
+    public CameraSystem() {
+        super(Aspect.all(Camera.class, Position.class));
     }
 
-    public CameraSystem(DisplayManager displayManager, ContextManager contextManager, int priority) {
-        super(Family.all(Camera.class, Position.class).get(), priority);
-
-        this.displayManager = displayManager;
-        this.contextManager = contextManager;
-
+    @Override
+    protected void initialize() {
         registerActions();
     }
 
     @Override
-    public void update(float deltaTime) {
+    protected void begin() {
         processInputs();
-
-        super.update(deltaTime);
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Camera cam = cm.get(entity);
-        Position pos = pm.get(entity);
+    protected void process(int entityId) {
+        Camera cam = cm.get(entityId);
+        Position pos = pm.get(entityId);
 
         PerspectiveDisplay display = displayManager.getFPVDisplay();
         PerspectiveCamera camera = display.getCamera();

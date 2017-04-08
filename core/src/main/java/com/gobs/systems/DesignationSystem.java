@@ -1,11 +1,10 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.artemis.Aspect;
+import com.artemis.BaseEntitySystem;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
+import com.artemis.utils.IntBag;
 import com.badlogic.gdx.utils.Array;
 import com.gobs.StateManager;
 import com.gobs.components.Animation;
@@ -17,56 +16,55 @@ import com.gobs.components.WorkItem;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.Event;
 
-public class DesignationSystem extends EntitySystem {
+public class DesignationSystem extends BaseEntitySystem {
+    private ComponentMapper<Designation> dm;
+    private ComponentMapper<Controller> cm;
+    private ComponentMapper<Position> pm;
+    private ComponentMapper<Pending> gm;
+    private ComponentMapper<WorkItem> wm;
+
+    @Wire
     private ContextManager contextManager;
+    @Wire
     private StateManager stateManager;
 
-    private Family designationFamily;
-    private Family cursorFamily;
-    private ImmutableArray<Entity> designations;
-    private ImmutableArray<Entity> cursor;
+    private Position cursorPosition = null;
 
     private final static String consummerID = DesignationSystem.class.getName();
 
-    private final ComponentMapper<Designation> dm = ComponentMapper.getFor(Designation.class);
-    private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
-    private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-
-    public DesignationSystem(ContextManager contextManager, StateManager stateManager) {
-        this(contextManager, stateManager, 0);
+    public DesignationSystem() {
+        super(Aspect.all(Designation.class, Pending.class));
     }
 
-    public DesignationSystem(ContextManager contextManager, StateManager stateManager, int priority) {
-        super(priority);
-
-        this.designationFamily = Family.all(Designation.class, Pending.class).get();
-        this.cursorFamily = Family.all(Position.class, Controller.class).exclude(Animation.class).get();
-
-        this.contextManager = contextManager;
-        this.stateManager = stateManager;
-
+    @Override
+    protected void initialize() {
         registerActions();
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
+    public void begin() {
+        cursorPosition = null;
 
-        designations = engine.getEntitiesFor(designationFamily);
-        cursor = engine.getEntitiesFor(cursorFamily);
+        IntBag cursor = getWorld().getAspectSubscriptionManager().get(Aspect.all(Position.class, Controller.class).exclude(Animation.class)).getEntities();
 
+        for (int i = 0; i < cursor.size(); i++) {
+            int entityId = cursor.get(i);
+
+            Position pos = pm.get(entityId);
+            Controller controller = cm.get(entityId);
+
+            if (controller.isActive()) {
+                cursorPosition = pos;
+                break;
+            }
+        }
     }
 
     @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-        designations = null;
-        cursor = null;
-    }
-
-    @Override
-    public void update(float deltaTime) {
+    protected void processSystem() {
+        if (cursorPosition == null) {
+            return;
+        }
         if (stateManager.getState() == StateManager.State.EDITMAP) {
             updateDesignation();
         } else {
@@ -100,19 +98,13 @@ public class DesignationSystem extends EntitySystem {
     }
 
     private void updateDesignation() {
-        Entity cursor = getCursor();
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
 
-        if (cursor == null) {
-            return;
-        }
+            Designation design = dm.get(entityId);
 
-        Position pos = pm.get(cursor);
-
-        for (Entity entity : designations) {
-            Designation design = dm.get(entity);
-
-            int width = pos.getX() - design.getX();
-            int height = pos.getY() - design.getY();
+            int width = cursorPosition.getX() - design.getX();
+            int height = cursorPosition.getY() - design.getY();
 
             if (width >= 0) {
                 width += 1;
@@ -131,38 +123,41 @@ public class DesignationSystem extends EntitySystem {
     }
 
     private void cancelDesignation() {
-        for (Entity entity : designations) {
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
             System.out.println("cancel");
-            getEngine().removeEntity(entity);
+            getWorld().delete(entityId);
         }
     }
 
     private void startDesignation(WorkItem.WorkType type) {
         // only one designation at a time
-        if (designations.size() > 0) {
+        if (getEntityIds().size() > 0) {
             return;
         }
 
-        Entity cursor = getCursor();
+        int zone = getWorld().create();
 
-        if (cursor != null) {
-            Position pos = pm.get(cursor);
+        Designation design = dm.create(zone);
+        design.setPosition(cursorPosition.getX(), cursorPosition.getY());
 
-            Entity zone = new Entity();
-            zone.add(new Designation(pos.getX(), pos.getY()));
-            zone.add(new WorkItem(type, 10));
-            zone.add(new Pending());
-            getEngine().addEntity(zone);
-        }
+        WorkItem work = wm.create(zone);
+        work.setDuration(10);
+        work.setType(type);
+
+        gm.create(zone);
     }
 
     private void completeDesignation() {
-        for (Entity entity : designations) {
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
             System.out.println("complete");
-            Designation design = dm.get(entity);
+            Designation design = dm.get(entityId);
             normalize(design);
 
-            entity.remove(Pending.class);
+            gm.remove(entityId);
         }
     }
 
@@ -179,18 +174,5 @@ public class DesignationSystem extends EntitySystem {
 
         designation.setPosition(x, y);
         designation.setDimension(width, height);
-
-    }
-
-    private Entity getCursor() {
-        for (Entity entity : cursor) {
-            Controller controller = cm.get(entity);
-
-            if (controller.isActive()) {
-                return entity;
-            }
-        }
-
-        return null;
     }
 }

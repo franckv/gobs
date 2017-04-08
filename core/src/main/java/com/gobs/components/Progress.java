@@ -1,12 +1,12 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-public class Progress implements Component {
-    private int duration;
-    private int progress;
+public class Progress extends Component {
+    private int duration = 0;
+    private int progress = 0;
 
-    public Progress(int duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
         this.progress = 0;
     }

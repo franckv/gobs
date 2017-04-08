@@ -1,9 +1,6 @@
 package com.gobs;
 
-import com.badlogic.ashley.core.Engine;
 import com.gobs.input.ContextManager;
-import com.gobs.systems.AISystem;
-import com.gobs.systems.MapRenderingSystem;
 
 public class StateManager {
     public enum State {
@@ -13,11 +10,9 @@ public class StateManager {
     }
 
     private State currentState;
-    private Engine engine;
     private ContextManager contextManager;
 
-    public StateManager(Engine engine, ContextManager contextManager, State state) {
-        this.engine = engine;
+    public StateManager(ContextManager contextManager, State state) {
         this.contextManager = contextManager;
         this.currentState = state;
     }
@@ -61,7 +56,6 @@ public class StateManager {
     }
 
     private void enterCRAWL() {
-        engine.getSystem(AISystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.CRAWLING);
     }
 
@@ -70,24 +64,18 @@ public class StateManager {
     }
 
     private void enterEDITMAP() {
-        engine.getSystem(AISystem.class).setProcessing(false);
-        engine.getSystem(MapRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.EDITMAP);
     }
 
     private void exitEDITMAP() {
-        engine.getSystem(MapRenderingSystem.class).setProcessing(false);
         contextManager.disableContext(ContextManager.ContextType.EDITMAP);
     }
 
     private void enterMAP() {
-        engine.getSystem(AISystem.class).setProcessing(false);
-        engine.getSystem(MapRenderingSystem.class).setProcessing(true);
         contextManager.activateContext(ContextManager.ContextType.MAP);
     }
 
     private void exitMAP() {
-        engine.getSystem(MapRenderingSystem.class).setProcessing(false);
         contextManager.disableContext(ContextManager.ContextType.MAP);
     }
 }

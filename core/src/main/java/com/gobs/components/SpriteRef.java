@@ -1,15 +1,15 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
-public class SpriteRef implements Component {
+public class SpriteRef extends Component {
     String path;
-    
-    public SpriteRef(String path) {
-        this.path = path;
-    }
-    
+
     public String getPath() {
         return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

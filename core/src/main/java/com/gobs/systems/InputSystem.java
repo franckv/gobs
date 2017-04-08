@@ -1,11 +1,11 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.artemis.Aspect;
+import com.artemis.BaseEntitySystem;
+import com.artemis.Component;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
+import com.artemis.utils.Bag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.gobs.components.AI;
@@ -18,48 +18,30 @@ import com.gobs.input.InputHandler;
 import com.gobs.ui.GUI;
 import com.gobs.ui.InputMap;
 
-public class InputSystem extends LogicSystem {
-    private InputHandler inputHandler;
-    private ContextManager contextManager;
+public class InputSystem extends BaseEntitySystem {
+    private ComponentMapper<Position> pm;
+    private ComponentMapper<Goal> gm;
+    private ComponentMapper<Controller> cm;
+    private ComponentMapper<AI> am;
 
-    private Family family;
-    private ImmutableArray<Entity> entities;
+    @Wire
+    private InputHandler inputHandler;
+    @Wire
+    private ContextManager contextManager;
 
     private final static String consummerID = InputSystem.class.getName();
 
-    private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
-    private final ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
-
-    public InputSystem(InputHandler inputHandler, ContextManager contextManager) {
-        this(inputHandler, contextManager, 0);
+    public InputSystem() {
+        super(Aspect.one(Controller.class, AI.class));
     }
 
-    public InputSystem(InputHandler inputHandler, ContextManager contextManager, int priority) {
-        this.family = Family.one(Controller.class, AI.class).get();
-
-        this.inputHandler = inputHandler;
-        this.contextManager = contextManager;
-
+    @Override
+    protected void initialize() {
         registerActions();
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        entities = engine.getEntitiesFor(family);
-    }
-
-    @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-        entities = null;
-    }
-
-    @Override
-    public void update(float deltaTime) {
+    protected void processSystem() {
         InputMap inputMap = inputHandler.getInputMap();
 
         if (inputMap.hasInput()) {
@@ -97,22 +79,28 @@ public class InputSystem extends LogicSystem {
     }
 
     private void dumpEntities() {
-        int i = 0;
-        for (Entity entity : getEngine().getEntities()) {
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
             System.out.println("=== Entity #" + i + " ===");
-            for (Component component : entity.getComponents()) {
+
+            Bag<Component> components = new Bag<>();
+            getWorld().getEntity(entityId).getComponents(components);
+
+            for (Component component : components) {
                 System.out.println(" * " + component.getClass().getSimpleName());
             }
-            i++;
         }
     }
 
     private void setTarget() {
         int x = 0;
         int y = 0;
-        for (Entity entity : entities) {
-            Controller controller = cm.get(entity);
-            Position pos = pm.get(entity);
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
+            Controller controller = cm.get(entityId);
+            Position pos = pm.get(entityId);
 
             if (controller != null && controller.isActive() && pos != null) {
                 x = pos.getX();
@@ -122,11 +110,14 @@ public class InputSystem extends LogicSystem {
             }
         }
 
-        for (Entity entity : entities) {
-            AI ai = am.get(entity);
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
+            AI ai = am.get(entityId);
 
             if (ai != null) {
-                entity.add(new Goal(x, y));
+                Goal goal = gm.create(entityId);
+                goal.setPosition(x, y);
                 break;
             }
         }

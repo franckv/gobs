@@ -1,14 +1,15 @@
 package com.gobs;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
+import com.artemis.BaseSystem;
+import com.artemis.World;
+import com.artemis.WorldConfiguration;
+import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.assets.DungeonFactory;
@@ -49,13 +50,13 @@ public class GobsGame extends Game {
     private SCREEN currentScreen;
 
     private Config config;
-    private GobsEngine engine;
+    private World world;
 
     private InputHandler inputHandler;
     private TileFactory tileManager;
     private DisplayManager displayManager;
     private ContextManager contextManager;
-    private CollisionManager<Entity> collisionManager;
+    private CollisionManager<Integer> collisionManager;
     private WorldMap worldMap;
     private StateManager stateManager;
     private Batch batch;
@@ -67,27 +68,26 @@ public class GobsGame extends Game {
         inputHandler = new InputHandler(config.getKeyDelay(), config.getKeyRepeat());
         Gdx.input.setInputProcessor(inputHandler);
 
-        engine = new GobsEngine();
-
         tileManager = new TileFactory(config);
         contextManager = new ContextManager();
         displayManager = new DisplayManager(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), config.getTileSize(), 1f);
         collisionManager = new CollisionManager<>(config.getWorldWidth(), config.getWorldHeight());
         batch = new SpriteBatch();
 
+        worldMap = loadWorldMap();
+
+        stateManager = new StateManager(contextManager, StateManager.State.CRAWL);
+
+        initWorld();
+
         screens = new ObjectMap<>();
-        screens.put(SCREEN.WORLD, new MainScreen(displayManager, engine, config.getFPS()));
+        screens.put(SCREEN.WORLD, new MainScreen(displayManager, world, config.getFPS()));
         currentScreen = SCREEN.WORLD;
         super.setScreen(screens.get(currentScreen));
 
-        worldMap = loadWorld();
-        loadEntities(collisionManager, tileManager);
+        loadEntities();
 
         setKeyBindings();
-
-        stateManager = new StateManager(engine, contextManager, StateManager.State.CRAWL);
-
-        initSystems();
 
         Gdx.app.setLogLevel(Application.LOG_INFO);
     }
@@ -101,36 +101,49 @@ public class GobsGame extends Game {
         }
         tileManager.dispose();
         batch.dispose();
-        for (EntitySystem system : engine.getSystems()) {
+        for (BaseSystem system : world.getSystems()) {
             if (system instanceof Disposable) {
                 ((Disposable) system).dispose();
             }
         }
     }
 
-    public void initSystems() {
-        // logic systems
-        engine.addSystem(new AssetSystem(tileManager));
-        engine.addSystem(new InputSystem(inputHandler, contextManager));
-        engine.addSystem(new ControllerSystem(contextManager));
-        engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));
-        engine.addSystem(new DesignationSystem(contextManager, stateManager));
-        engine.addSystem(new WorkSystem(worldMap));
-        engine.addSystem(new AISystem(0.5f));
-        engine.addSystem(new MovementSystem(config.getFPS()));
-        engine.addSystem(new CollisionSystem(collisionManager, worldMap));
-        engine.addSystem(new AnimationSystem());
-        engine.addSystem(new ProgressSystem());
-        engine.addSystem(new TransformationSystem());
-        engine.addSystem(new CameraSystem(displayManager, contextManager));
+    private void initWorld() {
+        WorldConfiguration worldConfig = new WorldConfigurationBuilder()
+                .with(
+                        // logic systems
+                        new AssetSystem(),
+                        new InputSystem(),
+                        new ControllerSystem(),
+                        new MapUpdateSystem(),
+                        new DesignationSystem(),
+                        new WorkSystem(),
+                        new AISystem(0.5f),
+                        new MovementSystem(config.getFPS()),
+                        new CollisionSystem(),
+                        new AnimationSystem(),
+                        new ProgressSystem(),
+                        new TransformationSystem(),
+                        new CameraSystem(),
+                        // rendering systems
+                        new FPVRenderingSystem(displayManager.getFPVDisplay()),
+                        new MapRenderingSystem(displayManager.getMapDisplay()),
+                        new UIRenderingSystem(displayManager.getOverlayDisplay())
+                )
+                .build()
+                .register(inputHandler)
+                .register(tileManager)
+                .register(stateManager)
+                .register(displayManager)
+                .register(collisionManager)
+                .register(contextManager)
+                .register("batch", batch)
+                .register(worldMap);
 
-        // rendering systems
-        engine.addSystem(new FPVRenderingSystem(displayManager.getFPVDisplay(), worldMap));
-        engine.addSystem(new MapRenderingSystem(displayManager.getMapDisplay(), tileManager, stateManager, worldMap, batch), false);
-        engine.addSystem(new UIRenderingSystem(displayManager.getOverlayDisplay(), tileManager, stateManager, batch));
+        world = new World(worldConfig);
     }
 
-    public WorldMap loadWorld() {
+    private WorldMap loadWorldMap() {
         WorldMap map = new WorldMap(config.getWorldWidth(), config.getWorldHeight());
 
         try {
@@ -145,12 +158,10 @@ public class GobsGame extends Game {
         return map;
     }
 
-    public void loadEntities(CollisionManager<Entity> collisionManager, TileFactory tileManager) {
-        Array<Entity> entities = (new EntityFactory(collisionManager, tileManager)).loadEntities("entities.json");
-
-        for (Entity entity : entities) {
-            engine.addEntity(entity);
-        }
+    private void loadEntities() {
+        EntityFactory factory = new EntityFactory(collisionManager, tileManager);
+        world.inject(factory);
+        factory.loadEntities(world, "entities.json");
     }
 
     private void setKeyBindings() {

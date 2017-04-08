@@ -1,9 +1,9 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
 /**
  * Entity should be hidden
  */
-public class Hidden implements Component {
+public class Hidden extends Component {
 }

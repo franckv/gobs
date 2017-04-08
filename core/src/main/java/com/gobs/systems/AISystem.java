@@ -1,10 +1,10 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IntervalIteratingSystem;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
+import com.artemis.systems.IntervalIteratingSystem;
+import com.gobs.StateManager;
 import com.gobs.components.AI;
 import com.gobs.components.Animation;
 
@@ -12,24 +12,23 @@ import com.gobs.components.Animation;
  * Apply a behavior to an AI controlled entity
  */
 public class AISystem extends IntervalIteratingSystem {
-    private ComponentMapper<AI> am = ComponentMapper.getFor(AI.class);
+    private ComponentMapper<AI> am;
+
+    @Wire
+    private StateManager stateManager;
 
     public AISystem(float interval) {
-        this(interval, 0);
-    }
-
-    public AISystem(float interval, int priority) {
-        super(Family.all(AI.class).exclude(Animation.class).get(), interval, priority);
+        super(Aspect.all(AI.class).exclude(Animation.class), interval);
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return stateManager.getState() == StateManager.State.CRAWL && super.checkProcessing();
     }
 
     @Override
-    protected void processEntity(Entity entity) {
-        AI ai = am.get(entity);
+    protected void process(int entityId) {
+        AI ai = am.get(entityId);
         ai.getBehavior().update();
     }
 }

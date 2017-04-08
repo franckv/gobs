@@ -1,18 +1,18 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
 /**
  * Party member
  */
-public class Party implements Component {
+public class Party extends Component {
     int pos;
-
-    public Party(int pos) {
-        this.pos = pos;
-    }
 
     public int getPos() {
         return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
     }
 }

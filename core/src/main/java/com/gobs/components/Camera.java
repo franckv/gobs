@@ -1,23 +1,18 @@
 package com.gobs.components;
 
-import com.badlogic.ashley.core.Component;
+import com.artemis.Component;
 
 /**
  * Set the camera to follow this entity
  */
-public class Camera implements Component {
+public class Camera extends Component {
     public enum Orientation {
         UP, DOWN, LEFT, RIGHT
     };
 
-    Orientation orientation;
+    private Orientation orientation;
     // angle starting from current orientation
-    int angle;
-
-    public Camera(Orientation orientation) {
-        this.orientation = orientation;
-        this.angle = 0;
-    }
+    private int angle;
 
     public Orientation getOrientation() {
         return orientation;
@@ -27,11 +22,11 @@ public class Camera implements Component {
         this.orientation = orientation;
         this.angle = 0;
     }
-    
+
     public void setAngle(int angle) {
         this.angle = angle;
     }
-    
+
     public int getAngle() {
         return angle;
     }

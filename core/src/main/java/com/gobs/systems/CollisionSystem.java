@@ -1,12 +1,11 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.EntitySubscription;
+import com.artemis.annotations.Wire;
+import com.artemis.systems.IteratingSystem;
+import com.artemis.utils.IntBag;
 import com.gobs.components.Animation;
 import com.gobs.components.Collider;
 import com.gobs.components.Position;
@@ -16,59 +15,44 @@ import com.gobs.map.WorldMap;
 import com.gobs.util.CollisionManager;
 
 public class CollisionSystem extends IteratingSystem {
-    private CollisionManager<Entity> collisionManager;
+    private ComponentMapper<Transform> tm;
+    private ComponentMapper<Position> pm;
+    private ComponentMapper<Collider> cm;
+    private ComponentMapper<Animation> am;
+
+    @Wire
+    private CollisionManager<Integer> collisionManager;
+    @Wire
     private WorldMap worldMap;
 
-    private ImmutableArray<Entity> colliders;
+    private EntitySubscription colliders;
 
-    private ComponentMapper<Transform> tm = ComponentMapper.getFor(Transform.class);
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private ComponentMapper<Collider> cm = ComponentMapper.getFor(Collider.class);
-
-    public CollisionSystem(CollisionManager<Entity> collisionManager, WorldMap worldMap) {
-        this(collisionManager, worldMap, 0);
-    }
-
-    public CollisionSystem(CollisionManager<Entity> collisionManager, WorldMap worldMap, int priority) {
-        super(Family.all(Position.class, Transform.class).get(), priority);
-
-        this.collisionManager = collisionManager;
-        this.worldMap = worldMap;
+    public CollisionSystem() {
+        super(Aspect.all(Position.class, Transform.class));
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        colliders = engine.getEntitiesFor(Family.all(Collider.class, Position.class).get());
+    protected void initialize() {
+        this.colliders = getWorld().getAspectSubscriptionManager().get(Aspect.all(Collider.class, Position.class));
     }
 
     @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-        colliders = null;
-    }
-
-    @Override
-    public void update(float deltaTime) {
-
+    protected void begin() {
         collisionManager.reset();
 
-        buildTree();
+        buildTree(colliders.getEntities());
 
         for (LevelCell cell : worldMap.getCurrentLevel()) {
             if (cell != null && cell.isBlockable()) {
                 collisionManager.addBlockable(cell.getX(), cell.getY());
             }
         }
-
-        super.update(deltaTime);
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Position pos = pm.get(entity);
-        Transform trans = tm.get(entity);
+    protected void process(int entityId) {
+        Position pos = pm.get(entityId);
+        Transform trans = tm.get(entityId);
 
         int x = pos.getX();
         int dx = trans.getDX();
@@ -76,29 +60,32 @@ public class CollisionSystem extends IteratingSystem {
         int dy = trans.getDY();
 
         // TODO: trigger scrolling if moving out of screen
-        if (checkBounds(x + dx, y + dy, worldMap.getWorldWidth(), worldMap.getWorldHeight()) || checkColliders(entity, x + dx, y + dy)) {
+        if (checkBounds(x + dx, y + dy, worldMap.getWorldWidth(), worldMap.getWorldHeight()) || checkColliders(entityId, x + dx, y + dy)) {
             trans.setDX(0);
             trans.setDY(0);
             // TODO: check if animation type is translation
             // TODO: add bouncing animation
-            entity.remove(Animation.class);
+            am.remove(entityId);
         }
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
-    private void buildTree() {
-        for (Entity entity : colliders) {
-            Position pos = pm.get(entity);
-            Transform trans = tm.get(entity);
+    private void buildTree(IntBag colliders) {
+        for (int i = 0; i < colliders.size(); i++) {
+            int entityId = colliders.get(i);
+
+            Position pos = pm.get(entityId);
+            Transform trans = tm.get(entityId);
 
             if (trans != null) {
-                collisionManager.addEntity(entity, pos.getX() + trans.getDX(), pos.getY() + trans.getDY());
+                collisionManager.addEntity(entityId, pos.getX() + trans.getDX(), pos.getY() + trans.getDY());
             } else {
-                collisionManager.addEntity(entity, pos.getX(), pos.getY());
+                collisionManager.addEntity(entityId, pos.getX(), pos.getY());
             }
         }
     }
@@ -107,9 +94,9 @@ public class CollisionSystem extends IteratingSystem {
         return x < 0 || y < 0 || x > width - 1 || y > height - 1;
     }
 
-    private boolean checkColliders(Entity entity, int x, int y) {
-        if (cm.get(entity) != null) {
-            return collisionManager.isColliding(entity, x, y);
+    private boolean checkColliders(int entityId, int x, int y) {
+        if (cm.get(entityId) != null) {
+            return collisionManager.isColliding(entityId, x, y);
         }
         return false;
     }

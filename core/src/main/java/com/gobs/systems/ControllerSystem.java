@@ -1,10 +1,9 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.artemis.Aspect;
+import com.artemis.BaseEntitySystem;
+import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
 import com.badlogic.gdx.utils.Array;
 import com.gobs.components.Animation;
 import com.gobs.components.Command;
@@ -12,44 +11,26 @@ import com.gobs.components.Controller;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 
-public class ControllerSystem extends LogicSystem {
-    private ContextManager contextManager;
-    private Family family;
-    private ImmutableArray<Entity> entities;
+public class ControllerSystem extends BaseEntitySystem {
+    private ComponentMapper<Controller> cm;
+    private ComponentMapper<Command> mm;
 
-    private ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
+    @Wire
+    private ContextManager contextManager;
 
     private String consummerID = ControllerSystem.class.getName();
 
-    public ControllerSystem(ContextManager contextManager) {
-        this(contextManager, 0);
+    public ControllerSystem() {
+        super(Aspect.all(Controller.class).exclude(Animation.class));
     }
 
-    public ControllerSystem(ContextManager contextManager, int priority) {
-        this.family = Family.one(Controller.class).exclude(Animation.class).get();
-
-        this.contextManager = contextManager;
-
+    @Override
+    protected void initialize() {
         registerActions();
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-
-        entities = engine.getEntitiesFor(family);
-
-    }
-
-    @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-        entities = null;
-    }
-
-    @Override
-    public void update(float deltaTime) {
+    protected void processSystem() {
         processInputs();
     }
 
@@ -87,12 +68,14 @@ public class ControllerSystem extends LogicSystem {
     }
 
     private boolean setCommand(Command.CommandType type) {
-        Command command = new Command(type);
-        for (Entity entity : entities) {
-            Controller controller = cm.get(entity);
+        for (int i = 0; i < getEntityIds().size(); i++) {
+            int entityId = getEntityIds().get(i);
+
+            Controller controller = cm.get(entityId);
 
             if (controller.isActive()) {
-                entity.add(command);
+                Command command = mm.create(entityId);
+                command.setCommand(type);
                 return true;
             }
         }

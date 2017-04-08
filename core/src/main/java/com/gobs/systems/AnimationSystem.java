@@ -1,10 +1,8 @@
 package com.gobs.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.gobs.GobsEngine;
+import com.artemis.Aspect;
+import com.artemis.ComponentMapper;
+import com.artemis.systems.IteratingSystem;
 import com.gobs.components.Animation;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
@@ -12,32 +10,29 @@ import com.gobs.components.Progress;
 import com.gobs.components.Transform;
 
 public class AnimationSystem extends IteratingSystem {
-    private static ComponentMapper<Animation> am = ComponentMapper.getFor(Animation.class);
-    private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
-    private static ComponentMapper<Transform> tm = ComponentMapper.getFor(Transform.class);
-    private static ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
-    private static ComponentMapper<Progress> sm = ComponentMapper.getFor(Progress.class);
+    private static ComponentMapper<Animation> am;
+    private static ComponentMapper<Position> pm;
+    private static ComponentMapper<Transform> tm;
+    private static ComponentMapper<Camera> cm;
+    private static ComponentMapper<Progress> sm;
 
     public AnimationSystem() {
-        this(0);
-    }
-
-    public AnimationSystem(int priority) {
-        super(Family.all(Animation.class, Position.class, Transform.class, Progress.class).get(), priority);
+        super(Aspect.all(Animation.class, Position.class, Transform.class, Progress.class));
     }
 
     @Override
     public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
+        return super.checkProcessing();
+        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        Animation anim = am.get(entity);
-        Progress progress = sm.get(entity);
-        Position pos = pm.get(entity);
-        Transform trans = tm.get(entity);
-        Camera cam = cm.get(entity);
+    protected void process(int entityId) {
+        Animation anim = am.get(entityId);
+        Progress progress = sm.get(entityId);
+        Position pos = pm.get(entityId);
+        Transform trans = tm.get(entityId);
+        Camera cam = cm.get(entityId);
 
         progress.advance();
         if (!progress.isComplete()) {
@@ -53,8 +48,8 @@ public class AnimationSystem extends IteratingSystem {
                     break;
             }
         } else {
-            entity.remove(Animation.class);
-            entity.remove(Progress.class);
+            am.remove(entityId);
+            sm.remove(entityId);
         }
     }
 }
