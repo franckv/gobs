@@ -3,9 +3,8 @@ package com.gobs.ui;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.ObjectMap;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,15 +44,15 @@ class JsonGUILoader {
 
     private GUI gui;
     private JsonValue root;
-    private Map<String, JsonFragment> fragments;
-    private Map<String, JsonSubstitution> substitutions;
+    private ObjectMap<String, JsonFragment> fragments;
+    private ObjectMap<String, JsonSubstitution> substitutions;
     private int idx;
 
     JsonGUILoader(GUI gui) {
         this.gui = gui;
 
-        fragments = new HashMap<>();
-        substitutions = new HashMap<>();
+        fragments = new ObjectMap<>();
+        substitutions = new ObjectMap<>();
 
         idx = 0;
     }

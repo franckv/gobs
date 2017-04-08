@@ -8,9 +8,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.Config;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,9 +24,9 @@ public class TileFactory implements Disposable {
     private String frameSprite;
     private String frameSelectedSprite;
 
-    private Map<Color, TextureRegion> fullTiles;
-    private Map<Color, TextureRegion> rectTiles;
-    private Map<Color, TextureRegion> transTiles;
+    private ObjectMap<Color, TextureRegion> fullTiles;
+    private ObjectMap<Color, TextureRegion> rectTiles;
+    private ObjectMap<Color, TextureRegion> transTiles;
 
     private static Pattern fileResourcePattern = Pattern.compile("^file:(.*)!(\\d+),(\\d+):(\\d+),(\\d+)$");
     private static Pattern colorResourcePattern = Pattern.compile("^color:(.*)!(\\d+)$");
@@ -36,9 +35,9 @@ public class TileFactory implements Disposable {
         this.assetManager = new AssetManager();
         this.tileSize = config.getTileSize();
 
-        fullTiles = new HashMap<>();
-        rectTiles = new HashMap<>();
-        transTiles = new HashMap<>();
+        fullTiles = new ObjectMap<>();
+        rectTiles = new ObjectMap<>();
+        transTiles = new ObjectMap<>();
 
         Array<Color> colors = new Array<>();
 

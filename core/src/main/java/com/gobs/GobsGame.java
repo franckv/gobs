@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.assets.DungeonFactory;
 import com.gobs.assets.EntityFactory;
 import com.gobs.assets.TileFactory;
@@ -38,15 +39,13 @@ import com.gobs.systems.WorkSystem;
 import com.gobs.ui.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GobsGame extends Game {
     public enum SCREEN {
         WORLD
     }
 
-    private Map<SCREEN, Screen> screens;
+    private ObjectMap<SCREEN, Screen> screens;
     private SCREEN currentScreen;
 
     private Config config;
@@ -76,7 +75,7 @@ public class GobsGame extends Game {
         collisionManager = new CollisionManager<>(config.getWorldWidth(), config.getWorldHeight());
         batch = new SpriteBatch();
 
-        screens = new HashMap<>();
+        screens = new ObjectMap<>();
         screens.put(SCREEN.WORLD, new MainScreen(displayManager, engine, config.getFPS()));
         currentScreen = SCREEN.WORLD;
         super.setScreen(screens.get(currentScreen));

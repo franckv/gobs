@@ -6,7 +6,7 @@ import com.gobs.input.ContextManager.Event;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
 import com.badlogic.gdx.utils.Array;
-import java.util.Map;
+import com.badlogic.gdx.utils.ObjectMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class ContextManagerTest {
     public void testMapInput() {
         manager.mapInput(ContextType.CRAWLING, Input.UP, Action.MOVE_UP);
 
-        Map<Input, Action> inputMapping = manager.inputMappings.get(ContextType.CRAWLING);
+        ObjectMap<Input, Action> inputMapping = manager.inputMappings.get(ContextType.CRAWLING);
 
         Action action = inputMapping.get(Input.UP);
 
@@ -43,7 +43,7 @@ public class ContextManagerTest {
                     triggered = true;
                 });
 
-        Map<Action, Array<ContextManager.ContextHandler>> actionHandlers
+        ObjectMap<Action, Array<ContextManager.ContextHandler>> actionHandlers
                 = manager.handlerMappings.get(ContextType.CRAWLING);
 
         Array<ContextManager.ContextHandler> handlers = actionHandlers.get(Action.MOVE_UP);
@@ -87,14 +87,14 @@ public class ContextManagerTest {
     public void testRegisterConsumer() {
         manager.registerConsumer("test", ContextType.CRAWLING, Action.DUMP);
 
-        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keys().toArray().size);
         Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
 
         Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
 
         manager.registerConsumer("test2", ContextType.CRAWLING, Action.DUMP);
 
-        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keys().toArray().size);
         Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
 
         Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
@@ -102,7 +102,7 @@ public class ContextManagerTest {
 
         manager.registerConsumer("test2", ContextType.CRAWLING, Action.DIG);
 
-        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).keys().toArray().size);
         Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
         Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DIG).size);
 

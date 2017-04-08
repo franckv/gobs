@@ -3,20 +3,19 @@ package com.gobs.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
-import java.util.HashMap;
-import java.util.Map;
 
 public class InputHandler extends InputAdapter {
     InputMap inputMap;
 
-    Map<Integer, Input> codes;
+    ObjectMap<Integer, Input> codes;
 
     public InputHandler(int keyRepeat, int keyDelay) {
         inputMap = new InputMap(keyRepeat, keyDelay);
 
-        codes = new HashMap<>();
+        codes = new ObjectMap<>();
 
         codes.put(Keys.LEFT, Input.LEFT);
         codes.put(Keys.RIGHT, Input.RIGHT);

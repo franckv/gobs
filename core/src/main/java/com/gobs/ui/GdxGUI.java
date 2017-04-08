@@ -8,17 +8,13 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.OrthographicDisplay;
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- *
- */
 public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private Batch batch;
-    private Map<String, BitmapFont> fonts;
+    private ObjectMap<String, BitmapFont> fonts;
     private BitmapFont font;
     private Color color;
     private ShapeRenderer renderer;
@@ -31,7 +27,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
         this.tileManager = tileManager;
         this.batch = batch;
 
-        fonts = new HashMap<>();
+        fonts = new ObjectMap<>();
 
         color = Color.GREEN;
 

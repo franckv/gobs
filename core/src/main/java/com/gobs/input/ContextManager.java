@@ -1,11 +1,10 @@
 package com.gobs.input;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -44,20 +43,20 @@ public class ContextManager {
 
     BitSet activeContexts;
     // map input to actions in a specific context
-    Map<ContextType, Map<Input, Action>> inputMappings;
+    ObjectMap<ContextType, ObjectMap<Input, Action>> inputMappings;
     // callback registration for actions
-    Map<ContextType, Map<Action, Array<ContextHandler>>> handlerMappings;
+    ObjectMap<ContextType, ObjectMap<Action, Array<ContextHandler>>> handlerMappings;
     // poll based consummer registration for actions
-    Map<ContextType, Map<Action, Array<String>>> consummerMappings;
+    ObjectMap<ContextType, ObjectMap<Action, Array<String>>> consummerMappings;
     // list of events available for a specific consummer
-    Map<String, Array<Event>> dispatcher;
+    ObjectMap<String, Array<Event>> dispatcher;
 
     public ContextManager() {
         activeContexts = new BitSet(ContextType.values().length);
-        inputMappings = new HashMap<>();
-        handlerMappings = new HashMap<>();
-        consummerMappings = new HashMap<>();
-        dispatcher = new HashMap<>();
+        inputMappings = new ObjectMap<>();
+        handlerMappings = new ObjectMap<>();
+        consummerMappings = new ObjectMap<>();
+        dispatcher = new ObjectMap<>();
     }
 
     public void activateContext(ContextType context) {
@@ -69,9 +68,9 @@ public class ContextManager {
     }
 
     public void mapInput(ContextType context, Input input, Action action) {
-        Map<Input, Action> inputMapping;
+        ObjectMap<Input, Action> inputMapping;
         if (!inputMappings.containsKey(context)) {
-            inputMapping = new HashMap<>();
+            inputMapping = new ObjectMap<>();
             inputMappings.put(context, inputMapping);
         } else {
             inputMapping = inputMappings.get(context);
@@ -81,9 +80,9 @@ public class ContextManager {
     }
 
     public void registerConsumer(String consummer, ContextType context, Action action) {
-        Map<Action, Array<String>> consummerMapping;
+        ObjectMap<Action, Array<String>> consummerMapping;
         if (!consummerMappings.containsKey(context)) {
-            consummerMapping = new HashMap<>();
+            consummerMapping = new ObjectMap<>();
             consummerMappings.put(context, consummerMapping);
         } else {
             consummerMapping = consummerMappings.get(context);
@@ -100,7 +99,7 @@ public class ContextManager {
 
     public void dispatchInput(InputMap inputmap) {
         for (Input input : inputmap.getPressed()) {
-            for (ContextType context : inputMappings.keySet()) {
+            for (ContextType context : inputMappings.keys()) {
                 if (activeContexts.get(context.ordinal())) {
                     if (inputMappings.get(context).containsKey(input)) {
                         Action action = inputMappings.get(context).get(input);
@@ -124,9 +123,9 @@ public class ContextManager {
     }
 
     public void registerAction(ContextType context, Action action, ContextHandler handler) {
-        Map<Action, Array<ContextHandler>> actionHandlers;
+        ObjectMap<Action, Array<ContextHandler>> actionHandlers;
         if (!handlerMappings.containsKey(context)) {
-            actionHandlers = new HashMap<>();
+            actionHandlers = new ObjectMap<>();
             handlerMappings.put(context, actionHandlers);
         } else {
             actionHandlers = handlerMappings.get(context);
@@ -154,7 +153,7 @@ public class ContextManager {
     }
 
     public boolean acceptInput(Input input) {
-        for (ContextType context : inputMappings.keySet()) {
+        for (ContextType context : inputMappings.keys()) {
             if (activeContexts.get(context.ordinal())) {
                 if (inputMappings.get(context).containsKey(input)) {
                     Action action = inputMappings.get(context).get(input);
