@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.gobs.components.AI;
 import com.gobs.components.Controller;
 import com.gobs.components.Goal;
@@ -16,7 +17,6 @@ import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.InputHandler;
 import com.gobs.ui.GUI;
 import com.gobs.ui.InputMap;
-import java.util.List;
 
 public class InputSystem extends LogicSystem {
     private InputHandler inputHandler;
@@ -73,7 +73,7 @@ public class InputSystem extends LogicSystem {
     }
 
     private void processInputs() {
-        List<ContextManager.Event> events = contextManager.pollActions(consummerID);
+        Array<ContextManager.Event> events = contextManager.pollActions(consummerID);
 
         for (ContextManager.Event event : events) {
             switch (event.getAction()) {

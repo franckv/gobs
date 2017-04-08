@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.assets.DungeonFactory;
 import com.gobs.assets.EntityFactory;
@@ -38,7 +39,6 @@ import com.gobs.ui.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GobsGame extends Game {
@@ -147,7 +147,7 @@ public class GobsGame extends Game {
     }
 
     public void loadEntities(CollisionManager<Entity> collisionManager, TileFactory tileManager) {
-        List<Entity> entities = (new EntityFactory(collisionManager, tileManager)).loadEntities("entities.json");
+        Array<Entity> entities = (new EntityFactory(collisionManager, tileManager)).loadEntities("entities.json");
 
         for (Entity entity : entities) {
             engine.addEntity(entity);

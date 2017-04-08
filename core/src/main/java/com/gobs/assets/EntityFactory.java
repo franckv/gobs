@@ -3,6 +3,7 @@ package com.gobs.assets;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gobs.ai.AIBehavior;
@@ -19,8 +20,6 @@ import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.components.SpriteRef;
 import com.gobs.util.CollisionManager;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EntityFactory {
     private CollisionManager<Entity> collisionManager;
@@ -31,8 +30,8 @@ public class EntityFactory {
         this.tileManager = tileManager;
     }
 
-    public List<Entity> loadEntities(String filename) {
-        List<Entity> entities = new ArrayList<>();
+    public Array<Entity> loadEntities(String filename) {
+        Array<Entity> entities = new Array<>();
 
         JsonReader reader = new JsonReader();
 

@@ -5,13 +5,12 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.gobs.GobsEngine;
+import com.badlogic.gdx.utils.Array;
 import com.gobs.components.Animation;
 import com.gobs.components.Command;
 import com.gobs.components.Controller;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
-import java.util.List;
 
 public class ControllerSystem extends LogicSystem {
     private ContextManager contextManager;
@@ -55,7 +54,7 @@ public class ControllerSystem extends LogicSystem {
     }
 
     private void processInputs() {
-        List<ContextManager.Event> events = contextManager.pollActions(consummerID);
+        Array<ContextManager.Event> events = contextManager.pollActions(consummerID);
 
         for (ContextManager.Event event : events) {
             switch (event.getAction()) {

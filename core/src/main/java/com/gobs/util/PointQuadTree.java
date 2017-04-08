@@ -2,12 +2,11 @@ package com.gobs.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
-import java.util.ArrayList;
-import java.util.List;
+import com.badlogic.gdx.utils.Array;
 
 public class PointQuadTree<E> implements QuadTree<E> {
     int level;
-    List<E> elements;
+    Array<E> elements;
     GridPoint2 coord;
 
     int top, bottom, left, right;
@@ -36,7 +35,7 @@ public class PointQuadTree<E> implements QuadTree<E> {
     public void insert(E e, int x, int y) {
         Gdx.app.debug("PointQuadTree", "insert node " + e + " " + x + ":" + y);
         if (elements == null) {
-            elements = new ArrayList<>();
+            elements = new Array<>();
             elements.add(e);
             coord = new GridPoint2(x, y);
             Gdx.app.debug("PointQuadTree", "inserted level " + level);
@@ -73,8 +72,8 @@ public class PointQuadTree<E> implements QuadTree<E> {
     }
 
     @Override
-    public List<E> find(int x, int y) {
-        List<E> result;
+    public Array<E> find(int x, int y) {
+        Array<E> result;
 
         if (coord == null) {
             return null;
@@ -152,9 +151,9 @@ public class PointQuadTree<E> implements QuadTree<E> {
         ***********************
          */
         if (ne == null) {
-            ne = new PointQuadTree<>(top, coord.y+1, coord.x+1, right, level + 1);
-            nw = new PointQuadTree<>(top, coord.y+1, left, coord.x, level + 1);
-            se = new PointQuadTree<>(coord.y, bottom, coord.x+1, right, level + 1);
+            ne = new PointQuadTree<>(top, coord.y + 1, coord.x + 1, right, level + 1);
+            nw = new PointQuadTree<>(top, coord.y + 1, left, coord.x, level + 1);
+            se = new PointQuadTree<>(coord.y, bottom, coord.x + 1, right, level + 1);
             sw = new PointQuadTree<>(coord.y, bottom, left, coord.x, level + 1);
         }
 

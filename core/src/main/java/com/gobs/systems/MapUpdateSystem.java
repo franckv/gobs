@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Array;
 import com.gobs.GobsEngine;
 import com.gobs.StateManager;
 import com.gobs.components.Controller;
@@ -15,7 +16,6 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.ContextManager.Event;
 import com.gobs.map.WorldMap;
-import java.util.List;
 
 public class MapUpdateSystem extends EntitySystem {
     private ContextManager contextManager;
@@ -71,7 +71,7 @@ public class MapUpdateSystem extends EntitySystem {
     }
 
     private void processInputs() {
-        List<Event> events = contextManager.pollActions(consummerID);
+        Array<Event> events = contextManager.pollActions(consummerID);
 
         for (Event event : events) {
             switch (event.getAction()) {

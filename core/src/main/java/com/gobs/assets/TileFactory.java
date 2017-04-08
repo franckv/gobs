@@ -6,11 +6,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.Config;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +40,7 @@ public class TileFactory implements Disposable {
         rectTiles = new HashMap<>();
         transTiles = new HashMap<>();
 
-        List<Color> colors = new ArrayList<>();
+        Array<Color> colors = new Array<>();
 
         colors.add(Color.DARK_GRAY);
         colors.add(Color.LIGHT_GRAY);
@@ -61,26 +60,26 @@ public class TileFactory implements Disposable {
         frameSelectedSprite = config.getFrameSelectedSprite();
     }
 
-    private void initTiles(List<Color> colors) {
-        pixmap = new Pixmap(colors.size() * tileSize, 3 * tileSize, Pixmap.Format.RGBA8888);
+    private void initTiles(Array<Color> colors) {
+        pixmap = new Pixmap(colors.size * tileSize, 3 * tileSize, Pixmap.Format.RGBA8888);
 
-        for (int i = 0; i < colors.size(); i++) {
+        for (int i = 0; i < colors.size; i++) {
             Color color = colors.get(i);
 
             pixmap.setColor(color);
             pixmap.fillRectangle(i * tileSize, 0, tileSize, tileSize);
             pixmap.drawRectangle(i * tileSize, tileSize, tileSize, tileSize);
             pixmap.setColor(color.a, color.g, color.b, 0.4f);
-            pixmap.fillRectangle(i * tileSize, 2*tileSize, tileSize, tileSize);
+            pixmap.fillRectangle(i * tileSize, 2 * tileSize, tileSize, tileSize);
         }
 
         texture = new Texture(pixmap);
 
-        for (int i = 0; i < colors.size(); i++) {
+        for (int i = 0; i < colors.size; i++) {
             Color color = colors.get(i);
             fullTiles.put(color, new TextureRegion(texture, i * tileSize, 0, tileSize, tileSize));
             rectTiles.put(color, new TextureRegion(texture, i * tileSize, tileSize, tileSize, tileSize));
-            transTiles.put(color, new TextureRegion(texture, i * tileSize, 2*tileSize, tileSize, tileSize));
+            transTiles.put(color, new TextureRegion(texture, i * tileSize, 2 * tileSize, tileSize, tileSize));
         }
     }
 
@@ -107,7 +106,7 @@ public class TileFactory implements Disposable {
             return transTiles.get(Color.DARK_GRAY);
         }
     }
-    
+
     public TextureRegion getFrame() {
         return getTile(frameSprite);
     }

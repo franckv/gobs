@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Array;
 import com.gobs.StateManager;
 import com.gobs.components.Animation;
 import com.gobs.components.Controller;
@@ -15,7 +16,6 @@ import com.gobs.components.Position;
 import com.gobs.components.WorkItem;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.Event;
-import java.util.List;
 
 public class DesignationSystem extends EntitySystem {
     private ContextManager contextManager;
@@ -82,7 +82,7 @@ public class DesignationSystem extends EntitySystem {
     }
 
     private void processInputs() {
-        List<Event> events = contextManager.pollActions(consummerID);
+        Array<Event> events = contextManager.pollActions(consummerID);
 
         for (Event event : events) {
             switch (event.getAction()) {

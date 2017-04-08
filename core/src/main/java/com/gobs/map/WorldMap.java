@@ -1,16 +1,15 @@
 package com.gobs.map;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.badlogic.gdx.utils.Array;
 
 public class WorldMap {
-    List<Level> levels;
+    Array<Level> levels;
     int currentLevel;
     int worldWidth;
     int worldHeight;
 
     public WorldMap(int worldWidth, int worldHeight) {
-        levels = new ArrayList<>();
+        levels = new Array<>();
         currentLevel = 0;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
@@ -32,7 +31,7 @@ public class WorldMap {
     }
 
     public void setCurrentLevel(int level) {
-        currentLevel = Math.min(level, levels.size());
+        currentLevel = Math.min(level, levels.size);
     }
 
     public int getWorldHeight() {

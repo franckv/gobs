@@ -5,17 +5,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.utils.Array;
 import com.gobs.GobsEngine;
 import com.gobs.components.Camera;
 import com.gobs.components.Position;
 import com.gobs.display.DisplayManager;
 import com.gobs.display.PerspectiveDisplay;
 import com.gobs.input.ContextManager;
-import java.util.List;
 
-/**
- *
- */
 public class CameraSystem extends IteratingSystem {
     private ComponentMapper<Camera> cm = ComponentMapper.getFor(Camera.class);
     private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
@@ -54,11 +51,11 @@ public class CameraSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Camera cam = cm.get(entity);
         Position pos = pm.get(entity);
-  
+
         PerspectiveDisplay display = displayManager.getFPVDisplay();
         PerspectiveCamera camera = display.getCamera();
         float step = display.getStepSize();
-        
+
         float x = pos.getX() + pos.getDX();
         float y = pos.getY() + pos.getDY();
         float angle = (float) Math.toRadians(cam.getRotation() + cam.getAngle());
@@ -72,7 +69,7 @@ public class CameraSystem extends IteratingSystem {
     }
 
     private void processInputs() {
-        List<ContextManager.Event> events = contextManager.pollActions(consummerID);
+        Array<ContextManager.Event> events = contextManager.pollActions(consummerID);
 
         for (ContextManager.Event event : events) {
             switch (event.getAction()) {

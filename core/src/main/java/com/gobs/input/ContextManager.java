@@ -1,11 +1,10 @@
 package com.gobs.input;
 
+import com.badlogic.gdx.utils.Array;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,11 +46,11 @@ public class ContextManager {
     // map input to actions in a specific context
     Map<ContextType, Map<Input, Action>> inputMappings;
     // callback registration for actions
-    Map<ContextType, Map<Action, List<ContextHandler>>> handlerMappings;
+    Map<ContextType, Map<Action, Array<ContextHandler>>> handlerMappings;
     // poll based consummer registration for actions
-    Map<ContextType, Map<Action, List<String>>> consummerMappings;
+    Map<ContextType, Map<Action, Array<String>>> consummerMappings;
     // list of events available for a specific consummer
-    Map<String, List<Event>> dispatcher;
+    Map<String, Array<Event>> dispatcher;
 
     public ContextManager() {
         activeContexts = new BitSet(ContextType.values().length);
@@ -82,7 +81,7 @@ public class ContextManager {
     }
 
     public void registerConsumer(String consummer, ContextType context, Action action) {
-        Map<Action, List<String>> consummerMapping;
+        Map<Action, Array<String>> consummerMapping;
         if (!consummerMappings.containsKey(context)) {
             consummerMapping = new HashMap<>();
             consummerMappings.put(context, consummerMapping);
@@ -91,11 +90,11 @@ public class ContextManager {
         }
 
         if (!consummerMapping.containsKey(action)) {
-            consummerMapping.put(action, new ArrayList<>());
+            consummerMapping.put(action, new Array<>());
         }
         consummerMapping.get(action).add(consummer);
         if (!dispatcher.containsKey(consummer)) {
-            dispatcher.put(consummer, new ArrayList<>());
+            dispatcher.put(consummer, new Array<>());
         }
     }
 
@@ -117,15 +116,15 @@ public class ContextManager {
         }
     }
 
-    public List<Event> pollActions(String consummer) {
-        List<Event> result = new ArrayList<>(dispatcher.get(consummer));
+    public Array<Event> pollActions(String consummer) {
+        Array<Event> result = new Array<>(dispatcher.get(consummer));
         dispatcher.get(consummer).clear();
 
         return result;
     }
 
     public void registerAction(ContextType context, Action action, ContextHandler handler) {
-        Map<Action, List<ContextHandler>> actionHandlers;
+        Map<Action, Array<ContextHandler>> actionHandlers;
         if (!handlerMappings.containsKey(context)) {
             actionHandlers = new HashMap<>();
             handlerMappings.put(context, actionHandlers);
@@ -133,9 +132,9 @@ public class ContextManager {
             actionHandlers = handlerMappings.get(context);
         }
 
-        List<ContextHandler> handlers;
+        Array<ContextHandler> handlers;
         if (!actionHandlers.containsKey(action)) {
-            handlers = new ArrayList<>();
+            handlers = new Array<>();
             actionHandlers.put(action, handlers);
         } else {
             handlers = actionHandlers.get(action);

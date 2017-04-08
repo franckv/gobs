@@ -5,7 +5,7 @@ import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.ContextManager.Event;
 import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
-import java.util.List;
+import com.badlogic.gdx.utils.Array;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,15 +43,15 @@ public class ContextManagerTest {
                     triggered = true;
                 });
 
-        Map<Action, List<ContextManager.ContextHandler>> actionHandlers
+        Map<Action, Array<ContextManager.ContextHandler>> actionHandlers
                 = manager.handlerMappings.get(ContextType.CRAWLING);
 
-        List<ContextManager.ContextHandler> handlers = actionHandlers.get(Action.MOVE_UP);
+        Array<ContextManager.ContextHandler> handlers = actionHandlers.get(Action.MOVE_UP);
 
-        Assert.assertEquals(1, handlers.size());
+        Assert.assertEquals(1, handlers.size);
 
         triggered = false;
-        
+
         Event event = new Event(ContextType.CRAWLING, Action.MOVE_UP);
 
         handlers.get(0).triggerAction(event);
@@ -88,14 +88,14 @@ public class ContextManagerTest {
         manager.registerConsumer("test", ContextType.CRAWLING, Action.DUMP);
 
         Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
-        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
 
         Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
 
         manager.registerConsumer("test2", ContextType.CRAWLING, Action.DUMP);
 
         Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
-        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
 
         Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
         Assert.assertEquals("test2", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(1));
@@ -103,8 +103,8 @@ public class ContextManagerTest {
         manager.registerConsumer("test2", ContextType.CRAWLING, Action.DIG);
 
         Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).keySet().size());
-        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size());
-        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DIG).size());
+        Assert.assertEquals(2, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).size);
+        Assert.assertEquals(1, manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DIG).size);
 
         Assert.assertEquals("test", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(0));
         Assert.assertEquals("test2", manager.consummerMappings.get(ContextType.CRAWLING).get(Action.DUMP).get(1));
@@ -124,12 +124,12 @@ public class ContextManagerTest {
         map.set(Input.UP);
         manager.dispatchInput(map);
 
-        Assert.assertEquals(0, manager.dispatcher.get("test").size());
+        Assert.assertEquals(0, manager.dispatcher.get("test").size);
 
         map.set(Input.D);
         manager.dispatchInput(map);
 
-        Assert.assertEquals(1, manager.dispatcher.get("test").size());
+        Assert.assertEquals(1, manager.dispatcher.get("test").size);
 
         manager.pollActions("test");
 
@@ -137,8 +137,8 @@ public class ContextManagerTest {
         map.set(Input.ESCAPE);
         manager.dispatchInput(map);
 
-        Assert.assertEquals(2, manager.dispatcher.get("test").size());
-        Assert.assertEquals(1, manager.dispatcher.get("test2").size());
+        Assert.assertEquals(2, manager.dispatcher.get("test").size);
+        Assert.assertEquals(1, manager.dispatcher.get("test2").size);
 
         manager.pollActions("test");
         manager.pollActions("test2");
@@ -146,9 +146,9 @@ public class ContextManagerTest {
         map.clear(Input.D);
         manager.dispatchInput(map);
 
-        Assert.assertEquals(1, manager.dispatcher.get("test").size());
+        Assert.assertEquals(1, manager.dispatcher.get("test").size);
         Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test").get(0).getAction());
-        Assert.assertEquals(1, manager.dispatcher.get("test2").size());
+        Assert.assertEquals(1, manager.dispatcher.get("test2").size);
         Assert.assertEquals(Action.EXIT, manager.dispatcher.get("test2").get(0).getAction());
     }
 }

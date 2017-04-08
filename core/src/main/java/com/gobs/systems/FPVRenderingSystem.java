@@ -16,13 +16,12 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.GobsEngine;
 import com.gobs.display.PerspectiveDisplay;
 import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FPVRenderingSystem extends EntitySystem implements Disposable {
     private final static float h = 0.1f;
@@ -32,7 +31,7 @@ public class FPVRenderingSystem extends EntitySystem implements Disposable {
     private Environment environment;
     private ModelBatch modelBatch;
     private Model wall, floor;
-    private List<ModelInstance> instances = new ArrayList<>();
+    private Array<ModelInstance> instances = new Array<>();
     private PointLight light;
     private Texture texture;
     private float step;

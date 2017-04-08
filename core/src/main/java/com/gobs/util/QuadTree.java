@@ -1,7 +1,7 @@
 package com.gobs.util;
 
 import com.badlogic.gdx.math.GridPoint2;
-import java.util.List;
+import com.badlogic.gdx.utils.Array;
 
 public interface QuadTree<E> {
     public void insert(E e, int x, int y);
@@ -14,7 +14,7 @@ public interface QuadTree<E> {
 
     public boolean hasChildren();
 
-    public List<E> find(int x, int y);
+    public Array<E> find(int x, int y);
 
     public QuadTree<E> getNE();
 
