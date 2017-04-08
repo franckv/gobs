@@ -4,11 +4,9 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.gobs.GobsEngine;
 import com.gobs.components.AI;
 import com.gobs.components.Controller;
 import com.gobs.components.Goal;
@@ -20,7 +18,7 @@ import com.gobs.ui.GUI;
 import com.gobs.ui.InputMap;
 import java.util.List;
 
-public class InputSystem extends EntitySystem {
+public class InputSystem extends LogicSystem {
     private InputHandler inputHandler;
     private ContextManager contextManager;
 
@@ -72,11 +70,6 @@ public class InputSystem extends EntitySystem {
         }
 
         inputMap.done();
-    }
-
-    @Override
-    public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void processInputs() {

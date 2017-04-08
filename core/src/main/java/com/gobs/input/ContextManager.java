@@ -18,7 +18,7 @@ public class ContextManager {
 
     public enum Action {
         SHOW_MAP, SHOW_INVENTORY, TOGGLE_EDIT, TOGGLE_VIEW,
-        DIG, FILL, TARGET, DESIGNATE,
+        DIG, FILL, TARGET, COMPLETE,
         MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN,
         SCROLL_LEFT, SCROLL_RIGHT, SCROLL_UP, SCROLL_DOWN,
         ZOOM_IN, ZOOM_OUT,

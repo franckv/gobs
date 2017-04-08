@@ -2,21 +2,21 @@ package com.gobs.components;
 
 import com.badlogic.ashley.core.Component;
 
-public class Animation implements Component {
-    public enum AnimationType {
-        TRANSLATE,
-        ROTATE
+public class WorkItem implements Component {
+    public enum WorkType {
+        DIGGING,
+        FILLING
     }
 
-    private AnimationType type;
+    private WorkType type;
     private int duration;
 
-    public Animation(AnimationType type, int duration) {
+    public WorkItem(WorkType type, int duration) {
         this.type = type;
         this.duration = duration;
     }
 
-    public AnimationType getType() {
+    public WorkType getType() {
         return type;
     }
 

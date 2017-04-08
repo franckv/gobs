@@ -3,7 +3,6 @@ package com.gobs.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.gobs.GobsEngine;
@@ -14,7 +13,7 @@ import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import java.util.List;
 
-public class ControllerSystem extends EntitySystem {
+public class ControllerSystem extends LogicSystem {
     private ContextManager contextManager;
     private Family family;
     private ImmutableArray<Entity> entities;
@@ -53,11 +52,6 @@ public class ControllerSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         processInputs();
-    }
-
-    @Override
-    public boolean checkProcessing() {
-        return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void processInputs() {

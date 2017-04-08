@@ -30,8 +30,10 @@ import com.gobs.systems.InputSystem;
 import com.gobs.systems.MapRenderingSystem;
 import com.gobs.systems.MapUpdateSystem;
 import com.gobs.systems.MovementSystem;
+import com.gobs.systems.ProgressSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
+import com.gobs.systems.WorkSystem;
 import com.gobs.ui.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
@@ -113,11 +115,13 @@ public class GobsGame extends Game {
         engine.addSystem(new InputSystem(inputHandler, contextManager));
         engine.addSystem(new ControllerSystem(contextManager));
         engine.addSystem(new MapUpdateSystem(contextManager, stateManager, worldMap));
-        engine.addSystem(new DesignationSystem(contextManager, stateManager, worldMap));
+        engine.addSystem(new DesignationSystem(contextManager, stateManager));
+        engine.addSystem(new WorkSystem(worldMap));
         engine.addSystem(new AISystem(0.5f));
         engine.addSystem(new MovementSystem(config.getFPS()));
         engine.addSystem(new CollisionSystem(collisionManager, worldMap));
         engine.addSystem(new AnimationSystem());
+        engine.addSystem(new ProgressSystem());
         engine.addSystem(new TransformationSystem());
         engine.addSystem(new CameraSystem(displayManager, contextManager));
 
@@ -178,7 +182,7 @@ public class GobsGame extends Game {
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.UP, ContextManager.Action.MOVE_UP);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.DOWN, ContextManager.Action.MOVE_DOWN);
         contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
-        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.ENTER, ContextManager.Action.DESIGNATE);
+        contextManager.mapInput(ContextManager.ContextType.EDITMAP, Input.ENTER, ContextManager.Action.COMPLETE);
 
         contextManager.activateContext(ContextManager.ContextType.CRAWLING);
         contextManager.activateContext(ContextManager.ContextType.GLOBAL);

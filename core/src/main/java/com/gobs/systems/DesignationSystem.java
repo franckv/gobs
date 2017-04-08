@@ -12,16 +12,14 @@ import com.gobs.components.Controller;
 import com.gobs.components.Designation;
 import com.gobs.components.Pending;
 import com.gobs.components.Position;
+import com.gobs.components.WorkItem;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.Event;
-import com.gobs.map.LevelCell;
-import com.gobs.map.WorldMap;
 import java.util.List;
 
 public class DesignationSystem extends EntitySystem {
     private ContextManager contextManager;
     private StateManager stateManager;
-    private WorldMap worldMap;
 
     private Family designationFamily;
     private Family cursorFamily;
@@ -34,11 +32,11 @@ public class DesignationSystem extends EntitySystem {
     private final ComponentMapper<Controller> cm = ComponentMapper.getFor(Controller.class);
     private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
-    public DesignationSystem(ContextManager contextManager, StateManager stateManager, WorldMap worldMap) {
-        this(contextManager, stateManager, worldMap, 0);
+    public DesignationSystem(ContextManager contextManager, StateManager stateManager) {
+        this(contextManager, stateManager, 0);
     }
 
-    public DesignationSystem(ContextManager contextManager, StateManager stateManager, WorldMap worldMap, int priority) {
+    public DesignationSystem(ContextManager contextManager, StateManager stateManager, int priority) {
         super(priority);
 
         this.designationFamily = Family.all(Designation.class, Pending.class).get();
@@ -46,7 +44,6 @@ public class DesignationSystem extends EntitySystem {
 
         this.contextManager = contextManager;
         this.stateManager = stateManager;
-        this.worldMap = worldMap;
 
         registerActions();
     }
@@ -78,23 +75,28 @@ public class DesignationSystem extends EntitySystem {
         processInputs();
     }
 
+    private void registerActions() {
+        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.COMPLETE);
+        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.DIG);
+        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.FILL);
+    }
+
     private void processInputs() {
         List<Event> events = contextManager.pollActions(consummerID);
 
         for (Event event : events) {
             switch (event.getAction()) {
                 case DIG:
-                    digMap();
+                    startDesignation(WorkItem.WorkType.DIGGING);
                     break;
                 case FILL:
-                    fillMap();
+                    startDesignation(WorkItem.WorkType.FILLING);
                     break;
-                case DESIGNATE:
-                    toggleDesignation();
+                case COMPLETE:
+                    completeDesignation();
                     break;
             }
         }
-
     }
 
     private void updateDesignation() {
@@ -109,8 +111,22 @@ public class DesignationSystem extends EntitySystem {
         for (Entity entity : designations) {
             Designation design = dm.get(entity);
 
-            design.setWidth(pos.getX() - design.getX());
-            design.setHeight(pos.getY() - design.getY());
+            int width = pos.getX() - design.getX();
+            int height = pos.getY() - design.getY();
+
+            if (width >= 0) {
+                width += 1;
+            } else {
+                width -= 1;
+            }
+            if (height >= 0) {
+                height += 1;
+            } else {
+                height -= 1;
+            }
+
+            design.setWidth(width);
+            design.setHeight(height);
         }
     }
 
@@ -121,55 +137,49 @@ public class DesignationSystem extends EntitySystem {
         }
     }
 
-    private void toggleDesignation() {
+    private void startDesignation(WorkItem.WorkType type) {
+        // only one designation at a time
         if (designations.size() > 0) {
-            for (Entity entity : designations) {
-                System.out.println("complete");
-                entity.remove(Pending.class);
-            }
-        } else {
-            Entity cursor = getCursor();
-
-            if (cursor != null) {
-                Position pos = pm.get(cursor);
-
-                System.out.println("Start designation at " + pos.getX() + "," + pos.getY());
-
-                Designation design = new Designation(pos.getX(), pos.getY());
-
-                Entity zone = new Entity();
-                zone.add(design);
-                zone.add(new Pending());
-
-                getEngine().addEntity(zone);
-            }
+            return;
         }
-    }
 
-    private void digMap() {
         Entity cursor = getCursor();
 
         if (cursor != null) {
             Position pos = pm.get(cursor);
-            System.out.println("Dig at " + pos.getX() + "," + pos.getY());
-            worldMap.getCurrentLevel().setCell(pos.getX(), pos.getY(), LevelCell.LevelCellType.FLOOR);
+
+            Entity zone = new Entity();
+            zone.add(new Designation(pos.getX(), pos.getY()));
+            zone.add(new WorkItem(type, 10));
+            zone.add(new Pending());
+            getEngine().addEntity(zone);
         }
     }
 
-    private void fillMap() {
-        Entity cursor = getCursor();
+    private void completeDesignation() {
+        for (Entity entity : designations) {
+            System.out.println("complete");
+            Designation design = dm.get(entity);
+            normalize(design);
 
-        if (cursor != null) {
-            Position pos = pm.get(cursor);
-            System.out.println("Fill " + pos.getX() + "," + pos.getY());
-            worldMap.getCurrentLevel().setCell(pos.getX(), pos.getY(), LevelCell.LevelCellType.WALL);
+            entity.remove(Pending.class);
         }
     }
 
-    private void registerActions() {
-        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.DESIGNATE);
-        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.DIG);
-        contextManager.registerConsumer(consummerID, ContextManager.ContextType.EDITMAP, ContextManager.Action.FILL);
+    private void normalize(Designation designation) {
+        int x = designation.getX();
+        int y = designation.getY();
+        int width = designation.getWidth();
+        int height = designation.getHeight();
+
+        x = Math.min(x, x + width + 1);
+        y = Math.min(y, y + height + 1);
+        width = Math.abs(width);
+        height = Math.abs(height);
+
+        designation.setPosition(x, y);
+        designation.setDimension(width, height);
+
     }
 
     private Entity getCursor() {

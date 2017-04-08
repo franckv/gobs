@@ -110,10 +110,10 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
             int width = design.getWidth();
             int height = design.getHeight();
 
-            x = Math.min(x, x + width);
-            y = Math.min(y, y + height);
-            width = Math.abs(width) + 1;
-            height = Math.abs(height) + 1;
+            x = Math.min(x, x + width + 1);
+            y = Math.min(y, y + height + 1);
+            width = Math.abs(width);
+            height = Math.abs(height);
 
             batch.draw(designationTexture, x, y, width, height);
         }

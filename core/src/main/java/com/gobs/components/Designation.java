@@ -43,4 +43,14 @@ public class Designation implements Component {
         this.width += dx;
         this.height += dy;
     }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setDimension(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
 }
