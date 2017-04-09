@@ -16,11 +16,19 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
     private double accumulator = 0.0;
     private float logicalStep;
 
-    public MainLoopStrategy(float logicalStep) {
+    boolean perfMonitoring;
+    Bag<Long> perfMonitor;
+    long currentTime;
+
+    public MainLoopStrategy(float logicalStep, boolean perfMonitoring) {
         logicalSystems = new Bag<>(BaseSystem.class);
         renderingSystems = new Bag<>(BaseSystem.class);
 
         this.logicalStep = logicalStep;
+
+        this.perfMonitoring = perfMonitoring;
+        perfMonitor = new Bag<>(Long.class);
+        currentTime = 0;
     }
 
     @Override
@@ -49,6 +57,13 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
         processRendering();
 
         updateEntityStates();
+
+        if (perfMonitoring) {
+            System.out.println("#### Perf monitor ####");
+            for (int i = 0; i < perfMonitor.size(); i++) {
+                System.out.println(logicalSystems.get(i).getClass() + ": " + perfMonitor.get(i) / 1000);
+            }
+        }
     }
 
     @Override
@@ -98,7 +113,16 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
             }
 
             updateEntityStates();
+
+            if (perfMonitoring) {
+                currentTime = System.nanoTime();
+            }
+
             logicalSystems.get(i).process();
+
+            if (perfMonitoring) {
+                perfMonitor.set(i, System.nanoTime() - currentTime);
+            }
         }
     }
 

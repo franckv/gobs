@@ -112,7 +112,7 @@ public class GobsGame extends Game {
 
     private void initWorld() {
         float logicalStep = 1.0f / config.getFPS();
-        
+
         WorldConfiguration worldConfig = new WorldConfigurationBuilder()
                 .with(
                         new WorldSerializationManager(),
@@ -135,7 +135,7 @@ public class GobsGame extends Game {
                         new MapRenderingSystem(displayManager.getMapDisplay()),
                         new UIRenderingSystem(displayManager.getOverlayDisplay())
                 )
-                .register(new MainLoopStrategy(logicalStep))
+                .register(new MainLoopStrategy(logicalStep, true))
                 .build()
                 .register(inputHandler)
                 .register(tileManager)
