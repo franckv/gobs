@@ -4,8 +4,12 @@ import com.artemis.Aspect;
 import com.artemis.BaseEntitySystem;
 import com.artemis.Component;
 import com.artemis.ComponentMapper;
+import com.artemis.EntitySubscription;
 import com.artemis.annotations.Wire;
+import com.artemis.io.SaveFileFormat;
+import com.artemis.managers.WorldSerializationManager;
 import com.artemis.utils.Bag;
+import com.artemis.utils.IntBag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.gobs.components.AI;
@@ -17,6 +21,10 @@ import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.InputHandler;
 import com.gobs.ui.GUI;
 import com.gobs.ui.InputMap;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class InputSystem extends BaseEntitySystem {
     private ComponentMapper<Position> pm;
@@ -29,6 +37,8 @@ public class InputSystem extends BaseEntitySystem {
     @Wire
     private ContextManager contextManager;
 
+    private EntitySubscription allEntities;
+
     private final static String consummerID = InputSystem.class.getName();
 
     public InputSystem() {
@@ -37,6 +47,8 @@ public class InputSystem extends BaseEntitySystem {
 
     @Override
     protected void initialize() {
+        this.allEntities = getWorld().getAspectSubscriptionManager().get(Aspect.all());
+
         registerActions();
     }
 
@@ -79,8 +91,20 @@ public class InputSystem extends BaseEntitySystem {
     }
 
     private void dumpEntities() {
-        for (int i = 0; i < getEntityIds().size(); i++) {
-            int entityId = getEntityIds().get(i);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        WorldSerializationManager serializer = getWorld().getSystem(WorldSerializationManager.class);
+        IntBag ent = new IntBag();
+        ent.add(0);
+        ent.add(1);
+        ent.add(2);
+        ent.add(3);
+        ent.add(4);
+        ent.add(5);
+        ent.add(6);
+        serializer.save(baos, new SaveFileFormat(ent));
+
+        for (int i = 0; i < allEntities.getEntities().size(); i++) {
+            int entityId = allEntities.getEntities().get(i);
 
             System.out.println("=== Entity #" + i + " ===");
 
@@ -91,6 +115,13 @@ public class InputSystem extends BaseEntitySystem {
                 System.out.println(" * " + component.getClass().getSimpleName());
             }
         }
+
+        try {
+            System.out.println(baos.toString("utf8"));
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(InputSystem.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private void setTarget() {

@@ -4,6 +4,8 @@ import com.artemis.BaseSystem;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
 import com.artemis.WorldConfigurationBuilder;
+import com.artemis.io.JsonArtemisSerializer;
+import com.artemis.managers.WorldSerializationManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -81,7 +83,7 @@ public class GobsGame extends Game {
         initWorld();
 
         screens = new ObjectMap<>();
-        screens.put(SCREEN.WORLD, new MainScreen(displayManager, world, config.getFPS()));
+        screens.put(SCREEN.WORLD, new MainScreen(displayManager, world));
         currentScreen = SCREEN.WORLD;
         super.setScreen(screens.get(currentScreen));
 
@@ -109,8 +111,11 @@ public class GobsGame extends Game {
     }
 
     private void initWorld() {
+        float logicalStep = 1.0f / config.getFPS();
+        
         WorldConfiguration worldConfig = new WorldConfigurationBuilder()
                 .with(
+                        new WorldSerializationManager(),
                         // logic systems
                         new AssetSystem(),
                         new InputSystem(),
@@ -130,6 +135,7 @@ public class GobsGame extends Game {
                         new MapRenderingSystem(displayManager.getMapDisplay()),
                         new UIRenderingSystem(displayManager.getOverlayDisplay())
                 )
+                .register(new MainLoopStrategy(logicalStep))
                 .build()
                 .register(inputHandler)
                 .register(tileManager)
@@ -141,6 +147,8 @@ public class GobsGame extends Game {
                 .register(worldMap);
 
         world = new World(worldConfig);
+
+        world.getSystem(WorldSerializationManager.class).setSerializer(new JsonArtemisSerializer(world).prettyPrint(true));
     }
 
     private WorldMap loadWorldMap() {

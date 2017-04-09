@@ -21,12 +21,6 @@ public class AnimationSystem extends IteratingSystem {
     }
 
     @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
-    @Override
     protected void process(int entityId) {
         Animation anim = am.get(entityId);
         Progress progress = sm.get(entityId);

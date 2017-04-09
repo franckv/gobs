@@ -56,6 +56,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
         compile "net.onedaybeard.artemis:artemis-odb:2.1.0"
         compile "net.onedaybeard.artemis:artemis-odb:2.1.0:sources"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer:2.1.0"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer:2.1.0:sources"
         compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:2.1.0"
         compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:2.1.0:sources"
         testCompile "junit:junit:$junitVersion"

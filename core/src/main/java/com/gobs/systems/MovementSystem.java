@@ -102,10 +102,4 @@ public class MovementSystem extends IteratingSystem {
 
         cm.remove(entityId);
     }
-
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
 }

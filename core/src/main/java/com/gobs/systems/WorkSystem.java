@@ -25,12 +25,6 @@ public class WorkSystem extends BaseEntitySystem {
     }
 
     @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
-    @Override
     protected void processSystem() {
         for (int i = 0; i < getEntityIds().size(); i++) {
             int entityId = getEntityIds().get(i);

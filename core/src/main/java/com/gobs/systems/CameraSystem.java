@@ -38,12 +38,6 @@ public class CameraSystem extends IteratingSystem {
     }
 
     @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
-    @Override
     protected void process(int entityId) {
         Camera cam = cm.get(entityId);
         Position pos = pm.get(entityId);

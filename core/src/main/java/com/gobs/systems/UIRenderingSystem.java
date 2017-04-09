@@ -25,7 +25,7 @@ import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GdxGUI;
 
-public class UIRenderingSystem extends BaseSystem implements Disposable {
+public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
     private ComponentMapper<Controller> cm;
     private ComponentMapper<Name> nm;
@@ -100,12 +100,6 @@ public class UIRenderingSystem extends BaseSystem implements Disposable {
         batch.end();
 
         //gui.showCenters();
-    }
-
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void updateStatus() {

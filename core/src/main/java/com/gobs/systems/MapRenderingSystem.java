@@ -22,7 +22,7 @@ import com.gobs.display.MapDisplay;
 import com.gobs.map.TiledMapView;
 import com.gobs.map.WorldMap;
 
-public class MapRenderingSystem extends IteratingSystem implements Disposable {
+public class MapRenderingSystem extends IteratingSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
     private ComponentMapper<Sprite> sm;
     private ComponentMapper<Designation> dm;
@@ -119,7 +119,6 @@ public class MapRenderingSystem extends IteratingSystem implements Disposable {
     @Override
     public boolean checkProcessing() {
         return stateManager.getState() != StateManager.State.CRAWL && super.checkProcessing();
-        //return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     @Override

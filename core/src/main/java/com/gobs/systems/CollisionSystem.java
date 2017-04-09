@@ -69,12 +69,6 @@ public class CollisionSystem extends IteratingSystem {
         }
     }
 
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
     private void buildTree(IntBag colliders) {
         for (int i = 0; i < colliders.size(); i++) {
             int entityId = colliders.get(i);

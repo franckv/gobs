@@ -42,12 +42,6 @@ public class MapUpdateSystem extends BaseEntitySystem {
         processInputs();
     }
 
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
     private void processInputs() {
         Array<Event> events = contextManager.pollActions(consummerID);
 

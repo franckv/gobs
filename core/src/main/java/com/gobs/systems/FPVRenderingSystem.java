@@ -23,7 +23,7 @@ import com.gobs.display.PerspectiveDisplay;
 import com.gobs.map.LevelCell;
 import com.gobs.map.WorldMap;
 
-public class FPVRenderingSystem extends BaseSystem implements Disposable {
+public class FPVRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private final static float h = 0.1f;
 
     @Wire
@@ -108,12 +108,6 @@ public class FPVRenderingSystem extends BaseSystem implements Disposable {
         modelBatch.render(instances, environment);
 
         modelBatch.end();
-    }
-
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return ((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
     }
 
     private void clearScreen() {

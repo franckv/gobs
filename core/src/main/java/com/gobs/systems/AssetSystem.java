@@ -20,12 +20,6 @@ public class AssetSystem extends IteratingSystem {
     }
 
     @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
-
-    @Override
     protected void process(int entityId) {
         SpriteRef spriteRef = rm.get(entityId);
 

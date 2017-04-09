@@ -31,10 +31,4 @@ public class TransformationSystem extends IteratingSystem {
 
         tm.remove(entityId);
     }
-
-    @Override
-    public boolean checkProcessing() {
-        return super.checkProcessing();
-        //return !((GobsEngine) getEngine()).isRendering() && super.checkProcessing();
-    }
 }
