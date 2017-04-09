@@ -47,18 +47,20 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
     protected void process() {
         accumulator += world.getDelta();
 
-        // first pass: update logic in fixed time steps (catchup if frames are skipped)
+        boolean logicalUpdate = false;
+
         while (accumulator >= logicalStep) {
             accumulator -= logicalStep;
             world.setDelta(logicalStep);
             processLogical();
+            logicalUpdate = true;
         }
 
         processRendering();
 
         updateEntityStates();
 
-        if (perfMonitoring) {
+        if (perfMonitoring && logicalUpdate) {
             System.out.println("#### Perf monitor ####");
             for (int i = 0; i < perfMonitor.size(); i++) {
                 System.out.println(logicalSystems.get(i).getClass() + ": " + perfMonitor.get(i) / 1000);

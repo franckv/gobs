@@ -27,8 +27,12 @@ public class CollisionSystem extends IteratingSystem {
 
     private EntitySubscription colliders;
 
+    private boolean init;
+
     public CollisionSystem() {
         super(Aspect.all(Position.class, Transform.class));
+
+        init = true;
     }
 
     @Override
@@ -38,14 +42,17 @@ public class CollisionSystem extends IteratingSystem {
 
     @Override
     protected void begin() {
-        collisionManager.reset();
-
+        collisionManager.resetEntities();
         buildTree(colliders.getEntities());
 
-        for (LevelCell cell : worldMap.getCurrentLevel()) {
-            if (cell != null && cell.isBlockable()) {
-                collisionManager.addBlockable(cell.getX(), cell.getY());
+        if (init || worldMap.getCurrentLevel().isDirty()) {
+            collisionManager.resetBlockable();
+            for (LevelCell cell : worldMap.getCurrentLevel()) {
+                if (cell != null && cell.isBlockable()) {
+                    collisionManager.addBlockable(cell.getX(), cell.getY());
+                }
             }
+            init = false;
         }
     }
 

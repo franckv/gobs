@@ -1,6 +1,5 @@
 package com.gobs.util;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
 
@@ -33,18 +32,14 @@ public class PointQuadTree<E> implements QuadTree<E> {
 
     @Override
     public void insert(E e, int x, int y) {
-        Gdx.app.debug("PointQuadTree", "insert node " + e + " " + x + ":" + y);
         if (elements == null) {
             elements = new Array<>();
             elements.add(e);
             coord = new GridPoint2(x, y);
-            Gdx.app.debug("PointQuadTree", "inserted level " + level);
         } else if (coord.x == x && coord.y == y) {
-            //Gdx.app.debug("PointQuadTree", "duplicate node");
             elements.add(e);
         } else {
             int idx = getIndex(x, y);
-            Gdx.app.debug("PointQuadTree", "insert child " + idx);
             getChild(idx).insert(e, x, y);
         }
     }

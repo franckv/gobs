@@ -5,10 +5,12 @@ import com.gobs.pathfinding.Graph;
 
 public class CollisionManager<T> {
     private Graph<T> graph;
-    private QuadTree<T> tree;
+    private QuadTree<T> entityTree;
+    private QuadTree<T> blockableTree;
 
     public CollisionManager(int width, int height) {
-        tree = new PointQuadTree<>(height - 1, 0, 0, width - 1);
+        entityTree = new PointQuadTree<>(height - 1, 0, 0, width - 1);
+        blockableTree = new PointQuadTree<>(height - 1, 0, 0, width - 1);
 
         graph = new Graph<>(this, width, height, false);
     }
@@ -17,31 +19,35 @@ public class CollisionManager<T> {
         return graph;
     }
 
-    public QuadTree<T> getTree() {
-        return tree;
+    public void resetEntities() {
+        entityTree.reset();
     }
 
-    public void reset() {
-        tree.reset();
+    public void resetBlockable() {
+        blockableTree.reset();
     }
 
     public void addEntity(T e, int x, int y) {
-        tree.insert(e, x, y);
+        entityTree.insert(e, x, y);
     }
 
     public void addBlockable(int x, int y) {
-        tree.insert(null, x, y);
+        blockableTree.insert(null, x, y);
     }
 
     public boolean isColliding(T e, int x, int y) {
-        Array<T> result = tree.find(x, y);
+        Array<T> resultEntities = entityTree.find(x, y);
+        Array<T> resultBlockables = blockableTree.find(x, y);
 
-        return result != null && (result.size > 1 || result.get(0) != e);
+        return (resultEntities != null && (resultEntities.size > 1 || resultEntities.get(0) != e))
+                || (resultBlockables != null && (resultBlockables.size > 1 || resultBlockables.get(0) != e));
     }
 
     public boolean isBlocked(int x, int y) {
-        Array<T> result = tree.find(x, y);
+        Array<T> resultEntities = entityTree.find(x, y);
+        Array<T> resultBlockables = blockableTree.find(x, y);
 
-        return result != null && result.size > 0;
+        return (resultEntities != null && resultEntities.size > 0)
+                || (resultBlockables != null && resultBlockables.size > 0);
     }
 }
