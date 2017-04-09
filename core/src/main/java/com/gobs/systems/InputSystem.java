@@ -9,7 +9,6 @@ import com.artemis.annotations.Wire;
 import com.artemis.io.SaveFileFormat;
 import com.artemis.managers.WorldSerializationManager;
 import com.artemis.utils.Bag;
-import com.artemis.utils.IntBag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.gobs.components.AI;
@@ -93,15 +92,7 @@ public class InputSystem extends BaseEntitySystem {
     private void dumpEntities() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         WorldSerializationManager serializer = getWorld().getSystem(WorldSerializationManager.class);
-        IntBag ent = new IntBag();
-        ent.add(0);
-        ent.add(1);
-        ent.add(2);
-        ent.add(3);
-        ent.add(4);
-        ent.add(5);
-        ent.add(6);
-        serializer.save(baos, new SaveFileFormat(ent));
+        serializer.save(baos, new SaveFileFormat(allEntities));
 
         for (int i = 0; i < allEntities.getEntities().size(); i++) {
             int entityId = allEntities.getEntities().get(i);

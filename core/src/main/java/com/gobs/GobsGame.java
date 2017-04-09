@@ -5,6 +5,7 @@ import com.artemis.World;
 import com.artemis.WorldConfiguration;
 import com.artemis.WorldConfigurationBuilder;
 import com.artemis.io.JsonArtemisSerializer;
+import com.artemis.io.SaveFileFormat;
 import com.artemis.managers.WorldSerializationManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -15,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.assets.DungeonFactory;
-import com.gobs.assets.EntityFactory;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.DisplayManager;
 import com.gobs.input.ContextManager;
@@ -23,6 +23,7 @@ import com.gobs.input.InputHandler;
 import com.gobs.map.Level;
 import com.gobs.map.WorldMap;
 import com.gobs.screens.MainScreen;
+import com.gobs.systems.AILoaderSystem;
 import com.gobs.systems.AISystem;
 import com.gobs.systems.AnimationSystem;
 import com.gobs.systems.AssetSystem;
@@ -42,6 +43,7 @@ import com.gobs.systems.WorkSystem;
 import com.gobs.ui.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class GobsGame extends Game {
     public enum SCREEN {
@@ -118,6 +120,7 @@ public class GobsGame extends Game {
                         new WorldSerializationManager(),
                         // logic systems
                         new AssetSystem(),
+                        new AILoaderSystem(),
                         new InputSystem(),
                         new ControllerSystem(),
                         new MapUpdateSystem(),
@@ -167,9 +170,9 @@ public class GobsGame extends Game {
     }
 
     private void loadEntities() {
-        EntityFactory factory = new EntityFactory(collisionManager, tileManager);
-        world.inject(factory);
-        factory.loadEntities(world, "entities.json");
+        InputStream is = Gdx.files.internal("entities.json").read();
+
+        world.getSystem(WorldSerializationManager.class).load(is, SaveFileFormat.class);
     }
 
     private void setKeyBindings() {

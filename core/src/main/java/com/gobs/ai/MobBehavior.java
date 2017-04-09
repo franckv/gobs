@@ -1,6 +1,7 @@
 package com.gobs.ai;
 
 import com.artemis.ComponentMapper;
+import com.artemis.annotations.Wire;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.pfa.Connection;
@@ -25,18 +26,18 @@ public class MobBehavior implements AIBehavior {
     private static ComponentMapper<Command> cm;
     private static ComponentMapper<Goal> gm;
 
-    private int entity;
+    private int entityId;
+    @Wire
     private CollisionManager<Integer> collisionManager;
 
     private static Random rnd = new Random();
-    
+
     StateMachine<MobBehavior, MobState> stateMachine;
 
-    public MobBehavior(CollisionManager<Integer> collisionManager, int entity) {
+    public MobBehavior(int entityId) {
         this.stateMachine = new DefaultStateMachine<>(this, MobState.WAITING);
-        this.collisionManager = collisionManager;
 
-        this.entity = entity;
+        this.entityId = entityId;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class MobBehavior implements AIBehavior {
     }
 
     void isWaiting() {
-        Goal goal = gm.get(entity);
+        Goal goal = gm.get(entityId);
 
         if (goal == null) {
             int p = rnd.nextInt(10);
@@ -74,8 +75,8 @@ public class MobBehavior implements AIBehavior {
     }
 
     private void doChase() {
-        Goal goal = gm.get(entity);
-        Position pos = pm.get(entity);
+        Goal goal = gm.get(entityId);
+        Position pos = pm.get(entityId);
 
         boolean giveup = true;
 
@@ -103,7 +104,7 @@ public class MobBehavior implements AIBehavior {
                     }
 
                     if (commandType != null) {
-                        Command cmd = cm.create(entity);
+                        Command cmd = cm.create(entityId);
                         cmd.setCommand(commandType);
                     }
                 }
@@ -111,7 +112,7 @@ public class MobBehavior implements AIBehavior {
         }
 
         if (giveup) {
-            gm.remove(entity);
+            gm.remove(entityId);
             System.out.println("Give up chase");
             stateMachine.changeState(MobState.WAITING);
         }
@@ -139,7 +140,7 @@ public class MobBehavior implements AIBehavior {
         }
 
         if (commandType != null) {
-            Command cmd = cm.create(entity);
+            Command cmd = cm.create(entityId);
             cmd.setCommand(commandType);
         }
     }

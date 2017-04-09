@@ -28,7 +28,6 @@ import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GdxGUI;
-import java.util.Arrays;
 
 public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
@@ -93,7 +92,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
         if (stateManager.getState() == State.CRAWL) {
             updateCharactersStats();
-            gui.enableFragment("characters", true);
+            gui.enableFragment("characters", false);
         } else {
             gui.enableFragment("characters", false);
         }

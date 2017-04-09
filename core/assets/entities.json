@@ -1,262 +1,227 @@
-[
-    {
-        "entity": "sword",
-        "components": [
-            {
-                "type": "item",
-                "name": "Short sword"
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!0,5:34,34"
-            }
-        ]
+{
+    "metadata": {
+        "version": 1
     },
-    {
-        "entity": "party",
-        "components": [
-            {
-                "type": "name",
-                "name": "Party"
-            },
-            {
-                "type": "position",
-                "x": 21,
-                "y": 10
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!0,26:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "controller",
-                "active": true
-            }, 
-            {
-                "type": "camera"
-            },
-            {
-                "type": "inventory",
-                "size": 10,
-                "items": []
-            }
-        ]
-    }, {
-        "entity": "player1",
-        "components": [
-            {
-                "type": "name",
-                "name": "Arthur"
-            },
-            {
-                "type": "party",
-                "pos": 1
-            },
-            {
-                "type": "hp",
-                "hp": 7777,
-                "maxHP": 9999
-            },
-            {
-                "type": "mp",
-                "mp": 0,
-                "maxMP": 0
-            }
-        ]
-    }, {
-        "entity": "player2",
-        "components": [
-            {
-                "type": "name",
-                "name": "Zeni"
-            },
-            {
-                "type": "party",
-                "pos": 2
-            },
-            {
-                "type": "hp",
-                "hp": 1,
-                "maxHP": 9999
-            },
-            {
-                "type": "mp",
-                "mp": 777,
-                "maxMP": 999
-            }
-        ]
-    }, {
-        "entity": "player3",
-        "components": [
-            {
-                "type": "name",
-                "name": "Moka"
-            },
-            {
-                "type": "party",
-                "pos": 3
-            },
-            {
-                "type": "hp",
-                "hp": 9999,
-                "maxHP": 9999
-            },
-            {
-                "type": "mp",
-                "mp": 77,
-                "maxMP": 99
-            }
-        ]
-    },   
-    {
-        "entity": "cursor",
-        "disabled": false,
-        "components": [
-            {
-                "type": "position",
-                "x": 21,
-                "y": 12
-            },
-            {
-                "type": "sprite",
-                "res": "color:YELLOW!0"
-            },
-            {
-                "type": "controller",
-                "active": false
-            }, 
-            {
-                "type": "hidden"
-            }
-        ]
+    "componentIdentifiers": {
+        "com.gobs.components.Collider": "Collider",
+        "com.gobs.components.Camera": "Camera",
+        "com.gobs.components.MP": "MP",
+        "com.gobs.components.Party": "Party",
+        "com.gobs.components.Name": "Name",
+        "com.gobs.components.HP": "HP",
+        "com.gobs.components.Position": "Position",
+        "com.gobs.components.Hidden": "Hidden",
+        "com.gobs.components.Controller": "Controller",
+        "com.gobs.components.SpriteRef": "SpriteRef",
+        "com.gobs.components.AIRef": "AIRef"
     },
-    {
-        "entity": "mob1",
-        "components": [
-            {
-                "type": "position",
-                "x": 5,
-                "y": 4
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
+    "entities": {
+        "0": {
+            "archetype": 1,
+            "components": {
+                "Camera": {
+                    "orientation": "UP"
+                },
+                "Controller": {
+                    "active": true
+                },
+                "Name": {
+                    "name": "Party"
+                },
+                "Position": {
+                    "x": 21,
+                    "y": 10
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!0,26:34,34"
+                }
             }
-        ]
+        },
+        "1": {
+            "archetype": 2,
+            "components": {
+                "Position": {
+                    "x": 21,
+                    "y": 12
+                },
+                "Controller": {
+                    "active": false
+                },
+                "SpriteRef": {
+                    "path": "color:YELLOW!0"
+                }
+            }
+        },
+        "2": {
+            "archetype": 4,
+            "components": {
+                "HP": {
+                    "hp": 7777,
+                    "maxHP": 9999
+                },
+                "Name": {
+                    "name": "Arthur"
+                },
+                "Party": {
+                    "pos": 1
+                }
+            }
+        },
+        "3": {
+            "archetype": 4,
+            "components": {
+                "HP": {
+                    "hp": 1,
+                    "maxHP": 9999
+                },
+                "MP": {
+                    "mp": 777,
+                    "maxMP": 999
+                },
+                "Name": {
+                    "name": "Zeni"
+                },
+                "Party": {
+                    "pos": 2
+                }
+            }
+        },
+        "4": {
+            "archetype": 4,
+            "components": {
+                "HP": {
+                    "hp": 9999,
+                    "maxHP": 9999
+                },
+                "MP": {
+                    "mp": 77,
+                    "maxMP": 99
+                },
+                "Name": {
+                    "name": "Moka"
+                },
+                "Party": {
+                    "pos": 3
+                }
+            }
+        },
+        "5": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 5,
+                    "y": 4
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        },
+        "6": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 22,
+                    "y": 28
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        },
+        "7": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 29,
+                    "y": 16
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        },
+        "8": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 22,
+                    "y": 3
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        },
+        "9": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 15,
+                    "y": 6
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        },
+        "10": {
+            "archetype": 3,
+            "components": {
+                "Position": {
+                    "x": 1,
+                    "y": 10
+                },
+                "AIRef": {
+                    "behavior": "MobBehavior"
+                },
+                "SpriteRef": {
+                    "path": "file:sprites/tileset.png!4,24:34,34"
+                }
+            }
+        }
     },
-    {
-        "entity": "mob2",
-        "components": [
-            {
-                "type": "position",
-                "x": 22,
-                "y": 28
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
-            }
-        ]
-    },
-    {
-        "entity": "mob3",
-        "components": [
-            {
-                "type": "position",
-                "x": 29,
-                "y": 16
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
-            }
-        ]
-    },
-    {
-        "entity": "mob4",
-        "components": [
-            {
-                "type": "position",
-                "x": 22,
-                "y": 3
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
-            }
-        ]
-    },
-    {
-        "entity": "mob5",
-        "components": [
-            {
-                "type": "position",
-                "x": 15,
-                "y": 6
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
-            }
-        ]
-    },
-    {
-        "entity": "mob6",
-        "components": [
-            {
-                "type": "position",
-                "x": 1,
-                "y": 10
-            },
-            {
-                "type": "sprite",
-                "res": "file:sprites/tileset.png!4,24:34,34"
-            },
-            {
-                "type": "collider"
-            },
-            {
-                "type": "ai",
-                "behavior": "mob"
-            }
+    "archetypes": {
+        "1": [
+            "SpriteRef",
+            "Controller",
+            "Position",
+            "Camera",
+            "Collider",
+            "Name"
+        ],
+        "2": [
+            "SpriteRef",
+            "Controller",
+            "Position",
+            "Hidden"
+        ],
+        "3": [
+            "SpriteRef",
+            "AIRef",
+            "Position",
+            "Collider"
+        ],
+        "4": [
+            "Name",
+            "Party",
+            "HP",
+            "MP"
         ]
     }
-]
+}
