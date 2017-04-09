@@ -7,6 +7,7 @@ import java.util.Properties;
 public class Config {
     private Properties props;
     private int fps;
+    private boolean perfMonitor;
     private boolean logging;
     private int tileSize;
     private int worldWidth, worldHeight;
@@ -29,6 +30,7 @@ public class Config {
         }
 
         logging = props.getProperty("logging").equals("true");
+        perfMonitor = props.getProperty("perfMonitor", "false").equals("true");
         fps = getInt("fps", 60);
         tileSize = getInt("tilesize", 16);
         worldWidth = getInt("worldWidth", 100);
@@ -61,6 +63,10 @@ public class Config {
 
     public int getFPS() {
         return fps;
+    }
+    
+    public boolean getPerfMonitor() {
+        return perfMonitor;
     }
 
     public int getTileSize() {

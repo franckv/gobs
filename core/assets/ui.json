@@ -27,6 +27,10 @@
                                 "id": "inventory"
                             }
                         ]
+                    },
+                    {
+                        "type": "reference",
+                        "id": "perfmon"
                     }
                 ]
             }
@@ -73,6 +77,37 @@
                                 "label": ""
                             }
                         ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "fragment": "perfmon",
+        "enabled": "false",
+        "content": [
+            {
+                "type": "font",
+                "font": "small",
+                "color": "green"
+            },
+            {
+                "type": "layout",
+                "name": "monitor",
+                "direction": "Vertical",
+                "margin": 20,
+                "children": [
+                    {
+                        "type": "spacer",
+                        "value": 120
+                    },
+                    {
+                        "type": "label",
+                        "label": "Performances"
+                    },
+                    {
+                        "type": "label",
+                        "id": "perftable"
                     }
                 ]
             }

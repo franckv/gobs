@@ -4,11 +4,12 @@ import com.artemis.BaseSystem;
 import com.artemis.SystemInvocationStrategy;
 import com.artemis.utils.Bag;
 import com.artemis.utils.BitVector;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.systems.RenderingSystem;
 
 public class MainLoopStrategy extends SystemInvocationStrategy {
-    Bag<BaseSystem> logicalSystems;
-    Bag<BaseSystem> renderingSystems;
+    protected Bag<BaseSystem> logicalSystems;
+    protected Bag<BaseSystem> renderingSystems;
 
     protected final BitVector logicalDisabled = new BitVector();
     protected final BitVector renderingDisabled = new BitVector();
@@ -16,9 +17,10 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
     private double accumulator = 0.0;
     private float logicalStep;
 
-    boolean perfMonitoring;
-    Bag<Long> perfMonitor;
-    long currentTime;
+    private boolean perfMonitoring;
+    private ObjectMap<String, Long> perfData = new ObjectMap<>();
+    private long currentTime;
+    private long frame;
 
     public MainLoopStrategy(float logicalStep, boolean perfMonitoring) {
         logicalSystems = new Bag<>(BaseSystem.class);
@@ -27,8 +29,8 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
         this.logicalStep = logicalStep;
 
         this.perfMonitoring = perfMonitoring;
-        perfMonitor = new Bag<>(Long.class);
         currentTime = 0;
+        frame = 0;
     }
 
     @Override
@@ -47,25 +49,17 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
     protected void process() {
         accumulator += world.getDelta();
 
-        boolean logicalUpdate = false;
-
         while (accumulator >= logicalStep) {
             accumulator -= logicalStep;
             world.setDelta(logicalStep);
             processLogical();
-            logicalUpdate = true;
         }
 
         processRendering();
 
         updateEntityStates();
 
-        if (perfMonitoring && logicalUpdate) {
-            System.out.println("#### Perf monitor ####");
-            for (int i = 0; i < perfMonitor.size(); i++) {
-                System.out.println(logicalSystems.get(i).getClass() + ": " + perfMonitor.get(i) / 1000);
-            }
-        }
+        ++frame;
     }
 
     @Override
@@ -108,6 +102,14 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
         throw new RuntimeException("System not found");
     }
 
+    public ObjectMap<String, Long> getPerfData() {
+        return perfData;
+    }
+
+    public boolean hasPerfData() {
+        return perfMonitoring;
+    }
+
     private void processLogical() {
         for (int i = 0; i < logicalSystems.size(); i++) {
             if (logicalDisabled.get(i)) {
@@ -122,8 +124,10 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
 
             logicalSystems.get(i).process();
 
-            if (perfMonitoring) {
-                perfMonitor.set(i, System.nanoTime() - currentTime);
+            if (perfMonitoring && frame % 75 == 0) {
+                long delta = System.nanoTime() - currentTime;
+                String sys = logicalSystems.get(i).getClass().getSimpleName();
+                perfData.put(sys, delta / 1000);
             }
         }
     }
@@ -135,7 +139,18 @@ public class MainLoopStrategy extends SystemInvocationStrategy {
             }
 
             updateEntityStates();
+
+            if (perfMonitoring) {
+                currentTime = System.nanoTime();
+            }
+
             renderingSystems.get(i).process();
+
+            if (perfMonitoring && frame % 75 == 0) {
+                long delta = System.nanoTime() - currentTime;
+                String sys = renderingSystems.get(i).getClass().getSimpleName();
+                perfData.put(sys, delta / 1000);
+            }
         }
     }
 

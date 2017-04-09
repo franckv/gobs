@@ -153,5 +153,110 @@
                 "behavior": "mob"
             }
         ]
+    },
+    {
+        "entity": "mob2",
+        "components": [
+            {
+                "type": "position",
+                "x": 22,
+                "y": 28
+            },
+            {
+                "type": "sprite",
+                "res": "file:sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
+    },
+    {
+        "entity": "mob3",
+        "components": [
+            {
+                "type": "position",
+                "x": 29,
+                "y": 16
+            },
+            {
+                "type": "sprite",
+                "res": "file:sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
+    },
+    {
+        "entity": "mob4",
+        "components": [
+            {
+                "type": "position",
+                "x": 22,
+                "y": 3
+            },
+            {
+                "type": "sprite",
+                "res": "file:sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
+    },
+    {
+        "entity": "mob5",
+        "components": [
+            {
+                "type": "position",
+                "x": 15,
+                "y": 6
+            },
+            {
+                "type": "sprite",
+                "res": "file:sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
+    },
+    {
+        "entity": "mob6",
+        "components": [
+            {
+                "type": "position",
+                "x": 1,
+                "y": 10
+            },
+            {
+                "type": "sprite",
+                "res": "file:sprites/tileset.png!4,24:34,34"
+            },
+            {
+                "type": "collider"
+            },
+            {
+                "type": "ai",
+                "behavior": "mob"
+            }
+        ]
     }
 ]

@@ -135,7 +135,7 @@ public class GobsGame extends Game {
                         new MapRenderingSystem(displayManager.getMapDisplay()),
                         new UIRenderingSystem(displayManager.getOverlayDisplay())
                 )
-                .register(new MainLoopStrategy(logicalStep, true))
+                .register(new MainLoopStrategy(logicalStep, config.getPerfMonitor()))
                 .build()
                 .register(inputHandler)
                 .register(tileManager)

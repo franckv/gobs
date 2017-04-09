@@ -9,7 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Sort;
+import com.gobs.MainLoopStrategy;
 import com.gobs.StateManager;
 import com.gobs.StateManager.State;
 import com.gobs.assets.FontFactory;
@@ -24,6 +28,7 @@ import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GdxGUI;
+import java.util.Arrays;
 
 public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
@@ -91,6 +96,23 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
             gui.enableFragment("characters", true);
         } else {
             gui.enableFragment("characters", false);
+        }
+
+        MainLoopStrategy strategy = (MainLoopStrategy) world.getInvocationStrategy();
+
+        if (strategy.hasPerfData()) {
+            ObjectMap<String, Long> perfData = strategy.getPerfData();
+            StringBuilder perfLabel = new StringBuilder();
+
+            Array<String> systems = perfData.keys().toArray();
+            Sort.instance().sort(systems);
+
+            for (String system : systems) {
+                perfLabel.append(system).append(": ").append(perfData.get(system)).append("\n");
+            }
+
+            gui.enableFragment("perfmon", true);
+            gui.setStringValue("perftable", "label", perfLabel.toString());
         }
 
         gui.showFragment("ui");
