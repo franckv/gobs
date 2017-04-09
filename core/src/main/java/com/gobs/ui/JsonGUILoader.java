@@ -178,7 +178,9 @@ class JsonGUILoader {
     private void parseLabel(JsonValue value) {
         String label = getString(value, "label");
 
-        gui.Label(label);
+        if (label != null) {
+            gui.Label(label);
+        }
     }
 
     private void parseFrame(JsonValue value) {
