@@ -75,7 +75,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         gui.addFont("medium", fontManager.getFont(24));
         gui.addFont("large", fontManager.getFont(30));
 
-        gui.load("ui.json");
+        gui.load(Gdx.files.internal("ui.json").reader());
     }
 
     @Override
@@ -92,7 +92,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
         if (stateManager.getState() == State.CRAWL) {
             updateCharactersStats();
-            gui.enableFragment("characters", false);
+            gui.enableFragment("characters", true);
         } else {
             gui.enableFragment("characters", false);
         }

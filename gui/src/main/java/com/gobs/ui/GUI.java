@@ -1,5 +1,6 @@
 package com.gobs.ui;
 
+import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -36,6 +37,10 @@ public abstract class GUI<Color, Font> {
                 active = "Invalid";
             }
         }
+    }
+
+    public void load(Reader file) {
+        getGUILoader().load(file);
     }
 
     private boolean isActivated() {
@@ -174,7 +179,7 @@ public abstract class GUI<Color, Font> {
 
     public abstract void setFontColor(Color color);
 
-    public abstract void load(String resource);
+    public abstract GUILoader getGUILoader();
 
     public abstract void showFragment(String fragment);
 
@@ -183,4 +188,6 @@ public abstract class GUI<Color, Font> {
     public abstract void setStringValue(String id, String field, String value);
 
     public abstract void setIntValue(String id, String field, int value);
+
+    public abstract Color getColorByName(String name);
 }

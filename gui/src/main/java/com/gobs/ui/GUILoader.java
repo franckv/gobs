@@ -1,15 +1,14 @@
 package com.gobs.ui;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
 import java.io.Reader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
 
-class JsonGUILoader {
-    private static class JsonFragment {
+/**
+ * Load GUI from json file
+ */
+abstract class GUILoader<JsonValue, Color, Font> {
+    private class JsonFragment {
         private JsonValue value;
         private boolean enabled;
 
@@ -42,31 +41,29 @@ class JsonGUILoader {
         }
     }
 
-    private GUI gui;
+    private GUI<Color, Font> gui;
     private JsonValue root;
-    private ObjectMap<String, JsonFragment> fragments;
-    private ObjectMap<String, JsonSubstitution> substitutions;
+    private Map<String, JsonFragment> fragments;
+    private Map<String, JsonSubstitution> substitutions;
     private int idx;
 
-    JsonGUILoader(GUI gui) {
+    GUILoader(GUI gui) {
         this.gui = gui;
 
-        fragments = new ObjectMap<>();
-        substitutions = new ObjectMap<>();
+        fragments = new HashMap<>();
+        substitutions = new HashMap<>();
 
         idx = 0;
     }
 
     void load(Reader file) {
-        JsonReader reader = new JsonReader();
+        root = readFile(file);
 
-        root = reader.parse(file);
-
-        for (JsonValue value : root) {
-            if (value.has("fragment") && value.has("content")) {
-                String fragmentName = value.getString("fragment");
-                JsonFragment fragment = new JsonFragment(value.get("content"));
-                if (value.has("enabled") && value.getString("enabled").equalsIgnoreCase("false")) {
+        for (JsonValue value : readArray(root)) {
+            if (hasField(value, "fragment") && hasField(value, "content")) {
+                String fragmentName = readString(value, "fragment");
+                JsonFragment fragment = new JsonFragment(readObject(value, "content"));
+                if (hasField(value, "enabled") && readString(value, "enabled").equalsIgnoreCase("false")) {
                     fragment.enabled = false;
                 }
                 fragments.put(fragmentName, fragment);
@@ -100,12 +97,12 @@ class JsonGUILoader {
             return;
         }
 
-        if (value.isArray()) {
-            for (JsonValue child : value) {
+        if (isArray(value)) {
+            for (JsonValue child : readArray(value)) {
                 parse(child);
             }
-        } else if (value.has("type")) {
-            switch (value.getString("type")) {
+        } else if (hasField(value, "type")) {
+            switch (readString(value, "type")) {
                 case "layout":
                     parseLayout(value);
                     break;
@@ -138,8 +135,8 @@ class JsonGUILoader {
     }
 
     private void parseLayout(JsonValue value) {
-        String name = value.getString("name");
-        String direction = value.getString("direction");
+        String name = readString(value, "name");
+        String direction = readString(value, "direction");
 
         GUILayout.FlowDirection flowDirection = GUILayout.FlowDirection.NONE;
 
@@ -154,20 +151,20 @@ class JsonGUILoader {
 
         gui.createSection(name, flowDirection);
 
-        if (value.has("margin")) {
-            gui.setMargin(value.getInt("margin"));
+        if (hasField(value, "margin")) {
+            gui.setMargin(readInt(value, "margin"));
         }
 
-        if (value.has("marginX") && value.has("marginY")) {
-            gui.setMargin(value.getInt("marginX"), value.getInt("marginY"));
+        if (hasField(value, "marginX") && hasField(value, "marginY")) {
+            gui.setMargin(readInt(value, "marginX"), readInt(value, "marginY"));
         }
 
-        if (value.has("spacing")) {
-            gui.setSpacing(value.getInt("spacing"));
+        if (hasField(value, "spacing")) {
+            gui.setSpacing(readInt(value, "spacing"));
         }
 
-        if (value.has("children")) {
-            for (JsonValue child : value.get("children")) {
+        if (hasField(value, "children")) {
+            for (JsonValue child : readChildren(value, "children")) {
                 parse(child);
             }
         }
@@ -184,26 +181,26 @@ class JsonGUILoader {
     }
 
     private void parseFrame(JsonValue value) {
-        int width = value.getInt("width");
-        int height = value.getInt("height");
+        int width = readInt(value, "width");
+        int height = readInt(value, "height");
 
         gui.Frame(width, height);
     }
 
     private void parseBox(JsonValue value) {
         String id = getString(value, "id");
-        int width = value.getInt("width");
-        int height = value.getInt("height");
+        int width = readInt(value, "width");
+        int height = readInt(value, "height");
 
         gui.Box(id, width, height);
     }
 
     private void parsePusher(JsonValue value) {
-        if (value.has("id")) {
-            JsonSubstitution sub = substitutions.get(value.getString("id"));
+        if (hasField(value, "id")) {
+            JsonSubstitution sub = substitutions.get(readString(value, "id"));
             gui.pushToEnd(sub.strValue);
-        } else if (value.has("value")) {
-            gui.pushToEnd(value.getFloat("value"));
+        } else if (hasField(value, "value")) {
+            gui.pushToEnd(readFloat(value, "value"));
         }
     }
 
@@ -212,64 +209,74 @@ class JsonGUILoader {
     }
 
     private void parseRepeater(JsonValue value) {
-        int count = value.getInt("count");
+        int count = readInt(value, "count");
 
         for (idx = 0; idx < count; idx++) {
-            parse(value.get("content"));
+            parse(readObject(value, "content"));
         }
     }
 
     private void parseFont(JsonValue value) {
         String font = getString(value, "font");
         if (font != null) {
-            gui.setFont(value.getString("font"));
+            gui.setFont(readString(value, "font"));
         }
 
         String colorName = getString(value, "color");
         if (colorName != null) {
-            Color color = Color.GREEN;
+            Color color = gui.getColorByName(colorName);
 
-            try {
-                color = (Color) Color.class
-                        .getDeclaredField(colorName.toUpperCase()).get(null);
-            } catch (NoSuchFieldException | SecurityException
-                    | IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(JsonGUILoader.class
-                        .getName()).log(Level.SEVERE, "Invalid color " + value.getString("color"), ex);
-            }
             gui.setFontColor(color);
         }
     }
 
     private void parseReference(JsonValue value) {
-        String id = value.getString("id");
+        String id = readString(value, "id");
 
         showFragment(id);
     }
 
     private String getString(JsonValue value, String name) {
-        if (value.has("id")) {
-            String id = value.getString("id").replace("${i}", Integer.toString(idx));
+        if (hasField(value, "id")) {
+            String id = readString(value, "id").replace("${i}", Integer.toString(idx));
             if (substitutions.containsKey(id) && substitutions.get(id).field.equals(name)) {
                 return substitutions.get(id).strValue;
             }
         }
 
-        if (value.has(name)) {
-            return value.getString(name).replace("${i}", Integer.toString(idx));
+        if (hasField(value, name)) {
+            return readString(value, name).replace("${i}", Integer.toString(idx));
         }
 
         return null;
     }
 
     private int getInt(JsonValue value, String name) {
-        if (value.has("id")) {
-            String id = value.getString("id").replace("${i}", Integer.toString(idx));
+        if (hasField(value, "id")) {
+            String id = readString(value, "id").replace("${i}", Integer.toString(idx));
             if (substitutions.containsKey(id) && substitutions.get(id).field.equals(name)) {
                 return substitutions.get(id).intValue;
             }
         }
 
-        return value.getInt(name);
+        return readInt(value, name);
     }
+
+    protected abstract JsonValue readFile(Reader reader);
+
+    protected abstract boolean hasField(JsonValue value, String field);
+
+    protected abstract String readString(JsonValue value, String field);
+
+    protected abstract int readInt(JsonValue value, String field);
+
+    protected abstract float readFloat(JsonValue value, String field);
+
+    protected abstract JsonValue readObject(JsonValue value, String field);
+
+    protected abstract Iterable<JsonValue> readArray(JsonValue value);
+
+    protected abstract Iterable<JsonValue> readChildren(JsonValue value, String field);
+
+    protected abstract boolean isArray(JsonValue value);
 }

@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.OrthographicDisplay;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private Batch batch;
@@ -20,7 +22,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private ShapeRenderer renderer;
     private TileFactory tileManager;
     private OrthographicDisplay display;
-    private JsonGUILoader JsonLoader;
+    private GdxGUILoader JsonLoader;
 
     public GdxGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
         this.display = display;
@@ -31,7 +33,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
 
         color = Color.GREEN;
 
-        JsonLoader = new JsonGUILoader(this);
+        JsonLoader = new GdxGUILoader(this);
     }
 
     @Override
@@ -97,8 +99,8 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     }
 
     @Override
-    public void load(String resource) {
-        JsonLoader.load(Gdx.files.internal(resource).reader());
+    public GUILoader getGUILoader() {
+        return JsonLoader;
     }
 
     @Override
@@ -119,6 +121,22 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     @Override
     public void setIntValue(String id, String field, int value) {
         JsonLoader.setIntValue(id, field, value);
+    }
+
+    @Override
+    public Color getColorByName(String name) {
+        Color color = Color.GREEN;
+
+        try {
+            color = (Color) Color.class
+                    .getDeclaredField(name.toUpperCase()).get(null);
+        } catch (NoSuchFieldException | SecurityException
+                | IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(GdxGUI.class
+                    .getName()).log(Level.SEVERE, "Invalid color " + name, ex);
+        }
+
+        return color;
     }
 
     private ShapeRenderer getRenderer() {
