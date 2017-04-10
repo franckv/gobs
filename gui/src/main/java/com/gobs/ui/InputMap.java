@@ -8,6 +8,11 @@ import java.util.Set;
  * Represent a set of inputs for an entity
  */
 public class InputMap {
+    public enum Input {
+        LEFT, RIGHT, UP, DOWN, SPACE, ENTER, DEL, ESCAPE, TAB,
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+    }
+
     BitSet active;
     BitSet changed;
     int[] frames;

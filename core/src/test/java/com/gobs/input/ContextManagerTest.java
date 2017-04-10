@@ -3,7 +3,7 @@ package com.gobs.input;
 import com.gobs.input.ContextManager.Action;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.ContextManager.Event;
-import com.gobs.ui.Input;
+import com.gobs.ui.InputMap.Input;
 import com.gobs.ui.InputMap;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;

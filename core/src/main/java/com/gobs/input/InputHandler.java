@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.gobs.ui.Input;
+import com.gobs.ui.InputMap.Input;
 import com.gobs.ui.InputMap;
 
 public class InputHandler extends InputAdapter {

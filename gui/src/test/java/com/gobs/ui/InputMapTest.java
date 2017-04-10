@@ -1,5 +1,6 @@
 package com.gobs.ui;
 
+import com.gobs.ui.InputMap.Input;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
@@ -23,7 +24,7 @@ public class InputMapTest {
         map.set(Input.LEFT);
         Assert.assertTrue(map.isActive(Input.LEFT));
         Assert.assertEquals(1, map.active.cardinality());
-        
+
         Assert.assertFalse(map.isActive(Input.E));
         map.set(Input.E);
         Assert.assertTrue(map.isActive(Input.E));

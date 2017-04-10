@@ -2,8 +2,8 @@ package com.gobs.input;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.gobs.ui.Input;
 import com.gobs.ui.InputMap;
+import com.gobs.ui.InputMap.Input;
 import java.util.BitSet;
 
 /**
