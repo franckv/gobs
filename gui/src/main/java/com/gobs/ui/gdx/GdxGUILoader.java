@@ -30,6 +30,11 @@ public class GdxGUILoader extends GUILoader<JsonValue, Color, BitmapFont> {
     }
 
     @Override
+    protected boolean readBoolean(JsonValue value, String field) {
+        return value.getBoolean(field);
+    }
+
+    @Override
     protected int readInt(JsonValue value, String field) {
         return value.getInt(field);
     }

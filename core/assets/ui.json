@@ -4,15 +4,11 @@
         "content": [
             {
                 "type": "layout",
-                "name": "Screen",
+                "name": "screen",
                 "direction": "None",
                 "margin": 5,
                 "spacing": 30,
                 "children": [
-                    {
-                        "type": "reference",
-                        "id": "statusbar"
-                    },
                     {
                         "type": "layout",
                         "name": "ui",
@@ -30,7 +26,11 @@
                     },
                     {
                         "type": "reference",
-                        "id": "perfmon"
+                        "id": "debug"
+                    },
+                    {
+                        "type": "reference",
+                        "id": "statusbar"
                     }
                 ]
             }
@@ -38,6 +38,7 @@
     },
     {
         "fragment": "statusbar",
+        "enabled": false,
         "content": [
             {
                 "type": "font",
@@ -83,8 +84,8 @@
         ]
     },
     {
-        "fragment": "perfmon",
-        "enabled": "false",
+        "fragment": "debug",
+        "enabled": false,
         "content": [
             {
                 "type": "font",
@@ -97,22 +98,44 @@
                 "direction": "Horizontal",
                 "children": [
                     {
+                        "type": "layout",
+                        "name": "entities",
+                        "direction": "Vertical",
+                        "margin": 5,
+                        "spacing": 1,
+                        "children": [
+                            {
+                                "type": "spacer",
+                                "value": 150
+                            },
+                            {
+                                "type": "label",
+                                "label": "Entities\n------------"
+                            },
+                            {
+                                "type": "label",
+                                "id": "entities"
+                            }
+                        ]
+                    },
+                    {
                         "type": "pusher",
-                        "value": 280
+                        "value": 240
                     },
                     {
                         "type": "layout",
                         "name": "monitor",
                         "direction": "Vertical",
-                        "margin": 20,
+                        "margin": 10,
+                        "spacing": 1,
                         "children": [
                             {
                                 "type": "spacer",
-                                "value": 120
+                                "value": 150
                             },
                             {
                                 "type": "label",
-                                "label": "Performances"
+                                "label": "Performances\n------------"
                             },
                             {
                                 "type": "label",
@@ -129,7 +152,7 @@
         "content": [
             {
                 "type": "layout",
-                "name": "Portrait",
+                "name": "Portrait.${i}",
                 "direction": "None",
                 "children": [
                     {
@@ -217,87 +240,98 @@
     },
     {
         "fragment": "inventory",
-        "enabled": "false",
+        "enabled": false,
         "content": [
             {
                 "type": "layout",
-                "name": "inventory",
-                "direction": "None",
+                "name": "inventoryBox",
+                "direction": "Horizontal",
                 "children": [
                     {
-                        "type": "frame",
-                        "width": 400,
-                        "height": 400
+                        "type": "pusher",
+                        "value": 712
                     },
                     {
                         "type": "layout",
-                        "name": "",
-                        "direction": "Horizontal",
-                        "margin": 50,
+                        "name": "inventory",
+                        "direction": "None",
                         "children": [
-                            {   
+                            {
+                                "type": "frame",
+                                "width": 400,
+                                "height": 400
+                            },
+                            {
                                 "type": "layout",
-                                "name": "",
-                                "direction": "Vertical",
+                                "name": "inventoryContent",
+                                "direction": "Horizontal",
+                                "margin": 50,
                                 "children": [
-                                    {
-                                        "type": "repeater",
-                                        "count": 4,
-                                        "content":
-                                                {
+                                    {   
+                                        "type": "layout",
+                                        "name": "inventoryColumn",
+                                        "direction": "Vertical",
+                                        "children": [
+                                            {
+                                                "type": "repeater",
+                                                "count": 4,
+                                                "content":
+                                                        {
 
-                                                    "type": "layout",
-                                                    "name": "",
-                                                    "direction": "Horizontal",
-                                                    "children": [
-                                                        {   
-                                                            "type": "box",
-                                                            "id": "Item${i}0",
-                                                            "width": 50,
-                                                            "height": 50
-                                                        }, 
-                                                        {   
-                                                            "type": "box",
-                                                            "id": "Item${i}1",
-                                                            "width": 50,
-                                                            "height": 50
+                                                            "type": "layout",
+                                                            "name": "inventoryLine",
+                                                            "direction": "Horizontal",
+                                                            "children": [
+                                                                {   
+                                                                    "type": "box",
+                                                                    "id": "Item${i}0",
+                                                                    "width": 50,
+                                                                    "height": 50
+                                                                }, 
+                                                                {   
+                                                                    "type": "box",
+                                                                    "id": "Item${i}1",
+                                                                    "width": 50,
+                                                                    "height": 50
+                                                                }
+                                                            ]
                                                         }
-                                                    ]
-                                                }
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "layout",
-                                "name": "",
-                                "direction": "Vertical",
-                                "children": [
+                                            }
+                                        ]
+                                    },
                                     {
-                                        "type": "spacer",
-                                        "value": 150
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "layout",
-                                "name": "",
-                                "direction": "Vertical",
-                                "children": [
+                                        "type": "layout",
+                                        "name": "inventorySpace",
+                                        "direction": "Vertical",
+                                        "children": [
+                                            {
+                                                "type": "spacer",
+                                                "value": 150
+                                            }
+                                        ]
+                                    },
                                     {
-                                        "type": "repeater",
-                                        "count": 4,
-                                        "content": 
-                                                {
-                                                    "type": "box",
-                                                    "id": "Equip${i}",
-                                                    "width": 50,
-                                                    "height": 50
-                                                }    
+                                        "type": "layout",
+                                        "name": "inventoryEquip",
+                                        "direction": "Vertical",
+                                        "children": [
+                                            {
+                                                "type": "repeater",
+                                                "count": 4,
+                                                "content": 
+                                                        {
+                                                            "type": "box",
+                                                            "id": "Equip${i}",
+                                                            "width": 50,
+                                                            "height": 50
+                                                        }    
+                                            }
+                                        ]
                                     }
                                 ]
                             }
                         ]
-                    }
+                    }    
                 ]
             }
         ]

@@ -2,9 +2,11 @@ package com.gobs.systems;
 
 import com.artemis.Aspect;
 import com.artemis.BaseSystem;
+import com.artemis.Component;
 import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.Wire;
+import com.artemis.utils.Bag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
@@ -24,8 +26,10 @@ import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
+import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
 import com.gobs.ui.GobsGUI;
+import com.gobs.ui.UIState;
 
 public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
@@ -43,6 +47,8 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private Batch batch;
     @Wire
     private InputHandler inputHandler;
+    @Wire
+    private ContextManager contextManager;
 
     private EntitySubscription controllables;
     private EntitySubscription characters;
@@ -52,7 +58,11 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private FontFactory fontManager;
     private GobsGUI gui;
 
+    private UIState state;
+
     private int margin, spacing;
+
+    private final static String consummerID = UIRenderingSystem.class.getName();
 
     public UIRenderingSystem(OrthographicDisplay display) {
         this.display = display;
@@ -71,15 +81,21 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
         gui = new GobsGUI(display, tileManager, batch);
 
+        state = new UIState(gui);
+
         gui.addFont("small", fontManager.getFont(16));
         gui.addFont("medium", fontManager.getFont(24));
         gui.addFont("large", fontManager.getFont(30));
 
         gui.load(Gdx.files.internal("ui.json").reader());
+
+        registerActions();
     }
 
     @Override
     protected void processSystem() {
+        processInputs();
+
         // overlay text is displayed using absolute screen coordinates to avoid scaling font
         display.getCamera().update();
 
@@ -96,9 +112,11 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
         if (stateManager.getState() == State.CRAWL) {
             updateCharactersStats();
-            gui.enableFragment("characters", true);
+            if (state.getState() == UIState.State.NONE) {
+                state.setState(UIState.State.CRAWL);
+            }
         } else {
-            gui.enableFragment("characters", false);
+            state.setState(UIState.State.NONE);
         }
 
         MainLoopStrategy strategy = (MainLoopStrategy) world.getInvocationStrategy();
@@ -114,9 +132,10 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
                 perfLabel.append(system).append(": ").append(perfData.get(system)).append("\n");
             }
 
-            gui.enableFragment("perfmon", true);
             gui.setStringValue("perftable", "label", perfLabel.toString());
         }
+
+        dumpEntities();
 
         gui.showFragment("ui");
 
@@ -215,6 +234,58 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         }
 
         return pos;
+    }
+
+    private void dumpEntities() {
+        StringBuilder entities = new StringBuilder();
+
+        for (int i = 0; i < allEntities.getEntities().size(); i++) {
+            int entityId = allEntities.getEntities().get(i);
+
+            entities.append(entityId);
+            entities.append(": [");
+
+            Bag<Component> components = new Bag<>();
+            getWorld().getEntity(entityId).getComponents(components);
+
+            boolean first = true;
+            for (Component component : components) {
+                if (!first) {
+                    entities.append(",");
+                }
+                entities.append(component.getClass().getSimpleName());
+                first = false;
+            }
+
+            entities.append("]\n");
+        }
+
+        gui.setStringValue("entities", "label", entities.toString());
+    }
+
+    private void processInputs() {
+        Array<ContextManager.Event> events = contextManager.pollActions(consummerID);
+
+        for (ContextManager.Event event : events) {
+            switch (event.getAction()) {
+                case DEBUG:
+                    gui.toggleFragment("statusbar");
+                    gui.toggleFragment("debug");
+                    break;
+                case INVENTORY:
+                    if (state.getState() == UIState.State.CRAWL) {
+                        state.setState(UIState.State.INVENTORY);
+                    } else {
+                        state.setState(UIState.State.CRAWL);
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void registerActions() {
+        contextManager.registerConsumer(consummerID, ContextManager.ContextType.GLOBAL, ContextManager.Action.DEBUG);
+        contextManager.registerConsumer(consummerID, ContextManager.ContextType.CRAWLING, ContextManager.Action.INVENTORY);
     }
 
     @Override

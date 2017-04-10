@@ -104,6 +104,7 @@ public abstract class GUI<Color, Font> {
 
     public void endSection() {
         layout.end();
+
         popLayout();
     }
 
@@ -171,6 +172,8 @@ public abstract class GUI<Color, Font> {
     public abstract void showFragment(String fragment);
 
     public abstract void enableFragment(String fragment, boolean enabled);
+
+    public abstract void toggleFragment(String fragment);
 
     public abstract void setStringValue(String id, String field, String value);
 

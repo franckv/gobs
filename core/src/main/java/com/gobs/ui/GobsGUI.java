@@ -13,11 +13,17 @@ public class GobsGUI extends GdxGUI {
     private OrthographicDisplay display;
     private TileFactory tileManager;
 
+    private TextureRegion frame;
+    private TextureRegion frameSelected;
+
     public GobsGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
         super(batch);
 
         this.display = display;
         this.tileManager = tileManager;
+
+        frame = tileManager.getFrame();
+        frameSelected = tileManager.getFrameSelected();
     }
 
     public boolean acceptInput(InputMap inputMap) {
@@ -70,12 +76,10 @@ public class GobsGUI extends GdxGUI {
 
     @Override
     protected TextureRegion getFrame(boolean selected) {
-        TextureRegion r = tileManager.getFrame();
-
         if (selected) {
-            r = tileManager.getFrameSelected();
+            return frameSelected;
+        } else {
+            return frame;
         }
-
-        return r;
     }
 }

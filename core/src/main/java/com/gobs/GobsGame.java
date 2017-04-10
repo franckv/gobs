@@ -178,12 +178,14 @@ public class GobsGame extends Game {
     private void setKeyBindings() {
         contextManager.mapInput(ContextManager.ContextType.GLOBAL, Input.ESCAPE, ContextManager.Action.EXIT);
         contextManager.mapInput(ContextManager.ContextType.GLOBAL, Input.E, ContextManager.Action.DUMP);
+        contextManager.mapInput(ContextManager.ContextType.GLOBAL, Input.B, ContextManager.Action.DEBUG);
 
         contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.LEFT, ContextManager.Action.MOVE_LEFT);
         contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.RIGHT, ContextManager.Action.MOVE_RIGHT);
         contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.UP, ContextManager.Action.MOVE_UP);
         contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.DOWN, ContextManager.Action.MOVE_DOWN);
         contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.TAB, ContextManager.Action.TOGGLE_VIEW);
+        contextManager.mapInput(ContextManager.ContextType.CRAWLING, Input.I, ContextManager.Action.INVENTORY);
 
         contextManager.mapInput(ContextManager.ContextType.MAP, Input.Q, ContextManager.Action.SCROLL_LEFT);
         contextManager.mapInput(ContextManager.ContextType.MAP, Input.D, ContextManager.Action.SCROLL_RIGHT);

@@ -15,8 +15,8 @@ public class ContextManager {
         DIG, FILL, TARGET, COMPLETE,
         MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN,
         SCROLL_LEFT, SCROLL_RIGHT, SCROLL_UP, SCROLL_DOWN,
-        ZOOM_IN, ZOOM_OUT,
-        EXIT, DUMP
+        ZOOM_IN, ZOOM_OUT, INVENTORY,
+        EXIT, DUMP, DEBUG
     }
 
     public static class Event {

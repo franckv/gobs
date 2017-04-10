@@ -97,6 +97,11 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
+    public void toggleFragment(String fragment) {
+        JsonLoader.toggleFragment(fragment);
+    }
+
+    @Override
     public void setStringValue(String id, String field, String value) {
         JsonLoader.setStringValue(id, field, value);
     }

@@ -1,58 +1,12 @@
 package com.gobs.ui;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.gobs.assets.TileFactory;
-import com.gobs.display.DisplayManager;
-import com.gobs.ui.gdx.GdxGUI;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  *
  */
 public class GUITest {
-    private GdxGUI gui;
-
-    @Before
-    public void setUp() {
-        final HeadlessApplicationConfiguration appConfig = new HeadlessApplicationConfiguration();
-        new HeadlessApplication(new ApplicationListener() {
-            @Override
-            public void create() {
-            }
-
-            @Override
-            public void resize(int width, int height) {
-            }
-
-            @Override
-            public void render() {
-            }
-
-            @Override
-            public void pause() {
-            }
-
-            @Override
-            public void resume() {
-            }
-
-            @Override
-            public void dispose() {
-            }
-        }, appConfig);
-
-        DisplayManager displayManager = Mockito.mock(DisplayManager.class);
-
-        TileFactory tileFactory = Mockito.mock(TileFactory.class);
-        SpriteBatch spriteBatch = Mockito.mock(SpriteBatch.class);
-
-        gui = new GobsGUI(displayManager.getOverlayDisplay(), tileFactory, spriteBatch);
-    }
+    GUI gui;
 
     @Test
     public void testLayout() {

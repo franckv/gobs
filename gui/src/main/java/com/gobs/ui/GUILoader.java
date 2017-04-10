@@ -63,7 +63,7 @@ public abstract class GUILoader<JsonValue, Color, Font> {
             if (hasField(value, "fragment") && hasField(value, "content")) {
                 String fragmentName = readString(value, "fragment");
                 JsonFragment fragment = new JsonFragment(readObject(value, "content"));
-                if (hasField(value, "enabled") && readString(value, "enabled").equalsIgnoreCase("false")) {
+                if (hasField(value, "enabled") && !readBoolean(value, "enabled")) {
                     fragment.enabled = false;
                 }
                 fragments.put(fragmentName, fragment);
@@ -81,6 +81,12 @@ public abstract class GUILoader<JsonValue, Color, Font> {
     public void enableFragment(String fragment, boolean enabled) {
         if (fragments.containsKey(fragment)) {
             fragments.get(fragment).enabled = enabled;
+        }
+    }
+
+    public void toggleFragment(String fragment) {
+        if (fragments.containsKey(fragment)) {
+            fragments.get(fragment).enabled = !fragments.get(fragment).enabled;
         }
     }
 
@@ -135,7 +141,7 @@ public abstract class GUILoader<JsonValue, Color, Font> {
     }
 
     private void parseLayout(JsonValue value) {
-        String name = readString(value, "name");
+        String name = getString(value, "name");
         String direction = readString(value, "direction");
 
         GUILayout.FlowDirection flowDirection = GUILayout.FlowDirection.NONE;
@@ -267,6 +273,8 @@ public abstract class GUILoader<JsonValue, Color, Font> {
     protected abstract boolean hasField(JsonValue value, String field);
 
     protected abstract String readString(JsonValue value, String field);
+
+    protected abstract boolean readBoolean(JsonValue value, String field);
 
     protected abstract int readInt(JsonValue value, String field);
 

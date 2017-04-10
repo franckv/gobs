@@ -27,7 +27,7 @@ public class StateManager {
         return currentState;
     }
 
-    public void enterState(State state) {
+    private void enterState(State state) {
         switch (state) {
             case CRAWL:
                 enterCRAWL();
@@ -41,7 +41,7 @@ public class StateManager {
         }
     }
 
-    public void exitState(State state) {
+    private void exitState(State state) {
         switch (state) {
             case CRAWL:
                 exitCRAWL();
