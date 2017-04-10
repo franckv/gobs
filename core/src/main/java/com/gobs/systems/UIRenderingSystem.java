@@ -6,9 +6,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.Wire;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -26,8 +24,8 @@ import com.gobs.components.Name;
 import com.gobs.components.Party;
 import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
-import com.gobs.ui.GUI;
-import com.gobs.ui.GdxGUI;
+import com.gobs.input.InputHandler;
+import com.gobs.ui.GobsGUI;
 
 public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
@@ -43,6 +41,8 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private StateManager stateManager;
     @Wire(name = "batch")
     private Batch batch;
+    @Wire
+    private InputHandler inputHandler;
 
     private EntitySubscription controllables;
     private EntitySubscription characters;
@@ -50,7 +50,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
     private OrthographicDisplay display;
     private FontFactory fontManager;
-    private GUI<Color, BitmapFont> gui;
+    private GobsGUI gui;
 
     private int margin, spacing;
 
@@ -69,7 +69,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         this.characters = getWorld().getAspectSubscriptionManager().get(Aspect.all(Party.class, Name.class, HP.class, MP.class));
         this.allEntities = getWorld().getAspectSubscriptionManager().get(Aspect.all());
 
-        gui = new GdxGUI(display, tileManager, batch);
+        gui = new GobsGUI(display, tileManager, batch);
 
         gui.addFont("small", fontManager.getFont(16));
         gui.addFont("medium", fontManager.getFont(24));
@@ -82,6 +82,10 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     protected void processSystem() {
         // overlay text is displayed using absolute screen coordinates to avoid scaling font
         display.getCamera().update();
+
+        // TODO: mouse inputs may be lost if system processing time is too long
+        gui.acceptInput(inputHandler.getInputMap());
+
         batch.setProjectionMatrix(display.getCamera().combined);
 
         batch.begin();

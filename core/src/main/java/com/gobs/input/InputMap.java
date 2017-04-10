@@ -1,4 +1,4 @@
-package com.gobs.ui;
+package com.gobs.input;
 
 import java.util.BitSet;
 import java.util.HashSet;

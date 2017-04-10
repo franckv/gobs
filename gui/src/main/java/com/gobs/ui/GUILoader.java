@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Load GUI from json file
  */
-abstract class GUILoader<JsonValue, Color, Font> {
+public abstract class GUILoader<JsonValue, Color, Font> {
     private class JsonFragment {
         private JsonValue value;
         private boolean enabled;
@@ -47,7 +47,7 @@ abstract class GUILoader<JsonValue, Color, Font> {
     private Map<String, JsonSubstitution> substitutions;
     private int idx;
 
-    GUILoader(GUI gui) {
+    public GUILoader(GUI gui) {
         this.gui = gui;
 
         fragments = new HashMap<>();
@@ -56,7 +56,7 @@ abstract class GUILoader<JsonValue, Color, Font> {
         idx = 0;
     }
 
-    void load(Reader file) {
+    public void load(Reader file) {
         root = readFile(file);
 
         for (JsonValue value : readArray(root)) {
@@ -71,24 +71,24 @@ abstract class GUILoader<JsonValue, Color, Font> {
         }
     }
 
-    void showFragment(String fragment) {
+    public void showFragment(String fragment) {
         if (fragments.containsKey(fragment)
                 && fragments.get(fragment).enabled) {
             parse(fragments.get(fragment).value);
         }
     }
 
-    void enableFragment(String fragment, boolean enabled) {
+    public void enableFragment(String fragment, boolean enabled) {
         if (fragments.containsKey(fragment)) {
             fragments.get(fragment).enabled = enabled;
         }
     }
 
-    void setStringValue(String id, String field, String value) {
+    public void setStringValue(String id, String field, String value) {
         substitutions.put(id, new JsonSubstitution(field, value));
     }
 
-    void setIntValue(String id, String field, int value) {
+    public void setIntValue(String id, String field, int value) {
         substitutions.put(id, new JsonSubstitution(field, value));
     }
 

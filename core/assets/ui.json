@@ -93,21 +93,32 @@
             },
             {
                 "type": "layout",
-                "name": "monitor",
-                "direction": "Vertical",
-                "margin": 20,
+                "name": "pushToRight",
+                "direction": "Horizontal",
                 "children": [
                     {
-                        "type": "spacer",
-                        "value": 120
+                        "type": "pusher",
+                        "value": 280
                     },
                     {
-                        "type": "label",
-                        "label": "Performances"
-                    },
-                    {
-                        "type": "label",
-                        "id": "perftable"
+                        "type": "layout",
+                        "name": "monitor",
+                        "direction": "Vertical",
+                        "margin": 20,
+                        "children": [
+                            {
+                                "type": "spacer",
+                                "value": 120
+                            },
+                            {
+                                "type": "label",
+                                "label": "Performances"
+                            },
+                            {
+                                "type": "label",
+                                "id": "perftable"
+                            }
+                        ]
                     }
                 ]
             }

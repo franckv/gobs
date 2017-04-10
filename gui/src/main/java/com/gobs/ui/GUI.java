@@ -9,8 +9,6 @@ public abstract class GUI<Color, Font> {
         SMALL, MEDIUM, LARGE
     }
 
-    private static InputMap inputs;
-
     private String hot, active;
 
     private GUILayout layout;
@@ -30,7 +28,7 @@ public abstract class GUI<Color, Font> {
     }
 
     public void end() {
-        if (!isActivated()) {
+        if (!isMouseDown()) {
             active = null;
         } else {
             if (active == null) {
@@ -43,16 +41,11 @@ public abstract class GUI<Color, Font> {
         getGUILoader().load(file);
     }
 
-    private boolean isActivated() {
-        return (inputs != null && inputs.isMouseDown());
-    }
-
     private boolean isSelected(String id, float x, float y, float w, float h) {
-        if (inputs != null
-                && (inputs.getMouseX() >= x && inputs.getMouseX() <= x + w)
-                && (inputs.getMouseY() >= y && inputs.getMouseY() <= y + h)) {
+        if ((getMouseX() >= x && getMouseX() <= x + w)
+                && (getMouseY() >= y && getMouseY() <= y + h)) {
             hot = id;
-            if (active == null && isActivated()) {
+            if (active == null && isMouseDown()) {
                 active = id;
             }
             return true;
@@ -62,16 +55,10 @@ public abstract class GUI<Color, Font> {
     }
 
     private boolean isClicked(String id) {
-        if (inputs != null && !isActivated() && id.equals(hot) && id.equals(active)) {
+        if (!isMouseDown() && id.equals(hot) && id.equals(active)) {
             System.out.println(id + " is clicked");
             return true;
         }
-
-        return false;
-    }
-
-    public static boolean acceptInput(InputMap inputMap) {
-        GUI.inputs = inputMap;
 
         return false;
     }
@@ -190,4 +177,10 @@ public abstract class GUI<Color, Font> {
     public abstract void setIntValue(String id, String field, int value);
 
     public abstract Color getColorByName(String name);
+
+    protected abstract boolean isMouseDown();
+
+    protected abstract int getMouseX();
+
+    protected abstract int getMouseY();
 }

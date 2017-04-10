@@ -1,7 +1,8 @@
-package com.gobs.ui;
+package com.gobs.ui.gdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -9,24 +10,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.gobs.assets.TileFactory;
-import com.gobs.display.OrthographicDisplay;
+import com.gobs.ui.GUI;
+import com.gobs.ui.GUILoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
+public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     private Batch batch;
     private ObjectMap<String, BitmapFont> fonts;
     private BitmapFont font;
     private Color color;
     private ShapeRenderer renderer;
-    private TileFactory tileManager;
-    private OrthographicDisplay display;
     private GdxGUILoader JsonLoader;
 
-    public GdxGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
-        this.display = display;
-        this.tileManager = tileManager;
+    public GdxGUI(Batch batch) {
         this.batch = batch;
 
         fonts = new ObjectMap<>();
@@ -55,16 +52,6 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
     }
 
     @Override
-    public float getMaxWidth() {
-        return display.getViewPort().getWorldWidth();
-    }
-
-    @Override
-    public float getMaxHeight() {
-        return display.getViewPort().getWorldHeight();
-    }
-
-    @Override
     public float getLabelWidth(String text) {
         GlyphLayout glayout = new GlyphLayout(font, text);
 
@@ -89,11 +76,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
 
     @Override
     public void drawBox(float x, float y, float w, float h, boolean selected) {
-        TextureRegion r = tileManager.getFrame();
-
-        if (selected) {
-            r = tileManager.getFrameSelected();
-        }
+        TextureRegion r = getFrame(selected);
 
         batch.draw(r, x, y, w, h);
     }
@@ -148,7 +131,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
 
     public void drawSquare(float x1, float y1, float x2, float y2) {
         Gdx.gl20.glLineWidth(5);
-        getRenderer().setProjectionMatrix(display.getCamera().combined);
+        getRenderer().setProjectionMatrix(getCamera().combined);
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
         getRenderer().setColor(Color.GREEN);
 
@@ -162,7 +145,7 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
 
     public void showCenters() {
         Gdx.gl20.glLineWidth(1);
-        getRenderer().setProjectionMatrix(display.getCamera().combined);
+        getRenderer().setProjectionMatrix(getCamera().combined);
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
         getRenderer().setColor(Color.RED);
         getRenderer().line(Gdx.graphics.getWidth() / 2.0f, 0, Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight());
@@ -180,4 +163,8 @@ public class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
             renderer.dispose();
         }
     }
+
+    protected abstract TextureRegion getFrame(boolean selected);
+
+    protected abstract OrthographicCamera getCamera();
 }

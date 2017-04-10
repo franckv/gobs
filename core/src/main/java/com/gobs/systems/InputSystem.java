@@ -18,8 +18,7 @@ import com.gobs.components.Position;
 import com.gobs.input.ContextManager;
 import com.gobs.input.ContextManager.ContextType;
 import com.gobs.input.InputHandler;
-import com.gobs.ui.GUI;
-import com.gobs.ui.InputMap;
+import com.gobs.input.InputMap;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
@@ -56,7 +55,6 @@ public class InputSystem extends BaseEntitySystem {
         InputMap inputMap = inputHandler.getInputMap();
 
         if (inputMap.hasInput()) {
-            GUI.acceptInput(inputMap);
             contextManager.acceptInput(inputMap);
             contextManager.dispatchInput(inputMap);
             processInputs();

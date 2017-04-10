@@ -1,12 +1,13 @@
-package com.gobs.ui;
+package com.gobs.ui.gdx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gobs.ui.GUILoader;
 import java.io.Reader;
 
-class GdxGUILoader extends GUILoader<JsonValue, Color, BitmapFont> {
+public class GdxGUILoader extends GUILoader<JsonValue, Color, BitmapFont> {
     public GdxGUILoader(GdxGUI gui) {
         super(gui);
     }

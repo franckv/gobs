@@ -1,6 +1,7 @@
-package com.gobs.ui;
+package com.gobs.input;
 
-import com.gobs.ui.InputMap.Input;
+import com.gobs.input.InputMap;
+import com.gobs.input.InputMap.Input;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;

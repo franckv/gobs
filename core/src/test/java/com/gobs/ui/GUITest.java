@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.DisplayManager;
+import com.gobs.ui.gdx.GdxGUI;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,25 +22,36 @@ public class GUITest {
         final HeadlessApplicationConfiguration appConfig = new HeadlessApplicationConfiguration();
         new HeadlessApplication(new ApplicationListener() {
             @Override
-            public void create() {}
+            public void create() {
+            }
+
             @Override
-            public void resize(int width, int height) {}
+            public void resize(int width, int height) {
+            }
+
             @Override
-            public void render() {}
+            public void render() {
+            }
+
             @Override
-            public void pause() {}
+            public void pause() {
+            }
+
             @Override
-            public void resume() {}
+            public void resume() {
+            }
+
             @Override
-            public void dispose() {}
+            public void dispose() {
+            }
         }, appConfig);
-        
+
         DisplayManager displayManager = Mockito.mock(DisplayManager.class);
-        
+
         TileFactory tileFactory = Mockito.mock(TileFactory.class);
         SpriteBatch spriteBatch = Mockito.mock(SpriteBatch.class);
-        
-       gui = new GdxGUI(displayManager.getOverlayDisplay(), tileFactory, spriteBatch);
+
+        gui = new GobsGUI(displayManager.getOverlayDisplay(), tileFactory, spriteBatch);
     }
 
     @Test

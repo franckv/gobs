@@ -2,13 +2,9 @@ package com.gobs.input;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.gobs.ui.InputMap;
-import com.gobs.ui.InputMap.Input;
+import com.gobs.input.InputMap.Input;
 import java.util.BitSet;
 
-/**
- *
- */
 public class ContextManager {
     public enum ContextType {
         GLOBAL, CRAWLING, MAP, EDITMAP, INVENTORY

@@ -40,7 +40,7 @@ import com.gobs.systems.ProgressSystem;
 import com.gobs.systems.TransformationSystem;
 import com.gobs.systems.UIRenderingSystem;
 import com.gobs.systems.WorkSystem;
-import com.gobs.ui.InputMap.Input;
+import com.gobs.input.InputMap.Input;
 import com.gobs.util.CollisionManager;
 import java.io.IOException;
 import java.io.InputStream;
