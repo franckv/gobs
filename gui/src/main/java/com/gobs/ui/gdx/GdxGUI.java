@@ -23,14 +23,16 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     private ShapeRenderer renderer;
     private GdxGUILoader JsonLoader;
 
-    public GdxGUI(Batch batch) {
-        this.batch = batch;
-
+    public GdxGUI() {
         fonts = new ObjectMap<>();
 
         color = Color.GREEN;
 
         JsonLoader = new GdxGUILoader(this);
+    }
+
+    public void setBatch(Batch batch) {
+        this.batch = batch;
     }
 
     @Override
@@ -53,6 +55,10 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
 
     @Override
     public float getLabelWidth(String text) {
+        if (font == null) {
+            throw new RuntimeException("Must supply font");
+        }
+
         GlyphLayout glayout = new GlyphLayout(font, text);
 
         return glayout.width;
@@ -60,6 +66,10 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
 
     @Override
     public float getLabelHeight(String text) {
+        if (font == null) {
+            throw new RuntimeException("Must supply font");
+        }
+
         GlyphLayout glayout = new GlyphLayout(font, text);
 
         return glayout.height;
@@ -127,34 +137,23 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
         return color;
     }
 
-    private ShapeRenderer getRenderer() {
+    protected ShapeRenderer getRenderer() {
         if (renderer == null) {
             renderer = new ShapeRenderer();
         }
         return renderer;
     }
 
-    public void drawSquare(float x1, float y1, float x2, float y2) {
-        Gdx.gl20.glLineWidth(5);
+    public void drawSquare(float x1, float y1, float x2, float y2, Color color) {
+        Gdx.gl20.glLineWidth(1);
         getRenderer().setProjectionMatrix(getCamera().combined);
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
-        getRenderer().setColor(Color.GREEN);
+        getRenderer().setColor(color);
 
         getRenderer().line(x1, y1, x1, y2);
         getRenderer().line(x1, y2, x2, y2);
         getRenderer().line(x2, y2, x2, y1);
         getRenderer().line(x2, y1, x1, y1);
-
-        getRenderer().end();
-    }
-
-    public void showCenters() {
-        Gdx.gl20.glLineWidth(1);
-        getRenderer().setProjectionMatrix(getCamera().combined);
-        getRenderer().begin(ShapeRenderer.ShapeType.Line);
-        getRenderer().setColor(Color.RED);
-        getRenderer().line(Gdx.graphics.getWidth() / 2.0f, 0, Gdx.graphics.getWidth() / 2.0f, Gdx.graphics.getHeight());
-        getRenderer().line(0, Gdx.graphics.getHeight() / 2.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 2.0f);
 
         getRenderer().end();
     }
