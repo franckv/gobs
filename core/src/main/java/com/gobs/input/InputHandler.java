@@ -1,6 +1,5 @@
 package com.gobs.input;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -95,13 +94,13 @@ public class InputHandler extends InputAdapter {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
+        inputMap.mouseMoved(screenX, screenY);
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        inputMap.mouseMoved(screenX, Gdx.graphics.getHeight() - screenY);
+        inputMap.mouseMoved(screenX, screenY);
         return true;
     }
 

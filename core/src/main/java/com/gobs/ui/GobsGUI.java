@@ -1,8 +1,9 @@
 package com.gobs.ui;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.gobs.assets.TileFactory;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.input.InputMap;
@@ -18,7 +19,7 @@ public class GobsGUI extends GdxGUI {
 
     public GobsGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
         super();
-        
+
         setBatch(batch);
         this.display = display;
         this.tileManager = tileManager;
@@ -33,6 +34,13 @@ public class GobsGUI extends GdxGUI {
         return false;
     }
 
+    private Vector2 getMouseCoordinate() {
+        Vector2 screenCoord = new Vector2(inputMap.getMouseX(), inputMap.getMouseY());
+
+        // transform screen coord to world coord
+        return display.getViewPort().unproject(screenCoord);
+    }
+
     @Override
     protected boolean isMouseDown() {
         return (inputMap != null && inputMap.isMouseDown());
@@ -43,7 +51,7 @@ public class GobsGUI extends GdxGUI {
         int x = -1;
 
         if (inputMap != null) {
-            x = inputMap.getMouseX();
+            x = (int) getMouseCoordinate().x;
         }
 
         return x;
@@ -54,7 +62,7 @@ public class GobsGUI extends GdxGUI {
         int y = -1;
 
         if (inputMap != null) {
-            y = inputMap.getMouseY();
+            y = (int) getMouseCoordinate().y;
         }
 
         return y;
@@ -71,16 +79,16 @@ public class GobsGUI extends GdxGUI {
     }
 
     @Override
-    protected OrthographicCamera getCamera() {
-        return display.getCamera();
-    }
-
-    @Override
     protected TextureRegion getFrame(boolean selected) {
         if (selected) {
             return frameSelected;
         } else {
             return frame;
         }
+    }
+
+    @Override
+    protected TextureRegion getSolidTexture(Color color) {
+        return null;
     }
 }
