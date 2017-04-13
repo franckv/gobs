@@ -1,0 +1,70 @@
+[
+    {
+        "fragment": "ui",
+        "content": [
+            {
+
+                "type": "layout",
+                "name": "Portraits",
+                "direction": "Horizontal",
+                "margin": 20,
+                "spacing": 30,
+                "children": [
+                    {
+                        "type": "spacer",
+                        "id": "charactersSpacing",
+                        "height": 0
+                    },
+                    {
+                        "type": "layout",
+                        "name": "Portrait1",
+                        "direction": "None",
+                        "children": [
+                            {
+                                "type": "label",
+                                "label": "AAA"
+                            },
+                            {
+                                "type": "spacer",
+                                "width": 250,
+                                "height": 150
+                            }
+                        ]
+                    },
+                    {
+                        "type": "layout",
+                        "name": "Portrait2",
+                        "direction": "None",
+                        "children": [
+                            {
+                                "type": "label",
+                                "label": "BBB"
+                            },
+                            {
+                                "type": "spacer",
+                                "width": 250,
+                                "height": 150
+                            }
+                        ]
+                    },
+                    {
+                        "type": "layout",
+                        "name": "Portrait3",
+                        "direction": "None",
+                        "children": [
+                            {
+                                "type": "label",
+                                "label": "CCC"
+                            },
+                            {
+                                "type": "spacer",
+                                "width": 250,
+                                "height": 150
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
