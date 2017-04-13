@@ -1,13 +1,10 @@
 package com.gobs.ui.gdx;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUI;
@@ -19,14 +16,13 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     private Batch batch;
     private ObjectMap<String, BitmapFont> fonts;
     private BitmapFont font;
-    private Color color;
-    private ShapeRenderer renderer;
+    private Color fontColor;
     private GdxGUILoader JsonLoader;
 
     public GdxGUI() {
         fonts = new ObjectMap<>();
 
-        color = Color.GREEN;
+        fontColor = Color.GREEN;
 
         JsonLoader = new GdxGUILoader(this);
     }
@@ -50,7 +46,7 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
 
     @Override
     public void setFontColor(Color color) {
-        this.color = color;
+        this.fontColor = color;
     }
 
     @Override
@@ -76,10 +72,14 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
-    public void drawText(String text, float x, float y) {
-        font.setColor(color);
+    public void drawText(String text, float x, float y, boolean selected) {
+        font.setColor(fontColor);
 
         GlyphLayout glayout = new GlyphLayout(font, text);
+
+        float spacing = getLayout().getSpacing();
+
+        batch.draw(getLabelBg(selected), x, y - spacing / 2, glayout.width, glayout.height + spacing);
 
         font.draw(batch, glayout, x, y + glayout.height);
     }
@@ -92,7 +92,7 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
-    public GUILoader getGUILoader() {
+    protected GUILoader getGUILoader() {
         return JsonLoader;
     }
 
@@ -112,16 +112,6 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
-    public void setStringValue(String id, String field, String value) {
-        JsonLoader.setStringValue(id, field, value);
-    }
-
-    @Override
-    public void setIntValue(String id, String field, int value) {
-        JsonLoader.setIntValue(id, field, value);
-    }
-
-    @Override
     public Color getColorByName(String name) {
         Color color = Color.GREEN;
 
@@ -137,38 +127,16 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
         return color;
     }
 
-    protected ShapeRenderer getRenderer() {
-        if (renderer == null) {
-            renderer = new ShapeRenderer();
-        }
-        return renderer;
-    }
-
-    public void drawSquare(float x1, float y1, float x2, float y2, Color color) {
-        Gdx.gl20.glLineWidth(1);
-        getRenderer().setProjectionMatrix(getCamera().combined);
-        getRenderer().begin(ShapeRenderer.ShapeType.Line);
-        getRenderer().setColor(color);
-
-        getRenderer().line(x1, y1, x1, y2);
-        getRenderer().line(x1, y2, x2, y2);
-        getRenderer().line(x2, y2, x2, y1);
-        getRenderer().line(x2, y1, x1, y1);
-
-        getRenderer().end();
-    }
-
     @Override
     public void dispose() {
         for (BitmapFont font : fonts.values()) {
             font.dispose();
         }
-        if (renderer != null) {
-            renderer.dispose();
-        }
     }
 
-    protected abstract TextureRegion getFrame(boolean selected);
+    protected abstract TextureRegion getSolidTexture(Color color);
 
-    protected abstract OrthographicCamera getCamera();
+    protected abstract TextureRegion getLabelBg(boolean selected);
+
+    protected abstract TextureRegion getFrame(boolean selected);
 }

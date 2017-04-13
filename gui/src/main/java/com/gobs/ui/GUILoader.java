@@ -20,13 +20,14 @@ public abstract class GUILoader<JsonValue, Color, Font> {
 
     private static class JsonSubstitution {
         private enum JsonSubstitutionType {
-            STR, INT
+            STR, INT, LIST
         };
 
         private String field;
         private JsonSubstitutionType type;
         private String strValue;
         private int intValue;
+        private Iterable<String> listValues;
 
         private JsonSubstitution(String field, String value) {
             this.field = field;
@@ -39,12 +40,19 @@ public abstract class GUILoader<JsonValue, Color, Font> {
             this.type = JsonSubstitutionType.INT;
             this.intValue = value;
         }
+
+        private JsonSubstitution(String field, Iterable<String> values) {
+            this.field = field;
+            this.type = JsonSubstitutionType.LIST;
+            this.listValues = values;
+        }
     }
 
     private GUI<Color, Font> gui;
     private JsonValue root;
     private Map<String, JsonFragment> fragments;
     private Map<String, JsonSubstitution> substitutions;
+    private Map<String, Integer> listSelections;
     private int idx;
 
     public GUILoader(GUI gui) {
@@ -52,6 +60,7 @@ public abstract class GUILoader<JsonValue, Color, Font> {
 
         fragments = new HashMap<>();
         substitutions = new HashMap<>();
+        listSelections = new HashMap<>();
 
         idx = 0;
     }
@@ -98,6 +107,18 @@ public abstract class GUILoader<JsonValue, Color, Font> {
         substitutions.put(id, new JsonSubstitution(field, value));
     }
 
+    public void setListValue(String id, String field, Iterable<String> values) {
+        substitutions.put(id, new JsonSubstitution(field, values));
+    }
+
+    public int getListSelection(String id) {
+        if (listSelections.containsKey(id)) {
+            return listSelections.get(id);
+        }
+
+        return -1;
+    }
+
     private void parse(JsonValue value) {
         if (value == null) {
             return;
@@ -114,6 +135,9 @@ public abstract class GUILoader<JsonValue, Color, Font> {
                     break;
                 case "label":
                     parseLabel(value);
+                    break;
+                case "table":
+                    parseTable(value);
                     break;
                 case "frame":
                     parseFrame(value);
@@ -183,6 +207,23 @@ public abstract class GUILoader<JsonValue, Color, Font> {
 
         if (label != null) {
             gui.Label(label);
+        }
+    }
+
+    private void parseTable(JsonValue value) {
+        String id = getString(value, "id");
+        String header = getString(value, "header");
+        Iterable<String> values = getList(value, "values");
+
+        int selected = -1;
+
+        if (listSelections.containsKey(id)) {
+            selected = listSelections.get(id);
+        }
+
+        if (header != null) {
+            selected = gui.Table(id, header, values, selected);
+            listSelections.put(id, selected);
         }
     }
 
@@ -266,6 +307,17 @@ public abstract class GUILoader<JsonValue, Color, Font> {
         }
 
         return readInt(value, name);
+    }
+
+    private Iterable<String> getList(JsonValue value, String name) {
+        if (hasField(value, "id")) {
+            String id = readString(value, "id").replace("${i}", Integer.toString(idx));
+            if (substitutions.containsKey(id) && substitutions.get(id).field.equals(name)) {
+                return substitutions.get(id).listValues;
+            }
+        }
+
+        return null;
     }
 
     protected abstract JsonValue readFile(Reader reader);

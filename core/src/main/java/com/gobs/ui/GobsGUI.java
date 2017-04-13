@@ -89,6 +89,15 @@ public class GobsGUI extends GdxGUI {
 
     @Override
     protected TextureRegion getSolidTexture(Color color) {
-        return null;
+        return tileManager.getFullTile(color);
+    }
+
+    @Override
+    protected TextureRegion getLabelBg(boolean selected) {
+        if (selected) {
+            return getSolidTexture(Color.BLUE);
+        } else {
+            return getSolidTexture(Color.CLEAR);
+        }
     }
 }

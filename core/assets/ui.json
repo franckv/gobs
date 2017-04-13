@@ -128,7 +128,7 @@
                         "name": "monitor",
                         "direction": "Vertical",
                         "margin": 10,
-                        "spacing": 1,
+                        "spacing": 5,
                         "children": [
                             {
                                 "type": "spacer",
@@ -136,11 +136,8 @@
                                 "height": 150
                             },
                             {
-                                "type": "label",
-                                "label": "Performances\n------------"
-                            },
-                            {
-                                "type": "label",
+                                "type": "table",
+                                "header": "Performances\n------------",
                                 "id": "perftable"
                             }
                         ]

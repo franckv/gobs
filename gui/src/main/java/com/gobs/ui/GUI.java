@@ -56,24 +56,53 @@ public abstract class GUI<Color, Font> {
 
     private boolean isClicked(String id) {
         if (!isMouseDown() && id.equals(hot) && id.equals(active)) {
-            System.out.println(id + " is clicked");
             return true;
         }
 
         return false;
     }
 
-    public boolean Button() {
-        return false;
+    public void Label(String text) {
+        Label(text, false);
     }
 
-    public void Label(String text) {
+    private void Label(String text, boolean selected) {
         float h = getLabelHeight(text);
         float w = getLabelWidth(text);
 
-        drawText(text, layout.getX(w), layout.getY(h));
+        drawText(text, layout.getX(w), layout.getY(h), selected);
 
         layout.update(w, h);
+    }
+
+    public int Table(String id, String header, Iterable<String> values, int selected) {
+        createSection(header, GUILayout.FlowDirection.VERTICAL);
+
+        Label(header);
+
+        int i = 0;
+        for (String value : values) {
+            float w = getLabelWidth(value);
+            float h = getLabelHeight(value);
+
+            float x = layout.getX(w);
+            float y = layout.getY(h);
+            float spacing = layout.getSpacing();
+
+            boolean highlight = false;
+            if (isSelected(id + "#" + i, x, y - spacing / 2, w, h + spacing) || i == selected) {
+                highlight = true;
+            }
+            if (isClicked(id + "#" + i)) {
+                selected = i;
+            }
+            Label(value, highlight);
+            i++;
+        }
+
+        endSection();
+
+        return selected;
     }
 
     public void Spacer(float width, float height) {
@@ -96,6 +125,23 @@ public abstract class GUI<Color, Font> {
         layout.update(w, h);
 
         return isClicked(id);
+    }
+
+    public boolean Button(String id, float w, float h, String label) {
+        createSection(id, GUILayout.FlowDirection.NONE);
+
+        boolean result = Box(id, w, h);
+
+        float lw = getLabelWidth(label);
+        float lh = getLabelHeight(label);
+
+        layout.center(lw, lh);
+
+        Label(label);
+
+        endSection();
+
+        return result;
     }
 
     public void createSection(String name, GUILayout.FlowDirection flow) {
@@ -162,6 +208,22 @@ public abstract class GUI<Color, Font> {
         return layout;
     }
 
+    public void setStringValue(String id, String field, String value) {
+        getGUILoader().setStringValue(id, field, value);
+    }
+
+    public void setIntValue(String id, String field, int value) {
+        getGUILoader().setIntValue(id, field, value);
+    }
+
+    public void setListValue(String id, String field, Iterable<String> values) {
+        getGUILoader().setListValue(id, field, values);
+    }
+
+    public int getListSelection(String id) {
+        return getGUILoader().getListSelection(id);
+    }
+
     public abstract float getMaxWidth();
 
     public abstract float getMaxHeight();
@@ -170,7 +232,7 @@ public abstract class GUI<Color, Font> {
 
     public abstract float getLabelHeight(String text);
 
-    public abstract void drawText(String text, float x, float y);
+    public abstract void drawText(String text, float x, float y, boolean selected);
 
     public abstract void drawBox(float x, float y, float w, float h, boolean selected);
 
@@ -180,19 +242,15 @@ public abstract class GUI<Color, Font> {
 
     public abstract void setFontColor(Color color);
 
-    public abstract GUILoader getGUILoader();
-
     public abstract void showFragment(String fragment);
 
     public abstract void enableFragment(String fragment, boolean enabled);
 
     public abstract void toggleFragment(String fragment);
 
-    public abstract void setStringValue(String id, String field, String value);
-
-    public abstract void setIntValue(String id, String field, int value);
-
     public abstract Color getColorByName(String name);
+
+    protected abstract GUILoader getGUILoader();
 
     protected abstract boolean isMouseDown();
 

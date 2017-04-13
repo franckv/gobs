@@ -1,10 +1,10 @@
 package com.gobs.demo;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.gobs.ui.GUILayout;
 
-public class Sample02 extends DemoGUI {
+public class Sample02 extends DemoApplication {
     public static void main(String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 1024;
@@ -18,72 +18,35 @@ public class Sample02 extends DemoGUI {
     public void create() {
         super.create();
 
-        addFont("font", getFont("sazanami-mincho.ttf", 16));
+        gui.addFont("font", getFont("sazanami-mincho.ttf", 16));
 
-        setShowLayouts(true);
+        gui.load(Gdx.files.internal("portraits.json").reader());
+
+        int nPlayers = 3;
+        int boxW = 250;
+        int margin = 20;
+        int spacing = 30;
+
+        float size = nPlayers * boxW + (nPlayers - 1) * spacing;
+        float space = (viewport.getWorldWidth() - size - 2 * margin) / 2 - spacing;
+
+        gui.setIntValue("charactersSpacing", "width", (int) space);
     }
 
     @Override
     public void render() {
-        begin();
+        super.render();
 
-        setMargin(13, 13);
-        setSpacing(13);
+        batch.begin();
 
-        setFont("small");
+        gui.begin();
 
-        createSection("Line1", GUILayout.FlowDirection.HORIZONTAL);
-        {
-            createSection("Column11", GUILayout.FlowDirection.VERTICAL);
-            {
-                createSection("Line111", GUILayout.FlowDirection.HORIZONTAL);
-                {
-                    createSection("Column1111", GUILayout.FlowDirection.VERTICAL);
-                    Label("AAA");
-                    Label("AAA");
-                    Label("AAAAAA");
-                    Label("AAA");
-                    endSection();
+        gui.showFragment("ui");
 
-                    createSection("Column1112", GUILayout.FlowDirection.VERTICAL);
-                    Label("BBB");
-                    Label("BB");
-                    Label("BBB");
-                    Label("BBB");
-                    endSection();
-                }
-                endSection();
+        batch.end();
 
-                createSection("Line112", GUILayout.FlowDirection.HORIZONTAL);
-                Label("CCC");
-                endSection();
+        gui.end();
 
-                createSection("Line113", GUILayout.FlowDirection.HORIZONTAL);
-                Label("DDD");
-                Label("DDD");
-                Label("DDD");
-                Label("DDD");
-                endSection();
-            }
-            endSection(); // Column11
-
-            createSection("Column12", GUILayout.FlowDirection.VERTICAL);
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            Label("EEE");
-            endSection();
-        }
-        endSection(); // Line1
-
-        end();
-
-        showRuler(13);
+        gui.showCenters(16);
     }
 }

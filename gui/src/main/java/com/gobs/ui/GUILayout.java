@@ -91,6 +91,10 @@ public class GUILayout {
         return right;
     }
 
+    public float getSpacing() {
+        return spacing;
+    }
+
     String getId() {
         return id;
     }
@@ -118,10 +122,10 @@ public class GUILayout {
 
         posX = x;
         posY = y;
-        top = y;
-        bottom = y;
-        left = x;
-        right = x;
+    }
+
+    void center(float width, float height) {
+        setPosition(posX + (right - left - width) / 2, posY - (top - bottom - height) / 2);
     }
 
     void update(float width, float height) {

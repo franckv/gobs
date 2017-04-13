@@ -123,16 +123,15 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
         if (strategy.hasPerfData()) {
             ObjectMap<String, Long> perfData = strategy.getPerfData();
-            StringBuilder perfLabel = new StringBuilder();
 
-            Array<String> systems = perfData.keys().toArray();
-            Sort.instance().sort(systems);
-
-            for (String system : systems) {
-                perfLabel.append(system).append(": ").append(perfData.get(system)).append("\n");
+            Array<String> systems = new Array<>();
+            for (String system : perfData.keys()) {
+                systems.add(system + ": " + perfData.get(system));
             }
 
-            gui.setStringValue("perftable", "label", perfLabel.toString());
+            Sort.instance().sort(systems);
+
+            gui.setListValue("perftable", "values", systems);
         }
 
         dumpEntities();
@@ -239,7 +238,13 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private void dumpEntities() {
         StringBuilder entities = new StringBuilder();
 
+        boolean firstE = true;
+
         for (int i = 0; i < allEntities.getEntities().size(); i++) {
+            if (!firstE) {
+                entities.append("]\n");
+
+            }
             int entityId = allEntities.getEntities().get(i);
 
             entities.append(entityId);
@@ -248,16 +253,15 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
             Bag<Component> components = new Bag<>();
             getWorld().getEntity(entityId).getComponents(components);
 
-            boolean first = true;
+            boolean firstC = true;
             for (Component component : components) {
-                if (!first) {
+                if (!firstC) {
                     entities.append(",");
                 }
                 entities.append(component.getClass().getSimpleName());
-                first = false;
+                firstC = false;
             }
-
-            entities.append("]\n");
+            firstE = false;
         }
 
         gui.setStringValue("entities", "label", entities.toString());

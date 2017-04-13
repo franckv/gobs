@@ -1,40 +1,48 @@
 package com.gobs.demo;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.gdx.GdxGUI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public abstract class DemoGUI extends GdxGUI implements ApplicationListener, InputProcessor {
-    Batch batch;
-    OrthographicCamera camera;
-    Viewport viewport;
+public class DemoGUI extends GdxGUI {
+    private OrthographicCamera camera;
+    private ShapeRenderer renderer;
 
-    List<GUILayout> layouts;
+    private List<GUILayout> layouts;
 
-    boolean showLayouts = false;
+    private boolean showLayouts = false;
 
-    int idx = 0;
+    private int idx = 0;
+
+    private Color[] palette;
+    private Pixmap colorsMap;
+    private Texture colorsTexture;
+
+    private int mouseX, mouseY;
+    private boolean mouseDown;
+
+    private float maxWidth, maxHeight;
+
+    public DemoGUI() {
+        palette = new Color[]{
+            Color.GREEN, Color.RED, Color.BLUE, Color.YELLOW,
+            Color.PINK, Color.ORANGE, Color.MAGENTA, Color.PURPLE,
+            Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.CLEAR
+        };
+
+        initTextures();
+    }
 
     @Override
     public void begin() {
-        batch.begin();
         super.begin();
 
         if (showLayouts) {
@@ -46,25 +54,43 @@ public abstract class DemoGUI extends GdxGUI implements ApplicationListener, Inp
     @Override
     public void end() {
         super.end();
-        batch.end();
 
         if (showLayouts) {
             drawLayouts();
         }
     }
 
+    private void initTextures() {
+        colorsMap = new Pixmap(16 * palette.length, 16, Pixmap.Format.RGBA8888);
+
+        for (int i = 0; i < palette.length; i++) {
+            colorsMap.setColor(palette[i]);
+            colorsMap.fillRectangle(i * 16, 0, 16, 16);
+        }
+
+        colorsTexture = new Texture(colorsMap);
+    }
+
+    void toggleLayout() {
+        showLayouts = !showLayouts;
+    }
+
+    void resize(float width, float height) {
+        this.maxWidth = width;
+        this.maxHeight = height;
+    }
+
+    void setCamera(OrthographicCamera camera) {
+        this.camera = camera;
+    }
+
     private void drawLayouts() {
         for (int i = layouts.size() - 1; i >= 0; i--) {
             GUILayout layout = layouts.get(i);
 
-            Color[] colors = {
-                Color.GREEN, Color.RED, Color.BLUE, Color.YELLOW,
-                Color.PINK, Color.ORANGE, Color.MAGENTA, Color.PURPLE
-            };
+            idx = (idx + 1) % palette.length;
 
-            idx = (idx + 1) % colors.length;
-
-            drawSquare(layout.getLeft(), layout.getBottom(), layout.getRight(), layout.getTop(), colors[idx]);
+            drawSquare(layout.getLeft(), layout.getBottom(), layout.getRight(), layout.getTop(), palette[idx]);
         }
 
         layouts = null;
@@ -74,31 +100,49 @@ public abstract class DemoGUI extends GdxGUI implements ApplicationListener, Inp
         this.showLayouts = showLayouts;
     }
 
+    protected ShapeRenderer getRenderer() {
+        if (renderer == null) {
+            renderer = new ShapeRenderer();
+        }
+        return renderer;
+    }
+
+    public void drawSquare(float x1, float y1, float x2, float y2, Color color) {
+        Gdx.gl20.glLineWidth(1);
+        getRenderer().setProjectionMatrix(camera.combined);
+        getRenderer().begin(ShapeRenderer.ShapeType.Line);
+        getRenderer().setColor(color);
+
+        getRenderer().line(x1, y1, x1, y2);
+        getRenderer().line(x1, y2, x2, y2);
+        getRenderer().line(x2, y2, x2, y1);
+        getRenderer().line(x2, y1, x1, y1);
+
+        getRenderer().end();
+    }
+
     public void showCenters(int unit) {
         Gdx.gl20.glLineWidth(1);
-        getRenderer().setProjectionMatrix(getCamera().combined);
+        getRenderer().setProjectionMatrix(camera.combined);
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
         getRenderer().setColor(Color.RED);
 
         int size = unit / 2;
 
-        float h = Gdx.graphics.getHeight();
-        float w = Gdx.graphics.getWidth();
-
         // vertical
-        getRenderer().line(w / 2.0f, 0, w / 2.0f, h);
+        getRenderer().line(maxWidth / 2.0f, 0, maxWidth / 2.0f, maxHeight);
 
-        for (int i = 0; i < h / unit; i++) {
+        for (int i = 0; i < maxHeight / unit; i++) {
             float y = i * unit;
-            getRenderer().line(w / 2.0f - size, y, w / 2.0f + size, y);
+            getRenderer().line(maxWidth / 2.0f - size, y, maxWidth / 2.0f + size, y);
         }
 
         // horizontal
-        getRenderer().line(0, h / 2.0f, w, h / 2.0f);
+        getRenderer().line(0, maxHeight / 2.0f, maxWidth, maxHeight / 2.0f);
 
-        for (int i = 0; i < w / unit; i++) {
+        for (int i = 0; i < maxWidth / unit; i++) {
             float x = i * unit;
-            getRenderer().line(x, h / 2.0f - size, x, h / 2.0f + size);
+            getRenderer().line(x, maxHeight / 2.0f - size, x, maxHeight / 2.0f + size);
         }
 
         getRenderer().end();
@@ -106,23 +150,20 @@ public abstract class DemoGUI extends GdxGUI implements ApplicationListener, Inp
 
     public void showRuler(int unit) {
         Gdx.gl20.glLineWidth(1);
-        getRenderer().setProjectionMatrix(getCamera().combined);
+        getRenderer().setProjectionMatrix(camera.combined);
         getRenderer().begin(ShapeRenderer.ShapeType.Line);
         getRenderer().setColor(Color.RED);
 
         int size = unit;
 
-        float h = Gdx.graphics.getHeight();
-        float w = Gdx.graphics.getWidth();
-
-        for (int i = 0; i < h / unit; i++) {
-            float y = h - i * unit;
+        for (int i = 0; i < maxHeight / unit; i++) {
+            float y = maxHeight - i * unit;
             getRenderer().line(0, y, size, y);
         }
 
-        for (int i = 0; i < w / unit; i++) {
+        for (int i = 0; i < maxWidth / unit; i++) {
             float x = i * unit;
-            getRenderer().line(x, h, x, h - size);
+            getRenderer().line(x, maxHeight, x, maxHeight - size);
         }
 
         getRenderer().end();
@@ -136,137 +177,77 @@ public abstract class DemoGUI extends GdxGUI implements ApplicationListener, Inp
     }
 
     @Override
-    protected TextureRegion getFrame(boolean selected
-    ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    protected TextureRegion getSolidTexture(Color color) {
+        for (int i = 0; i < palette.length; i++) {
+            if (palette[i] == color) {
+                return new TextureRegion(colorsTexture, i * 16, 0, 16, 16);
+            }
+        }
+
+        return null;
     }
 
     @Override
-    protected OrthographicCamera getCamera() {
-        return camera;
+    protected TextureRegion getFrame(boolean selected) {
+        if (selected) {
+            return getSolidTexture(Color.GRAY);
+        } else {
+            return getSolidTexture(Color.LIGHT_GRAY);
+        }
+    }
+
+    @Override
+    protected TextureRegion getLabelBg(boolean selected) {
+        if (selected) {
+            return getSolidTexture(Color.LIGHT_GRAY);
+        } else {
+            return getSolidTexture(Color.CLEAR);
+        }
     }
 
     @Override
     public float getMaxWidth() {
-        return viewport.getWorldWidth();
+        return maxWidth;
     }
 
     @Override
     public float getMaxHeight() {
-        return viewport.getWorldHeight();
+        return maxHeight;
     }
 
     @Override
     protected boolean isMouseDown() {
-        return false;
+        return mouseDown;
     }
 
     @Override
     protected int getMouseX() {
-        return 0;
+        return mouseX;
     }
 
     @Override
     protected int getMouseY() {
-        return 0;
+        return mouseY;
     }
 
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-
-        setBatch(batch);
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
-        viewport.apply();
-
-        Gdx.input.setInputProcessor(this);
+    void setMouseDown(boolean mouseDown) {
+        this.mouseDown = mouseDown;
     }
 
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
-
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-    }
-
-    @Override
-    public void resize(int width, int height
-    ) {
-        viewport.update(width, height);
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
+    void setMousePosition(int x, int y) {
+        this.mouseX = x;
+        this.mouseY = y;
     }
 
     @Override
     public void dispose() {
         super.dispose();
 
-        batch.dispose();
-    }
+        colorsMap.dispose();
+        colorsTexture.dispose();
 
-    protected BitmapFont getFont(String file, int size) {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(file));
-
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = size;
-        BitmapFont font = generator.generateFont(parameter);
-
-        return font;
-    }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        if (keycode == Keys.ESCAPE) {
-            Gdx.app.exit();
+        if (renderer != null) {
+            renderer.dispose();
         }
-
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(int amount) {
-        return false;
     }
 }
