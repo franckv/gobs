@@ -99,11 +99,13 @@ public abstract class GUI<Color, Font> {
     }
 
     public void createSection(String name, GUILayout.FlowDirection flow) {
-        pushLayout(new GUILayout(name, layout, flow, getMaxWidth(), getMaxHeight()));
+        pushLayout(createLayout(name, layout, flow, getMaxWidth(), getMaxHeight()));
     }
 
     public void endSection() {
         layout.end();
+
+        disposeLayout(layout);
 
         popLayout();
     }
@@ -144,9 +146,20 @@ public abstract class GUI<Color, Font> {
         layouts.addFirst(layout);
     }
 
-    public void popLayout() {
+    private void popLayout() {
         layouts.removeFirst();
         layout = layouts.getFirst();
+    }
+
+    protected GUILayout createLayout(String name, GUILayout parent, GUILayout.FlowDirection direction, float width, float height) {
+        return new GUILayout(name, parent, direction, width, height);
+    }
+
+    protected void disposeLayout(GUILayout layout) {
+    }
+
+    protected GUILayout getLayout() {
+        return layout;
     }
 
     public abstract float getMaxWidth();
