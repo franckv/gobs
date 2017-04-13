@@ -45,12 +45,12 @@ public class GUILayout {
 
             switch (parent.flow) {
                 case HORIZONTAL:
-                    this.left = parent.right;
+                    this.left = parent.posX;
                     this.top = parent.top;
                     break;
                 case VERTICAL:
                     this.left = parent.left;
-                    this.top = parent.bottom;
+                    this.top = parent.posY;
                     break;
                 case NONE:
                     this.left = parent.left;
@@ -73,6 +73,22 @@ public class GUILayout {
 
         this.posX = left;
         this.posY = top;
+    }
+
+    public float getTop() {
+        return top;
+    }
+
+    public float getBottom() {
+        return bottom;
+    }
+
+    public float getLeft() {
+        return left;
+    }
+
+    public float getRight() {
+        return right;
     }
 
     String getId() {
@@ -124,6 +140,7 @@ public class GUILayout {
                 }
                 right = Math.min(posX + width, maxWidth);
                 posX = Math.min(right + spacing, maxWidth);
+
                 break;
             case NONE:
                 if (height > top - bottom) {
@@ -132,11 +149,18 @@ public class GUILayout {
                 if (width > right - left) {
                     right = Math.min(left + width, maxWidth);
                 }
+
                 break;
         }
     }
 
     void end() {
+        if (parent != null) {
+            parent.update(right - left, top - bottom);
+        }
+    }
+
+    void end0() {
         if (parent != null) {
             if (parent.right < right) {
                 parent.right = right;
@@ -152,7 +176,7 @@ public class GUILayout {
                     parent.posY = parent.top;
                     break;
                 case VERTICAL:
-                    parent.bottom = Math.max(0, parent.bottom - spacing);
+                    parent.bottom = Math.max(0, parent.bottom);
                     parent.posX = parent.left;
                     parent.posY = parent.bottom;
                     break;
@@ -201,5 +225,4 @@ public class GUILayout {
         this.bottom -= y;
         this.posY = top;
     }
-
 }
