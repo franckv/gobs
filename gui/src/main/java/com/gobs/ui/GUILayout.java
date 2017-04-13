@@ -160,42 +160,6 @@ public class GUILayout {
         }
     }
 
-    void end0() {
-        if (parent != null) {
-            if (parent.right < right) {
-                parent.right = right;
-            }
-            if (parent.bottom > bottom) {
-                parent.bottom = bottom;
-            }
-
-            switch (parent.flow) {
-                case HORIZONTAL:
-                    parent.right = Math.min(parent.right + spacing, maxWidth);
-                    parent.posX = parent.right;
-                    parent.posY = parent.top;
-                    break;
-                case VERTICAL:
-                    parent.bottom = Math.max(0, parent.bottom);
-                    parent.posX = parent.left;
-                    parent.posY = parent.bottom;
-                    break;
-            }
-        }
-    }
-
-    void space(float size) {
-
-        switch (flow) {
-            case VERTICAL:
-                update(0, size);
-                break;
-            case HORIZONTAL:
-                update(size, 0);
-                break;
-        }
-    }
-
     void pushToEnd(float size) {
         switch (flow) {
             case HORIZONTAL:

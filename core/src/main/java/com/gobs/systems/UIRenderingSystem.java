@@ -161,10 +161,10 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         int nPlayers = characters.getEntities().size();
         int boxW = 250;
 
-        float size = nPlayers * boxW + (nPlayers - 1) * spacing + 2 * margin;
-        float space = (display.getViewPort().getWorldWidth() - size) / 2;
+        float size = nPlayers * boxW + (nPlayers - 1) * spacing;
+        float space = (display.getViewPort().getWorldWidth() - size - 2 * margin) / 2 - spacing;
 
-        gui.setIntValue("charactersSpacing", "value", (int) space);
+        gui.setIntValue("charactersSpacing", "width", (int) space);
 
         for (int i = 0; i < nPlayers; i++) {
             for (int j = 0; j < characters.getEntities().size(); j++) {

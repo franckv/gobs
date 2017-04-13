@@ -76,8 +76,8 @@ public abstract class GUI<Color, Font> {
         layout.update(w, h);
     }
 
-    public void Spacer(float size) {
-        layout.space(size);
+    public void Spacer(float width, float height) {
+        layout.update(width, height);
     }
 
     public void Frame(float w, float h) {

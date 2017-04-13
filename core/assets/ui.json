@@ -106,7 +106,8 @@
                         "children": [
                             {
                                 "type": "spacer",
-                                "value": 150
+                                "width": 0,
+                                "height": 150
                             },
                             {
                                 "type": "label",
@@ -131,7 +132,8 @@
                         "children": [
                             {
                                 "type": "spacer",
-                                "value": 150
+                                "width": 0,
+                                "height": 150
                             },
                             {
                                 "type": "label",
@@ -179,7 +181,8 @@
                             },
                             {
                                 "type": "spacer",
-                                "value": 5
+                                "width": 0,
+                                "height": 5
                             },
                             {
                                 "type": "font",
@@ -222,7 +225,8 @@
                 "children": [
                     {
                         "type": "spacer",
-                        "id": "charactersSpacing"
+                        "id": "charactersSpacing",
+                        "height": 0
                     },
                     {
                         "type": "repeater",
@@ -306,7 +310,8 @@
                                         "children": [
                                             {
                                                 "type": "spacer",
-                                                "value": 150
+                                                "width": 0,
+                                                "height": 150
                                             }
                                         ]
                                     },

@@ -17,8 +17,9 @@ public class GobsGUI extends GdxGUI {
     private TextureRegion frameSelected;
 
     public GobsGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
-        super(batch);
-
+        super();
+        
+        setBatch(batch);
         this.display = display;
         this.tileManager = tileManager;
 

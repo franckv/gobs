@@ -211,7 +211,7 @@ public abstract class GUILoader<JsonValue, Color, Font> {
     }
 
     private void parseSpacer(JsonValue value) {
-        gui.Spacer(getInt(value, "value"));
+        gui.Spacer(getInt(value, "width"), getInt(value, "height"));
     }
 
     private void parseRepeater(JsonValue value) {
