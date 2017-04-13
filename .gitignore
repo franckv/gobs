@@ -3,6 +3,8 @@
 core/assets/textures
 core/assets/fonts
 core/assets/sprites
+*.ttf
+*.png
 
 ## Java
 
