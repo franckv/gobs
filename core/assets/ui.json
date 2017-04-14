@@ -41,9 +41,8 @@
         "enabled": false,
         "content": [
             {
-                "type": "font",
-                "font": "small",
-                "color": "green"
+                "type": "style",
+                "value": "debug"
             },
             {
                 "type": "layout",
@@ -88,9 +87,8 @@
         "enabled": false,
         "content": [
             {
-                "type": "font",
-                "font": "small",
-                "color": "green"
+                "type": "style",
+                "value": "debug"
             },
             {
                 "type": "layout",
@@ -155,7 +153,8 @@
                 "direction": "None",
                 "children": [
                     {
-                        "type": "frame",
+                        "type": "image",
+                        "resource": "frame",
                         "width": 250,
                         "height": 150
                     },
@@ -168,9 +167,8 @@
                         "spacing": 10,
                         "children": [
                             {
-                                "type": "font",
-                                "font": "large",
-                                "color": "white"
+                                "type": "style",
+                                "value": "characterheader"
                             },
                             {
                                 "type": "label",
@@ -182,8 +180,7 @@
                                 "height": 5
                             },
                             {
-                                "type": "font",
-                                "font": "medium",
+                                "type": "style",
                                 "id": "hpColor.${i}"
                             },
                             {
@@ -191,7 +188,7 @@
                                 "id": "hp.${i}"
                             },
                             {
-                                "type": "font",
+                                "type": "style",
                                 "id": "mpColor.${i}"
                             },
                             {
@@ -199,8 +196,8 @@
                                 "id": "mp.${i}"
                             },
                             {
-                                "type": "font",
-                                "color": "white"
+                                "type": "style",
+                                "value": "stat"
                             },
                             {
                                 "type": "label",
@@ -258,7 +255,8 @@
                         "direction": "None",
                         "children": [
                             {
-                                "type": "frame",
+                                "type": "image",
+                                "resource": "frame",
                                 "width": 400,
                                 "height": 400
                             },
@@ -284,14 +282,18 @@
                                                             "direction": "Horizontal",
                                                             "children": [
                                                                 {   
-                                                                    "type": "box",
+                                                                    "type": "imagebox",
                                                                     "id": "Item${i}0",
+                                                                    "resource": "frame",
+                                                                    "resource_selected": "frame_selected",
                                                                     "width": 50,
                                                                     "height": 50
                                                                 }, 
                                                                 {   
-                                                                    "type": "box",
+                                                                    "type": "imagebox",
                                                                     "id": "Item${i}1",
+                                                                    "resource": "frame",
+                                                                    "resource_selected": "frame_selected",
                                                                     "width": 50,
                                                                     "height": 50
                                                                 }
@@ -322,8 +324,10 @@
                                                 "count": 4,
                                                 "content": 
                                                         {
-                                                            "type": "box",
+                                                            "type": "imagebox",
                                                             "id": "Equip${i}",
+                                                            "resource": "frame",
+                                                            "resource_selected": "frame_selected",
                                                             "width": 50,
                                                             "height": 50
                                                         }    

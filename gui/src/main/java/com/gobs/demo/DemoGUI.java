@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.gdx.GdxGUI;
 import java.util.ArrayList;
@@ -19,26 +21,35 @@ public class DemoGUI extends GdxGUI {
     private List<GUILayout> layouts;
 
     private boolean showLayouts = false;
-
     private int idx = 0;
 
-    private Color[] palette;
+    Color[] palette;
     private Pixmap colorsMap;
-    private Texture colorsTexture;
+    Texture colorsTexture;
+    int textureSize = 32;
+    int step = 6;
+    ObjectMap<String, TextureRegion> images;
 
     private int mouseX, mouseY;
     private boolean mouseDown;
 
     private float maxWidth, maxHeight;
 
-    public DemoGUI() {
+    public DemoGUI(Batch batch) {
+        super(batch);
+
         palette = new Color[]{
-            Color.GREEN, Color.RED, Color.BLUE, Color.YELLOW,
-            Color.PINK, Color.ORANGE, Color.MAGENTA, Color.PURPLE,
-            Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.CLEAR
+            Color.BLUE, Color.BROWN, Color.CHARTREUSE, Color.CORAL, Color.CYAN, Color.DARK_GRAY,
+            Color.FIREBRICK, Color.FOREST, Color.GOLD, Color.GOLDENROD, Color.GRAY, Color.GREEN,
+            Color.LIGHT_GRAY, Color.LIME, Color.MAGENTA, Color.MAROON, Color.NAVY, Color.OLIVE,
+            Color.ORANGE, Color.PINK, Color.PURPLE, Color.RED, Color.ROYAL, Color.SALMON,
+            Color.SCARLET, Color.SKY, Color.SLATE, Color.TAN, Color.TEAL, Color.VIOLET,
+            Color.WHITE, Color.YELLOW, Color.CLEAR
         };
 
         initTextures();
+
+        images = new ObjectMap<>();
     }
 
     @Override
@@ -61,11 +72,11 @@ public class DemoGUI extends GdxGUI {
     }
 
     private void initTextures() {
-        colorsMap = new Pixmap(16 * palette.length, 16, Pixmap.Format.RGBA8888);
+        colorsMap = new Pixmap(step * textureSize, ((palette.length / step) + 1) * textureSize, Pixmap.Format.RGBA8888);
 
         for (int i = 0; i < palette.length; i++) {
             colorsMap.setColor(palette[i]);
-            colorsMap.fillRectangle(i * 16, 0, 16, 16);
+            colorsMap.fillRectangle((i % step) * textureSize, (i / step) * textureSize, textureSize, textureSize);
         }
 
         colorsTexture = new Texture(colorsMap);
@@ -180,7 +191,7 @@ public class DemoGUI extends GdxGUI {
     protected TextureRegion getSolidTexture(Color color) {
         for (int i = 0; i < palette.length; i++) {
             if (palette[i] == color) {
-                return new TextureRegion(colorsTexture, i * 16, 0, 16, 16);
+                return new TextureRegion(colorsTexture, (i % step) * textureSize + 1, (i / step) * textureSize, textureSize - 1, textureSize);
             }
         }
 
@@ -197,12 +208,8 @@ public class DemoGUI extends GdxGUI {
     }
 
     @Override
-    protected TextureRegion getLabelBg(boolean selected) {
-        if (selected) {
-            return getSolidTexture(Color.LIGHT_GRAY);
-        } else {
-            return getSolidTexture(Color.CLEAR);
-        }
+    protected TextureRegion getImage(String resource) {
+        return images.get(resource);
     }
 
     @Override
@@ -228,6 +235,10 @@ public class DemoGUI extends GdxGUI {
     @Override
     protected int getMouseY() {
         return mouseY;
+    }
+
+    protected void registerImage(String resource, TextureRegion image) {
+        images.put(resource, image);
     }
 
     void setMouseDown(boolean mouseDown) {

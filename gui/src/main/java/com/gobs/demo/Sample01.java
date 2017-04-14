@@ -2,7 +2,11 @@ package com.gobs.demo;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
+import com.gobs.ui.GUIStyle;
 
 public class Sample01 extends DemoApplication {
     public static void main(String[] arg) {
@@ -18,7 +22,13 @@ public class Sample01 extends DemoApplication {
     public void create() {
         super.create();
 
-        gui.addFont("font", getFont("sazanami-mincho.ttf", 16));
+        gui.addFont("small", generateFont("sazanami-mincho.ttf", 16));
+        gui.addFont("medium", generateFont("sazanami-mincho.ttf", 24));
+        gui.addFont("large", generateFont("sazanami-mincho.ttf", 32));
+
+        GUIStyle<Color, BitmapFont> style = gui.createStyle("red");
+        style.setFontColor(GUI.GUIElement.LABEL, Color.RED);
+        style.setFont(GUI.GUIElement.LABEL, gui.getFont("medium"));
     }
 
     @Override
@@ -41,9 +51,12 @@ public class Sample01 extends DemoApplication {
                 gui.createSection("multiline", GUILayout.FlowDirection.HORIZONTAL);
                 {
                     gui.Label("One label");
+                    gui.selectStyle("red");
                     gui.Label("Two labels");
                 }
                 gui.endSection();
+
+                gui.resetStyle();
 
                 gui.Label("A spacer");
 
@@ -72,8 +85,6 @@ public class Sample01 extends DemoApplication {
             gui.createSection("panel2", GUILayout.FlowDirection.VERTICAL);
             {
                 gui.Label("Imbricated layouts");
-
-                gui.setFont("small");
 
                 gui.createSection("Line1", GUILayout.FlowDirection.HORIZONTAL);
                 {

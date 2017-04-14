@@ -18,7 +18,7 @@ public class Sample02 extends DemoApplication {
     public void create() {
         super.create();
 
-        gui.addFont("font", getFont("sazanami-mincho.ttf", 16));
+        gui.addFont("font", generateFont("sazanami-mincho.ttf", 16));
 
         gui.load(Gdx.files.internal("portraits.json").reader());
 

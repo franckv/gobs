@@ -25,7 +25,7 @@ public class DemoApplication implements ApplicationListener, InputProcessor {
         return gui;
     }
 
-    BitmapFont getFont(String file, int size) {
+    BitmapFont generateFont(String file, int size) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(file));
 
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -39,9 +39,7 @@ public class DemoApplication implements ApplicationListener, InputProcessor {
     public void create() {
         batch = new SpriteBatch();
 
-        gui = new DemoGUI();
-
-        gui.setBatch(batch);
+        gui = new DemoGUI(batch);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -121,11 +119,11 @@ public class DemoApplication implements ApplicationListener, InputProcessor {
     public boolean mouseMoved(int screenX, int screenY) {
 
         Vector2 coord = new Vector2(screenX, screenY);
-        
+
         Vector2 newcoord = viewport.unproject(coord);
-                
-        gui.setMousePosition((int)newcoord.x, (int)newcoord.y);
-        
+
+        gui.setMousePosition((int) newcoord.x, (int) newcoord.y);
+
         return false;
     }
 

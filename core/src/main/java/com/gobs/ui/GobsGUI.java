@@ -18,9 +18,8 @@ public class GobsGUI extends GdxGUI {
     private TextureRegion frameSelected;
 
     public GobsGUI(OrthographicDisplay display, TileFactory tileManager, Batch batch) {
-        super();
+        super(batch);
 
-        setBatch(batch);
         this.display = display;
         this.tileManager = tileManager;
 
@@ -93,11 +92,14 @@ public class GobsGUI extends GdxGUI {
     }
 
     @Override
-    protected TextureRegion getLabelBg(boolean selected) {
-        if (selected) {
-            return getSolidTexture(Color.BLUE);
-        } else {
-            return getSolidTexture(Color.CLEAR);
+    protected TextureRegion getImage(String resource) {
+        switch (resource) {
+            case "frame":
+                return tileManager.getFrame();
+            case "frame_selected":
+                return tileManager.getFrameSelected();
         }
+
+        return null;
     }
 }

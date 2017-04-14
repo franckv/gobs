@@ -8,7 +8,9 @@ import com.artemis.EntitySubscription;
 import com.artemis.annotations.Wire;
 import com.artemis.utils.Bag;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -28,6 +30,8 @@ import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
+import com.gobs.ui.GUI;
+import com.gobs.ui.GUIStyle;
 import com.gobs.ui.GobsGUI;
 import com.gobs.ui.UIState;
 
@@ -87,6 +91,28 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         gui.addFont("medium", fontManager.getFont(24));
         gui.addFont("large", fontManager.getFont(30));
 
+        GUIStyle<Color, BitmapFont> style = gui.createStyle("debug");
+        style.setFontColor(GUI.GUIElement.LABEL, Color.GREEN);
+        style.setFontColor(GUI.GUIElement.HEADER, Color.GREEN);
+        style.setFontColor(GUI.GUIElement.LIST_ITEM, Color.GREEN);
+        style.setFontBgColor(GUI.GUIElement.LIST_ITEM_SELECTED, Color.BLUE);
+
+        style = gui.createStyle("stat");
+        style.setFont(GUI.GUIElement.LABEL, gui.getFont("medium"));
+        style.setFontColor(GUI.GUIElement.LABEL, Color.WHITE);
+        
+        style = gui.createStyle("statlow", style);
+        style.setFontColor(GUI.GUIElement.LABEL, Color.RED);
+
+        style = gui.createStyle("statmedium", style);
+        style.setFontColor(GUI.GUIElement.LABEL, Color.GOLD);
+
+        style = gui.createStyle("statfull", style);
+        style.setFontColor(GUI.GUIElement.LABEL, Color.WHITE);
+
+        style = gui.createStyle("characterheader");
+        style.setFont(GUI.GUIElement.LABEL, gui.getFont("large"));
+
         gui.load(Gdx.files.internal("ui.json").reader());
 
         registerActions();
@@ -107,6 +133,8 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         batch.begin();
 
         gui.begin();
+
+        gui.resetStyle();
 
         updateStatus();
 
@@ -178,14 +206,14 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
                     String hpColor;
 
                     if (hp == maxHP) {
-                        hpColor = "white";
+                        hpColor = "statfull";
                     } else if (hp < maxHP / 4) {
-                        hpColor = "red";
+                        hpColor = "statlow";
                     } else {
-                        hpColor = "gold";
+                        hpColor = "statmedium";
                     }
 
-                    gui.setStringValue("hpColor." + i, "color", hpColor);
+                    gui.setStringValue("hpColor." + i, "value", hpColor);
 
                     String hpLabel = String.format("HP: %d / %d", hp, maxHP);
 
@@ -196,14 +224,14 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
                     String mpColor;
 
                     if (mp == maxMP) {
-                        mpColor = "white";
+                        mpColor = "statfull";
                     } else if (mp < maxMP / 4) {
-                        mpColor = "red";
+                        mpColor = "statlow";
                     } else {
-                        mpColor = "gold";
+                        mpColor = "statmedium";
                     }
 
-                    gui.setStringValue("mpColor." + i, "color", mpColor);
+                    gui.setStringValue("mpColor." + i, "value", mpColor);
 
                     String mpLabel = String.format("MP: %d / %d", mp, maxMP);
 

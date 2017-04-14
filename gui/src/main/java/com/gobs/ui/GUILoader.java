@@ -142,6 +142,12 @@ public abstract class GUILoader<JsonValue, Color, Font> {
                 case "frame":
                     parseFrame(value);
                     break;
+                case "image":
+                    parseImage(value);
+                    break;
+                case "imagebox":
+                    parseImageBox(value);
+                    break;
                 case "box":
                     parseBox(value);
                     break;
@@ -154,11 +160,11 @@ public abstract class GUILoader<JsonValue, Color, Font> {
                 case "spacer":
                     parseSpacer(value);
                     break;
-                case "font":
-                    parseFont(value);
-                    break;
                 case "reference":
                     parseReference(value);
+                    break;
+                case "style":
+                    parseStyle(value);
                     break;
             }
         }
@@ -234,18 +240,37 @@ public abstract class GUILoader<JsonValue, Color, Font> {
         gui.Frame(width, height);
     }
 
+    private void parseImage(JsonValue value) {
+        String res = readString(value, "resource");
+        int width = readInt(value, "width");
+        int height = readInt(value, "height");
+
+        gui.Image(res, width, height);
+    }
+
+    private void parseImageBox(JsonValue value) {
+        String id = getString(value, "id");
+        String res = readString(value, "resource");
+        String res_selected = readString(value, "resource_selected");
+        int width = readInt(value, "width");
+        int height = readInt(value, "height");
+
+        boolean clicked = gui.ImageBox(id, res, res_selected, width, height);
+    }
+
     private void parseBox(JsonValue value) {
         String id = getString(value, "id");
         int width = readInt(value, "width");
         int height = readInt(value, "height");
 
-        gui.Box(id, width, height);
+        boolean clicked = gui.Box(id, width, height);
     }
 
     private void parsePusher(JsonValue value) {
         if (hasField(value, "id")) {
             JsonSubstitution sub = substitutions.get(readString(value, "id"));
-            gui.pushToEnd(sub.strValue);
+            // TODO: fix type
+            gui.pushToEnd(sub.strValue, GUI.GUIElement.LABEL);
         } else if (hasField(value, "value")) {
             gui.pushToEnd(readFloat(value, "value"));
         }
@@ -263,24 +288,16 @@ public abstract class GUILoader<JsonValue, Color, Font> {
         }
     }
 
-    private void parseFont(JsonValue value) {
-        String font = getString(value, "font");
-        if (font != null) {
-            gui.setFont(readString(value, "font"));
-        }
-
-        String colorName = getString(value, "color");
-        if (colorName != null) {
-            Color color = gui.getColorByName(colorName);
-
-            gui.setFontColor(color);
-        }
-    }
-
     private void parseReference(JsonValue value) {
         String id = readString(value, "id");
 
         showFragment(id);
+    }
+
+    private void parseStyle(JsonValue value) {
+        String name = getString(value, "value");
+
+        gui.selectStyle(name);
     }
 
     private String getString(JsonValue value, String name) {
