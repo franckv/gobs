@@ -5,22 +5,42 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUI;
+import com.gobs.ui.GUIFormat;
 import com.gobs.ui.GUIStyle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposable {
+public abstract class GdxGUI extends GUI<Color, BitmapFont> {
     private Batch batch;
-    private GdxGUILoader JsonLoader;
-    private GdxGUIStylist stylist;
+
+    private ObjectMap<String, BitmapFont> fonts;
+    public ObjectMap<String, GUIStyle<Color, BitmapFont>> styles;
 
     public GdxGUI(Batch batch) {
-        this.batch = batch;
-        JsonLoader = new GdxGUILoader(this);
+        super();
 
-        stylist = new GdxGUIStylist();
+        this.batch = batch;
+
+        style = new GUIStyle<Color, BitmapFont>();
+
+        style.getLabelFormat().setTextColor(Color.WHITE);
+        style.getHeaderFormat().setTextColor(Color.WHITE);
+        style.getButtonFormat().setTextColor(Color.WHITE);
+        style.getButtonSelectedFormat().setTextColor(Color.WHITE);
+        style.getListItemFormat().setTextColor(Color.WHITE);
+        style.getListItemSelectedFormat().setTextColor(Color.WHITE);
+
+        style.getLabelFormat().setTextBgColor(Color.CLEAR);
+        style.getHeaderFormat().setTextBgColor(Color.CLEAR);
+        style.getButtonFormat().setTextBgColor(Color.DARK_GRAY);
+        style.getButtonSelectedFormat().setTextBgColor(Color.LIGHT_GRAY);
+        style.getListItemFormat().setTextBgColor(Color.CLEAR);
+        style.getListItemSelectedFormat().setTextBgColor(Color.LIGHT_GRAY);
+
+        styles = new ObjectMap<>();
+        styles.put("default", style);
+
+        fonts = new ObjectMap<>();
     }
 
     @Override
@@ -29,48 +49,29 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     public void addFont(String name, BitmapFont font) {
-        stylist.addFont(name, font);
-    }
+        if (fonts.size == 0) {
+            style.setFont(font);
+        }
 
-    public BitmapFont getFont(GUI.GUIElement type) {
-        return stylist.getFont(type);
-    }
-
-    public TextureRegion getBackground(GUI.GUIElement type) {
-        Color color = stylist.getBackgroundColor(type);
-
-        return getSolidTexture(color);
+        fonts.put(name, font);
     }
 
     public BitmapFont getFont(String name) {
-        return stylist.getFont(name);
+        return fonts.get(name);
     }
 
-    public GUIStyle<Color, BitmapFont> createStyle(String name) {
-        return stylist.createStyle(name);
+    public void addStyle(String name, GUIStyle<Color, BitmapFont> style) {
+        styles.put(name, style);
     }
 
-    public GUIStyle<Color, BitmapFont> createStyle(String name, GUIStyle<Color, BitmapFont> parent) {
-        return stylist.createStyle(name, parent);
-    }
-
-    public void resetStyle() {
-        stylist.resetStyle();
-    }
-
-    @Override
     public void selectStyle(String name) {
-        stylist.selectStyle(name);
-    }
-
-    public GUIStyle<Color, BitmapFont> getStyle() {
-        return stylist.getCurrentStyle();
+        if (styles.containsKey(name)) {
+            style = styles.get(name);
+        }
     }
 
     @Override
-    public float getLabelWidth(String text, GUIElement type) {
-        BitmapFont font = getFont(type);
-
+    public float getLabelWidth(String text, BitmapFont font) {
         if (font == null) {
             throw new RuntimeException("Must supply font");
         }
@@ -81,9 +82,7 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
-    public float getLabelHeight(String text, GUIElement type) {
-        BitmapFont font = getFont(type);
-
+    public float getLabelHeight(String text, BitmapFont font) {
         if (font == null) {
             throw new RuntimeException("Must supply font");
         }
@@ -94,21 +93,17 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
     }
 
     @Override
-    public void drawText(String text, float x, float y, GUIElement type) {
-        BitmapFont font = getFont(type);
+    public void drawText(String text, float x, float y, BitmapFont font, Color color) {
+        font.setColor(color);
 
         GlyphLayout glayout = new GlyphLayout(font, text);
-
-        float spacing = getLayout().getSpacing();
-
-        batch.draw(getBackground(type), x, y - spacing * 0.4f, glayout.width, glayout.height + spacing * 0.8f);
 
         font.draw(batch, glayout, x, y + glayout.height);
     }
 
     @Override
-    public void drawBox(float x, float y, float w, float h, GUIElement type) {
-        TextureRegion r = getBackground(type);
+    public void drawBox(float x, float y, float w, float h, Color color) {
+        TextureRegion r = getSolidTexture(color);
 
         batch.draw(r, x, y, w, h);
     }
@@ -118,26 +113,6 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
         TextureRegion img = getImage(res);
 
         batch.draw(img, x, y, w, h);
-    }
-
-    public Color getColorByName(String name) {
-        Color color = Color.GREEN;
-
-        try {
-            color = (Color) Color.class
-                    .getDeclaredField(name.toUpperCase()).get(null);
-        } catch (NoSuchFieldException | SecurityException
-                | IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(GdxGUI.class
-                    .getName()).log(Level.SEVERE, "Invalid color " + name, ex);
-        }
-
-        return color;
-    }
-
-    @Override
-    public void dispose() {
-        stylist.dispose();
     }
 
     protected abstract TextureRegion getSolidTexture(Color color);

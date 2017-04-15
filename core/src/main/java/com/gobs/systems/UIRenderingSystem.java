@@ -94,27 +94,37 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         gui.addFont("medium", fontManager.getFont(24));
         gui.addFont("large", fontManager.getFont(30));
 
-        GUIStyle<Color, BitmapFont> style = gui.createStyle("debug");
-        style.setFontColor(GUI.GUIElement.LABEL, Color.GREEN);
-        style.setFontColor(GUI.GUIElement.HEADER, Color.GREEN);
-        style.setFontColor(GUI.GUIElement.LIST_ITEM, Color.GREEN);
-        style.setFontBgColor(GUI.GUIElement.LIST_ITEM_SELECTED, Color.BLUE);
+        GUIStyle<Color, BitmapFont> style = new GUIStyle<>(gui.getStyle());
 
-        style = gui.createStyle("stat");
-        style.setFont(GUI.GUIElement.LABEL, gui.getFont("medium"));
-        style.setFontColor(GUI.GUIElement.LABEL, Color.WHITE);
+        style.getLabelFormat().setTextColor(Color.GREEN);
+        style.getHeaderFormat().setTextColor(Color.GREEN);
+        style.getListItemFormat().setTextColor(Color.GREEN);
+        style.getListItemSelectedFormat().setTextBgColor(Color.BLUE);
 
-        style = gui.createStyle("statlow", style);
-        style.setFontColor(GUI.GUIElement.LABEL, Color.RED);
+        gui.addStyle("debug", style);
 
-        style = gui.createStyle("statmedium", style);
-        style.setFontColor(GUI.GUIElement.LABEL, Color.GOLD);
+        style = new GUIStyle<>(gui.getStyle());
 
-        style = gui.createStyle("statfull", style);
-        style.setFontColor(GUI.GUIElement.LABEL, Color.WHITE);
+        style.getLabelFormat().setTextFont(gui.getFont("medium"));
+        style.getLabelFormat().setTextColor(Color.WHITE);
 
-        style = gui.createStyle("characterheader");
-        style.setFont(GUI.GUIElement.LABEL, gui.getFont("large"));
+        gui.addStyle("stat", style);
+
+        style = new GUIStyle<>(style);
+        style.getLabelFormat().setTextColor(Color.RED);
+        gui.addStyle("statlow", style);
+
+        style = new GUIStyle<>(style);
+        style.getLabelFormat().setTextColor(Color.GOLD);
+        gui.addStyle("statmedium", style);
+
+        style = new GUIStyle<>(style);
+        style.getLabelFormat().setTextColor(Color.WHITE);
+        gui.addStyle("statfull", style);
+
+        style = new GUIStyle<>(style);
+        style.getLabelFormat().setTextFont(gui.getFont("large"));
+        gui.addStyle("characterheader", style);
 
         guiLoader.load(Gdx.files.internal("ui.json").reader());
 
@@ -136,8 +146,6 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         batch.begin();
 
         gui.begin();
-
-        gui.resetStyle();
 
         updateStatus();
 

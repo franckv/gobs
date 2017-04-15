@@ -1,73 +1,65 @@
 package com.gobs.ui;
 
-import com.gobs.ui.GUI.GUIElement;
-import java.util.HashMap;
-import java.util.Map;
-
 public class GUIStyle<Color, Font> {
-    public class GUIStyleAttributes {
-        public Color textColor;
-        public Color textBgColor;
-        public Font textFont;
-
-        public GUIStyleAttributes() {
-        }
-
-        public GUIStyleAttributes(GUIStyleAttributes parent) {
-            textColor = parent.textColor;
-            textBgColor = parent.textBgColor;
-            textFont = parent.textFont;
-        }
-    }
-
-    public GUIStyle<Color, Font> parent;
-
-    Map<GUI.GUIElement, GUIStyleAttributes> styleAttributes;
+    private GUIFormat<Color, Font> labelFormat;
+    private GUIFormat<Color, Font> headerFormat;
+    private GUIFormat<Color, Font> buttonFormat;
+    private GUIFormat<Color, Font> buttonSelectedFormat;
+    private GUIFormat<Color, Font> listItemFormat;
+    private GUIFormat<Color, Font> listItemSelectedFormat;
 
     public GUIStyle() {
         this(null);
     }
 
     public GUIStyle(GUIStyle<Color, Font> parent) {
-        this.parent = parent;
-        styleAttributes = new HashMap<>();
-
         if (parent != null) {
-            for (GUIElement e : GUIElement.values()) {
-                styleAttributes.put(e, new GUIStyleAttributes(parent.getStyleAttributes(e)));
-            }
+            labelFormat = new GUIFormat<>(parent.getLabelFormat());
+            headerFormat = new GUIFormat<>(parent.getHeaderFormat());
+            buttonFormat = new GUIFormat<>(parent.getButtonFormat());
+            buttonSelectedFormat = new GUIFormat<>(parent.getButtonSelectedFormat());
+            listItemFormat = new GUIFormat<>(parent.getListItemFormat());
+            listItemSelectedFormat = new GUIFormat<>(parent.getListItemSelectedFormat());
         } else {
-            for (GUIElement e : GUIElement.values()) {
-                styleAttributes.put(e, new GUIStyleAttributes());
-            }
+            labelFormat = new GUIFormat<>();
+            headerFormat = new GUIFormat<>();
+            buttonFormat = new GUIFormat<>();
+            buttonSelectedFormat = new GUIFormat<>();
+            listItemFormat = new GUIFormat<>();
+            listItemSelectedFormat = new GUIFormat<>();
         }
     }
 
-    public GUIStyleAttributes getStyleAttributes(GUI.GUIElement type) {
-        return styleAttributes.get(type);
+    public GUIFormat<Color, Font> getLabelFormat() {
+        return labelFormat;
     }
 
-    public void setFont(GUI.GUIElement type, Font font) {
-        styleAttributes.get(type).textFont = font;
+    public GUIFormat<Color, Font> getHeaderFormat() {
+        return headerFormat;
     }
 
-    public Font getFont(GUI.GUIElement type) {
-        return styleAttributes.get(type).textFont;
+    public GUIFormat<Color, Font> getButtonFormat() {
+        return buttonFormat;
     }
 
-    public void setFontColor(GUI.GUIElement type, Color color) {
-        styleAttributes.get(type).textColor = color;
+    public GUIFormat<Color, Font> getButtonSelectedFormat() {
+        return buttonSelectedFormat;
     }
 
-    public Color getFontColor(GUI.GUIElement type) {
-        return styleAttributes.get(type).textColor;
+    public GUIFormat<Color, Font> getListItemFormat() {
+        return listItemFormat;
     }
 
-    public void setFontBgColor(GUI.GUIElement type, Color color) {
-        styleAttributes.get(type).textBgColor = color;
+    public GUIFormat<Color, Font> getListItemSelectedFormat() {
+        return listItemSelectedFormat;
     }
 
-    public Color getFontBgColor(GUI.GUIElement type) {
-        return styleAttributes.get(type).textBgColor;
+    public void setFont(Font font) {
+        labelFormat.setTextFont(font);
+        headerFormat.setTextFont(font);
+        buttonFormat.setTextFont(font);
+        buttonSelectedFormat.setTextFont(font);
+        listItemFormat.setTextFont(font);
+        listItemSelectedFormat.setTextFont(font);
     }
 }

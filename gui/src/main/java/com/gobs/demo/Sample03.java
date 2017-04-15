@@ -5,7 +5,6 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.GUIStyle;
 
@@ -28,16 +27,24 @@ public class Sample03 extends DemoApplication {
         gui.addFont("default", generateFont("sazanami-mincho.ttf", 16));
         gui.addFont("button", generateFont("sazanami-mincho.ttf", 24));
 
-        GUIStyle<Color, BitmapFont> style = gui.createStyle("button");
-        style.setFont(GUI.GUIElement.BUTTON, gui.getFont("button"));
-        style.setFontColor(GUI.GUIElement.BUTTON, Color.BLUE);
-        style.setFontBgColor(GUI.GUIElement.BUTTON, Color.GRAY);
-        style.setFontColor(GUI.GUIElement.BUTTON_SELECTED, Color.RED);
-        style.setFontBgColor(GUI.GUIElement.BUTTON_SELECTED, Color.LIGHT_GRAY);
-        style.setFont(GUI.GUIElement.BUTTON_SELECTED, gui.getFont("button"));
+        GUIStyle<Color, BitmapFont> style = new GUIStyle<>(gui.getStyle());
 
-        style = gui.createStyle("palette", style);
-        style.setFontColor(GUI.GUIElement.BUTTON, Color.BLACK);
+        style.getButtonFormat().setTextFont(gui.getFont("button"));
+        style.getButtonSelectedFormat().setTextFont(gui.getFont("button"));
+
+        style.getButtonFormat().setTextColor(Color.BLUE);
+        style.getButtonSelectedFormat().setTextColor(Color.RED);
+
+        style.getButtonFormat().setTextBgColor(Color.GRAY);
+        style.getButtonSelectedFormat().setTextBgColor(Color.LIGHT_GRAY);
+
+        gui.addStyle("button", style);
+
+        style = new GUIStyle<>(style);
+
+        style.getButtonFormat().setTextColor(Color.BLACK);
+
+        gui.addStyle("palette", style);
     }
 
     @Override
@@ -48,7 +55,7 @@ public class Sample03 extends DemoApplication {
 
         gui.begin();
 
-        gui.resetStyle();
+        gui.selectStyle("default");
 
         gui.setMargin(16);
         gui.setSpacing(16);
@@ -113,7 +120,7 @@ public class Sample03 extends DemoApplication {
                 if (y == 0) {
                     gui.createSection("", GUILayout.FlowDirection.HORIZONTAL);
                 }
-                gui.getStyle().setFontBgColor(GUI.GUIElement.BUTTON, gui.palette[i]);
+                gui.getStyle().getButtonFormat().setTextBgColor(gui.palette[i]);
                 gui.Button("Box" + x + ":" + y, 128, 64, gui.palette[i].toString());
                 if (y == step - 1) {
                     gui.endSection();

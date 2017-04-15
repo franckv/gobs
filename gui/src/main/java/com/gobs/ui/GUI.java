@@ -4,18 +4,25 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public abstract class GUI<Color, Font> {
-    public enum GUIElement {
-        LABEL, HEADER, LIST_ITEM, LIST_ITEM_SELECTED, BUTTON, BUTTON_SELECTED, FRAME
-    }
-
     private String hot, active;
 
     private GUILayout layout;
     private Deque<GUILayout> layouts;
 
+    protected GUIStyle<Color, Font> style;
+
     public GUI() {
         hot = null;
         active = null;
+        style = null;
+    }
+
+    public void setStyle(GUIStyle<Color, Font> style) {
+        this.style = style;
+    }
+
+    public GUIStyle<Color, Font> getStyle() {
+        return style;
     }
 
     public void begin() {
@@ -78,14 +85,18 @@ public abstract class GUI<Color, Font> {
     }
 
     public void Label(String text) {
-        Label(text, GUIElement.LABEL);
+        Label(text, style.getLabelFormat());
     }
 
-    private void Label(String text, GUIElement type) {
-        float h = getLabelHeight(text, type);
-        float w = getLabelWidth(text, type);
+    private void Label(String text, GUIFormat<Color, Font> format) {
+        float h = getLabelHeight(text, format.getTextFont());
+        float w = getLabelWidth(text, format.getTextFont());
 
-        drawText(text, layout.getX(w), layout.getY(h), type);
+        float spacing = layout.getSpacing();
+
+        drawBox(layout.getX(w), layout.getY(h) - spacing * 0.4f, w, h + spacing * 0.8f, format.getTextBgColor());
+
+        drawText(text, layout.getX(w), layout.getY(h), format.getTextFont(), format.getTextColor());
 
         layout.update(w, h);
     }
@@ -93,13 +104,13 @@ public abstract class GUI<Color, Font> {
     public int Table(String id, String header, Iterable<String> values, int selected) {
         createSection(header, GUILayout.FlowDirection.VERTICAL);
 
-        Label(header, GUIElement.HEADER);
+        Label(header, style.getHeaderFormat());
 
         int i = 0;
         for (String value : values) {
             // assumes selected items have the same size as unselected
-            float w = getLabelWidth(value, GUIElement.LIST_ITEM);
-            float h = getLabelHeight(value, GUIElement.LIST_ITEM);
+            float w = getLabelWidth(value, style.getListItemFormat().getTextFont());
+            float h = getLabelHeight(value, style.getListItemFormat().getTextFont());
 
             float x = layout.getX(w);
             float y = layout.getY(h);
@@ -112,7 +123,7 @@ public abstract class GUI<Color, Font> {
             if (isClicked(id + "#" + i)) {
                 selected = i;
             }
-            Label(value, highlight ? GUIElement.LIST_ITEM_SELECTED : GUIElement.LIST_ITEM);
+            Label(value, highlight ? style.getListItemSelectedFormat() : style.getListItemFormat());
             i++;
         }
 
@@ -125,8 +136,8 @@ public abstract class GUI<Color, Font> {
         layout.update(width, height);
     }
 
-    public void Frame(float w, float h) {
-        drawBox(layout.getX(w), layout.getY(h), w, h, GUIElement.FRAME);
+    public void Frame(float w, float h, Color color) {
+        drawBox(layout.getX(w), layout.getY(h), w, h, color);
         layout.update(w, h);
     }
 
@@ -136,7 +147,7 @@ public abstract class GUI<Color, Font> {
 
         boolean selected = isSelected(id, x, y, w, h);
 
-        drawBox(x, y, w, h, selected ? GUIElement.BUTTON_SELECTED : GUIElement.BUTTON);
+        drawBox(x, y, w, h, selected ? style.getButtonSelectedFormat().getTextBgColor() : style.getButtonFormat().getTextBgColor());
 
         layout.update(w, h);
 
@@ -148,12 +159,12 @@ public abstract class GUI<Color, Font> {
 
         boolean result = Box(id, w, h);
 
-        float lw = getLabelWidth(label, GUIElement.BUTTON);
-        float lh = getLabelHeight(label, GUIElement.BUTTON);
+        float lw = getLabelWidth(label, style.getButtonFormat().getTextFont());
+        float lh = getLabelHeight(label, style.getButtonFormat().getTextFont());
 
         layout.center(lw, lh);
 
-        Label(label, hot == id ? GUIElement.BUTTON_SELECTED : GUIElement.BUTTON);
+        Label(label, hot == id ? style.getButtonSelectedFormat() : style.getButtonFormat());
 
         endSection();
 
@@ -180,13 +191,13 @@ public abstract class GUI<Color, Font> {
         layout.pushToEnd(size);
     }
 
-    public void pushToEnd(String label, GUIElement type) {
+    public void pushToEnd(String label) {
         switch (layout.getFlowDirection()) {
             case HORIZONTAL:
-                pushToEnd(getLabelWidth(label, type));
+                pushToEnd(getLabelWidth(label, style.getLabelFormat().getTextFont()));
                 break;
             case VERTICAL:
-                pushToEnd(getLabelHeight(label, type));
+                pushToEnd(getLabelHeight(label, style.getLabelFormat().getTextFont()));
                 break;
         }
     }
@@ -228,17 +239,15 @@ public abstract class GUI<Color, Font> {
 
     public abstract float getMaxHeight();
 
-    public abstract float getLabelWidth(String text, GUIElement type);
+    public abstract float getLabelWidth(String text, Font font);
 
-    public abstract float getLabelHeight(String text, GUIElement type);
+    public abstract float getLabelHeight(String text, Font font);
 
-    public abstract void drawText(String text, float x, float y, GUIElement type);
+    public abstract void drawText(String text, float x, float y, Font font, Color color);
 
-    public abstract void drawBox(float x, float y, float w, float h, GUIElement type);
+    public abstract void drawBox(float x, float y, float w, float h, Color color);
 
     public abstract void drawImage(String res, float x, float y, float w, float h);
-
-    public abstract void selectStyle(String name);
 
     protected abstract boolean isMouseDown();
 

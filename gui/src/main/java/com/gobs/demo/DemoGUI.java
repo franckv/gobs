@@ -8,13 +8,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUILayout;
 import com.gobs.ui.gdx.GdxGUI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DemoGUI extends GdxGUI {
+public class DemoGUI extends GdxGUI implements Disposable {
     private OrthographicCamera camera;
     private ShapeRenderer renderer;
 
@@ -250,10 +251,7 @@ public class DemoGUI extends GdxGUI {
         this.mouseY = y;
     }
 
-    @Override
     public void dispose() {
-        super.dispose();
-
         colorsMap.dispose();
         colorsTexture.dispose();
 

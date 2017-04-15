@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUI;
 import com.gobs.ui.GUILayout;
 import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Load GUI from JSON file
@@ -53,14 +55,14 @@ public class GdxGUILoader {
         }
     }
 
-    private GUI<Color, BitmapFont> gui;
+    private GdxGUI gui;
     private JsonValue root;
     private ObjectMap<String, JsonFragment> fragments;
     private ObjectMap<String, JsonSubstitution> substitutions;
     private ObjectMap<String, Integer> listSelections;
     private int idx;
 
-    public GdxGUILoader(GUI gui) {
+    public GdxGUILoader(GdxGUI gui) {
         this.gui = gui;
 
         fragments = new ObjectMap<>();
@@ -241,8 +243,9 @@ public class GdxGUILoader {
     private void parseFrame(JsonValue value) {
         int width = readInt(value, "width");
         int height = readInt(value, "height");
+        Color color = getColorByName(getString(value, "color"));
 
-        gui.Frame(width, height);
+        gui.Frame(width, height, color);
     }
 
     private void parseImage(JsonValue value) {
@@ -275,7 +278,7 @@ public class GdxGUILoader {
         if (hasField(value, "id")) {
             JsonSubstitution sub = substitutions.get(readString(value, "id"));
             // TODO: fix type
-            gui.pushToEnd(sub.strValue, GUI.GUIElement.LABEL);
+            gui.pushToEnd(sub.strValue);
         } else if (hasField(value, "value")) {
             gui.pushToEnd(readFloat(value, "value"));
         }
@@ -303,6 +306,21 @@ public class GdxGUILoader {
         String name = getString(value, "value");
 
         gui.selectStyle(name);
+    }
+
+    private Color getColorByName(String name) {
+        Color color = Color.GREEN;
+
+        try {
+            color = (Color) Color.class
+                    .getDeclaredField(name.toUpperCase()).get(null);
+        } catch (NoSuchFieldException | SecurityException
+                | IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(GdxGUI.class
+                    .getName()).log(Level.SEVERE, "Invalid color " + name, ex);
+        }
+
+        return color;
     }
 
     private String getString(JsonValue value, String name) {
