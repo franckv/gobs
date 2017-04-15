@@ -20,7 +20,7 @@ public class Sample02 extends DemoApplication {
 
         gui.addFont("font", generateFont("sazanami-mincho.ttf", 16));
 
-        gui.load(Gdx.files.internal("portraits.json").reader());
+        guiLoader.load(Gdx.files.internal("portraits.json").reader());
 
         int nPlayers = 3;
         int boxW = 250;
@@ -30,7 +30,7 @@ public class Sample02 extends DemoApplication {
         float size = nPlayers * boxW + (nPlayers - 1) * spacing;
         float space = (viewport.getWorldWidth() - size - 2 * margin) / 2 - spacing;
 
-        gui.setIntValue("charactersSpacing", "width", (int) space);
+        guiLoader.setIntValue("charactersSpacing", "width", (int) space);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class Sample02 extends DemoApplication {
 
         gui.begin();
 
-        gui.showFragment("ui");
+        guiLoader.showFragment("ui");
 
         batch.end();
 

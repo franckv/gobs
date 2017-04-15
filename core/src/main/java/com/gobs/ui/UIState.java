@@ -1,16 +1,18 @@
 package com.gobs.ui;
 
+import com.gobs.ui.gdx.GdxGUILoader;
+
 public class UIState {
     public enum State {
         NONE, CRAWL, INVENTORY
     }
 
     private State currentState;
-    private GUI gui;
+    private GdxGUILoader guiLoader;
 
-    public UIState(GUI gui) {
+    public UIState(GdxGUILoader guiLoader) {
         currentState = State.CRAWL;
-        this.gui = gui;
+        this.guiLoader = guiLoader;
     }
 
     public void setState(State state) {
@@ -26,13 +28,13 @@ public class UIState {
     private void enterState(State state) {
         switch (state) {
             case CRAWL:
-                gui.enableFragment("characters", true);
+                guiLoader.enableFragment("characters", true);
                 break;
             case NONE:
-                gui.enableFragment("characters", false);
+                guiLoader.enableFragment("characters", false);
                 break;
             case INVENTORY:
-                gui.enableFragment("inventory", true);
+                guiLoader.enableFragment("inventory", true);
                 break;
         }
     }
@@ -44,7 +46,7 @@ public class UIState {
             case NONE:
                 break;
             case INVENTORY:
-                gui.enableFragment("inventory", false);
+                guiLoader.enableFragment("inventory", false);
                 break;
         }
     }

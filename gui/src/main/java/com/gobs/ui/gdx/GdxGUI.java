@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.gobs.ui.GUI;
-import com.gobs.ui.GUILoader;
 import com.gobs.ui.GUIStyle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -121,27 +120,6 @@ public abstract class GdxGUI extends GUI<Color, BitmapFont> implements Disposabl
         batch.draw(img, x, y, w, h);
     }
 
-    @Override
-    protected GUILoader getGUILoader() {
-        return JsonLoader;
-    }
-
-    @Override
-    public void showFragment(String fragment) {
-        JsonLoader.showFragment(fragment);
-    }
-
-    @Override
-    public void enableFragment(String fragment, boolean enabled) {
-        JsonLoader.enableFragment(fragment, enabled);
-    }
-
-    @Override
-    public void toggleFragment(String fragment) {
-        JsonLoader.toggleFragment(fragment);
-    }
-
-    @Override
     public Color getColorByName(String name) {
         Color color = Color.GREEN;
 

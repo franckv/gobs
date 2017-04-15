@@ -34,6 +34,7 @@ import com.gobs.ui.GUI;
 import com.gobs.ui.GUIStyle;
 import com.gobs.ui.GobsGUI;
 import com.gobs.ui.UIState;
+import com.gobs.ui.gdx.GdxGUILoader;
 
 public class UIRenderingSystem extends BaseSystem implements Disposable, RenderingSystem {
     private ComponentMapper<Position> pm;
@@ -61,6 +62,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private OrthographicDisplay display;
     private FontFactory fontManager;
     private GobsGUI gui;
+    private GdxGUILoader guiLoader;
 
     private UIState state;
 
@@ -84,8 +86,9 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         this.allEntities = getWorld().getAspectSubscriptionManager().get(Aspect.all());
 
         gui = new GobsGUI(display, tileManager, batch);
+        guiLoader = new GdxGUILoader(gui);
 
-        state = new UIState(gui);
+        state = new UIState(guiLoader);
 
         gui.addFont("small", fontManager.getFont(16));
         gui.addFont("medium", fontManager.getFont(24));
@@ -100,7 +103,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         style = gui.createStyle("stat");
         style.setFont(GUI.GUIElement.LABEL, gui.getFont("medium"));
         style.setFontColor(GUI.GUIElement.LABEL, Color.WHITE);
-        
+
         style = gui.createStyle("statlow", style);
         style.setFontColor(GUI.GUIElement.LABEL, Color.RED);
 
@@ -113,7 +116,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         style = gui.createStyle("characterheader");
         style.setFont(GUI.GUIElement.LABEL, gui.getFont("large"));
 
-        gui.load(Gdx.files.internal("ui.json").reader());
+        guiLoader.load(Gdx.files.internal("ui.json").reader());
 
         registerActions();
     }
@@ -159,12 +162,12 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
             Sort.instance().sort(systems);
 
-            gui.setListValue("perftable", "values", systems);
+            guiLoader.setListValue("perftable", "values", systems);
         }
 
         dumpEntities();
 
-        gui.showFragment("ui");
+        guiLoader.showFragment("ui");
 
         gui.end();
 
@@ -176,12 +179,12 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
     private void updateStatus() {
         String msg = "FPS: " + Gdx.graphics.getFramesPerSecond() + " / Entities: " + allEntities.getEntities().size();
 
-        gui.setStringValue("fpsStatus", "label", msg);
+        guiLoader.setStringValue("fpsStatus", "label", msg);
 
         Position pos = getPlayerPosition();
         msg = "Position: " + pos.getX() + "," + pos.getY();
 
-        gui.setStringValue("positionStatus", "label", msg);
+        guiLoader.setStringValue("positionStatus", "label", msg);
     }
 
     private void updateCharactersStats() {
@@ -191,7 +194,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         float size = nPlayers * boxW + (nPlayers - 1) * spacing;
         float space = (display.getViewPort().getWorldWidth() - size - 2 * margin) / 2 - spacing;
 
-        gui.setIntValue("charactersSpacing", "width", (int) space);
+        guiLoader.setIntValue("charactersSpacing", "width", (int) space);
 
         for (int i = 0; i < nPlayers; i++) {
             for (int j = 0; j < characters.getEntities().size(); j++) {
@@ -199,7 +202,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
 
                 if (am.get(character).getPos() == i + 1) {
 
-                    gui.setStringValue("name." + i, "label", nm.get(character).getName());
+                    guiLoader.setStringValue("name." + i, "label", nm.get(character).getName());
 
                     int hp = hm.get(character).getHP();
                     int maxHP = hm.get(character).getMaxHP();
@@ -213,11 +216,11 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
                         hpColor = "statmedium";
                     }
 
-                    gui.setStringValue("hpColor." + i, "value", hpColor);
+                    guiLoader.setStringValue("hpColor." + i, "value", hpColor);
 
                     String hpLabel = String.format("HP: %d / %d", hp, maxHP);
 
-                    gui.setStringValue("hp." + i, "label", hpLabel);
+                    guiLoader.setStringValue("hp." + i, "label", hpLabel);
 
                     int mp = mm.get(character).getMP();
                     int maxMP = mm.get(character).getMaxMP();
@@ -231,13 +234,13 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
                         mpColor = "statmedium";
                     }
 
-                    gui.setStringValue("mpColor." + i, "value", mpColor);
+                    guiLoader.setStringValue("mpColor." + i, "value", mpColor);
 
                     String mpLabel = String.format("MP: %d / %d", mp, maxMP);
 
-                    gui.setStringValue("mp." + i, "label", mpLabel);
+                    guiLoader.setStringValue("mp." + i, "label", mpLabel);
 
-                    gui.setStringValue("lvl." + i, "label", "LV: 99");
+                    guiLoader.setStringValue("lvl." + i, "label", "LV: 99");
                 }
             }
         }
@@ -292,7 +295,7 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
             firstE = false;
         }
 
-        gui.setStringValue("entities", "label", entities.toString());
+        guiLoader.setStringValue("entities", "label", entities.toString());
     }
 
     private void processInputs() {
@@ -301,8 +304,8 @@ public class UIRenderingSystem extends BaseSystem implements Disposable, Renderi
         for (ContextManager.Event event : events) {
             switch (event.getAction()) {
                 case DEBUG:
-                    gui.toggleFragment("statusbar");
-                    gui.toggleFragment("debug");
+                    guiLoader.toggleFragment("statusbar");
+                    guiLoader.toggleFragment("debug");
                     break;
                 case INVENTORY:
                     if (state.getState() == UIState.State.CRAWL) {

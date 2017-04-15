@@ -1,6 +1,5 @@
 package com.gobs.ui;
 
-import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -35,10 +34,6 @@ public abstract class GUI<Color, Font> {
                 active = "Invalid";
             }
         }
-    }
-
-    public void load(Reader file) {
-        getGUILoader().load(file);
     }
 
     private boolean isSelected(String id, float x, float y, float w, float h) {
@@ -229,22 +224,6 @@ public abstract class GUI<Color, Font> {
         return layout;
     }
 
-    public void setStringValue(String id, String field, String value) {
-        getGUILoader().setStringValue(id, field, value);
-    }
-
-    public void setIntValue(String id, String field, int value) {
-        getGUILoader().setIntValue(id, field, value);
-    }
-
-    public void setListValue(String id, String field, Iterable<String> values) {
-        getGUILoader().setListValue(id, field, values);
-    }
-
-    public int getListSelection(String id) {
-        return getGUILoader().getListSelection(id);
-    }
-
     public abstract float getMaxWidth();
 
     public abstract float getMaxHeight();
@@ -259,17 +238,7 @@ public abstract class GUI<Color, Font> {
 
     public abstract void drawImage(String res, float x, float y, float w, float h);
 
-    public abstract void showFragment(String fragment);
-
-    public abstract void enableFragment(String fragment, boolean enabled);
-
-    public abstract void toggleFragment(String fragment);
-
-    public abstract Color getColorByName(String name);
-
     public abstract void selectStyle(String name);
-
-    protected abstract GUILoader getGUILoader();
 
     protected abstract boolean isMouseDown();
 

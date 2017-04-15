@@ -13,13 +13,15 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.gobs.ui.gdx.GdxGUILoader;
 
 public class DemoApplication implements ApplicationListener, InputProcessor {
     Batch batch;
     OrthographicCamera camera;
     Viewport viewport;
 
-    DemoGUI gui;
+    protected DemoGUI gui;
+    protected GdxGUILoader guiLoader;
 
     DemoGUI getGUI() {
         return gui;
@@ -40,6 +42,8 @@ public class DemoApplication implements ApplicationListener, InputProcessor {
         batch = new SpriteBatch();
 
         gui = new DemoGUI(batch);
+        
+        guiLoader = new GdxGUILoader(gui);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
