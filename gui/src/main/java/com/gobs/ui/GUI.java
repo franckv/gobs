@@ -1,13 +1,12 @@
 package com.gobs.ui;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 public abstract class GUI<Color, Font> {
     private String hot, active;
 
     private GUILayout layout;
-    private Deque<GUILayout> layouts;
+    private GUILayout[] layouts;
+    private int layoutIdx = 0;
+    private static final int MAX_LAYOUTS = 100;
 
     protected GUIStyle<Color, Font> style;
 
@@ -15,6 +14,11 @@ public abstract class GUI<Color, Font> {
         hot = null;
         active = null;
         style = null;
+
+        layouts = new GUILayout[MAX_LAYOUTS];
+        layout = null;
+        layouts[0] = null;
+        layoutIdx = 0;
     }
 
     public void setStyle(GUIStyle<Color, Font> style) {
@@ -26,9 +30,14 @@ public abstract class GUI<Color, Font> {
     }
 
     public void begin() {
-        layout = new GUILayout("root", null, GUILayout.FlowDirection.VERTICAL, getMaxWidth(), getMaxHeight());
-        layouts = new ArrayDeque<>();
-        layouts.addFirst(layout);
+        layoutIdx = 0;
+
+        if (layouts[0] == null) {
+            layouts[0] = new GUILayout("root", null, GUILayout.FlowDirection.VERTICAL, getMaxWidth(), getMaxHeight());
+        } else {
+            layouts[0].init();
+        }
+        layout = layouts[0];
 
         hot = null;
     }
@@ -215,13 +224,19 @@ public abstract class GUI<Color, Font> {
     }
 
     private void pushLayout(GUILayout layout) {
+        layoutIdx++;
+        assert layoutIdx < MAX_LAYOUTS;
+
         this.layout = layout;
-        layouts.addFirst(layout);
+        layouts[layoutIdx] = layout;
+        //layouts.addFirst(layout);
     }
 
     private void popLayout() {
-        layouts.removeFirst();
-        layout = layouts.getFirst();
+        layoutIdx--;
+        assert layoutIdx >= 0;
+
+        layout = layouts[layoutIdx];
     }
 
     protected GUILayout createLayout(String name, GUILayout parent, GUILayout.FlowDirection direction, float width, float height) {

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gobs.ui.GUI;
-import com.gobs.ui.GUIFormat;
 import com.gobs.ui.GUIStyle;
 
 public abstract class GdxGUI extends GUI<Color, BitmapFont> {

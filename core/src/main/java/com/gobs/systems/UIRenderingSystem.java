@@ -30,7 +30,6 @@ import com.gobs.components.Position;
 import com.gobs.display.OrthographicDisplay;
 import com.gobs.input.ContextManager;
 import com.gobs.input.InputHandler;
-import com.gobs.ui.GUI;
 import com.gobs.ui.GUIStyle;
 import com.gobs.ui.GobsGUI;
 import com.gobs.ui.UIState;

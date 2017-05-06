@@ -9,6 +9,8 @@ public class GUILayout {
         NONE, HORIZONTAL, VERTICAL
     }
 
+    private String name;
+
     private String id;
 
     private int nChildren;
@@ -27,13 +29,20 @@ public class GUILayout {
     private int spacing;
 
     GUILayout(String name, GUILayout parent, GUILayout.FlowDirection flow, float maxWidth, float maxHeight) {
+        this.name = name;
+
         this.parent = parent;
-        this.nChildren = 0;
 
         this.flow = flow;
 
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
+
+        init();
+    }
+
+    public void init() {
+        this.nChildren = 0;
 
         if (parent != null) {
             parent.nChildren++;
