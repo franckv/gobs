@@ -16,12 +16,10 @@ allprojects {
     ext {
         appName = "gobs"
         gdxVersion = '1.9.6'
-        roboVMVersion = '2.1.0'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.3'
+        artemisVersion = '2.1.0'
         aiVersion = '1.8.1'
         junitVersion = '4.12'
-        mockitoVersion = "2.7.20"
+        mockitoVersion = "2.8.47"
     }
 
     repositories {
@@ -54,12 +52,12 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion:sources"
-        compile "net.onedaybeard.artemis:artemis-odb:2.1.0"
-        compile "net.onedaybeard.artemis:artemis-odb:2.1.0:sources"
-        compile "net.onedaybeard.artemis:artemis-odb-serializer:2.1.0"
-        compile "net.onedaybeard.artemis:artemis-odb-serializer:2.1.0:sources"
-        compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:2.1.0"
-        compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:2.1.0:sources"
+        compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+        compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion:sources"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer:$artemisVersion"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer:$artemisVersion:sources"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:$artemisVersion"
+        compile "net.onedaybeard.artemis:artemis-odb-serializer-json-libgdx:$artemisVersion:sources"
         testCompile "junit:junit:$junitVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
         testCompile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
